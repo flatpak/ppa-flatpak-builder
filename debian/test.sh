@@ -1,6 +1,21 @@
 #!/bin/sh
 set -e
 
+if ! bwrap --ro-bind / / /bin/true; then
+    echo "SKIP: Cannot run bwrap"
+    exit 0
+fi
+
+tmpdir="$(mktemp -d -p /var/tmp)"
+
+if ! setfattr -n user.test-xattr-support -v yes "$tmpdir"; then
+    rm -fr "$tmpdir"
+    echo "SKIP: Cannot set xattrs in /var/tmp"
+    exit 0
+fi
+
+rm -fr "$tmpdir"
+
 e=0
 dh_auto_test || e=$?
 

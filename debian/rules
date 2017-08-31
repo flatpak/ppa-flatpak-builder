@@ -4,35 +4,16 @@ export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
 
 %:
-	dh $@ --with=gir
-
-override_dh_autoreconf:
-	dh_autoreconf \
-		--as-needed \
-		debian/autogen.sh \
-		-- \
-		$(NULL)
+	dh $@
 
 override_dh_auto_configure:
 	dh_auto_configure -- \
 		--disable-silent-rules \
 		--enable-docbook-docs \
-		--enable-gtk-doc \
 		--enable-installed-tests \
 		--libexecdir=/usr/lib/flatpak \
-		--with-priv-mode=none \
-		--with-html-dir=/usr/share/doc/libflatpak-doc \
-		--with-privileged-group=sudo \
-		--with-system-bubblewrap=bwrap \
-		--with-systemdsystemunitdir=/lib/systemd/system \
+		--with-html-dir=/usr/share/doc/flatpak-builder \
 		$(NULL)
-
-override_dh_install:
-	install -d debian/tmp/etc/X11/Xsession.d
-	install -m644 debian/tmp/etc/profile.d/flatpak.sh \
-		debian/tmp/etc/X11/Xsession.d/20flatpak
-	rm -f debian/tmp/usr/lib/*/*.la
-	dh_install
 
 override_dh_missing:
 	dh_missing --fail-missing
