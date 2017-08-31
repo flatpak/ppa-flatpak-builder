@@ -1,6 +1,6 @@
-flatpak-builder (0.9.8+16+g4ff21f43-1) UNRELEASED; urgency=medium
+flatpak-builder (0.9.8+16+g4ff21f43-1) experimental; urgency=medium
 
   * New source package, taking over flatpak-builder from src:flatpak
     (Closes: #873594)
 
- -- Simon McVittie <smcv@debian.org>  Thu, 31 Aug 2017 16:47:36 +0100
+ -- Simon McVittie <smcv@debian.org>  Thu, 31 Aug 2017 19:29:25 +0100
