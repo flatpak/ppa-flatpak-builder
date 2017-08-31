@@ -1,26 +1,11 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
-/* Define if sandboxed triggers are disabled */
-#undef DISABLE_SANDBOXED_TRIGGERS
-
 /* Define to 1 if translation of program messages to the user's native
    language is requested. */
 #undef ENABLE_NLS
 
-/* Define if using seccomp */
-#undef ENABLE_SECCOMP
-
-/* Define if using xauth */
-#undef ENABLE_XAUTH
-
-/* defines how to decorate public symbols while building */
-#undef FLATPAK_EXTERN
-
 /* gettext domain */
 #undef GETTEXT_PACKAGE
-
-/* Define to 1 if you have the `archive_read_support_filter_all' function. */
-#undef HAVE_ARCHIVE_READ_SUPPORT_FILTER_ALL
 
 /* Define to 1 if you have the Mac OS X function CFLocaleCopyCurrent in the
    CoreFoundation framework. */
@@ -79,15 +64,6 @@
 /* Define to the address where bug reports for this package should be sent. */
 #undef PACKAGE_BUGREPORT
 
-/* Major version */
-#undef PACKAGE_MAJOR_VERSION
-
-/* Micro version */
-#undef PACKAGE_MICRO_VERSION
-
-/* Minor version */
-#undef PACKAGE_MINOR_VERSION
-
 /* Define to the full name of this package. */
 #undef PACKAGE_NAME
 
@@ -127,9 +103,6 @@
 # undef __EXTENSIONS__
 #endif
 
-
-/* Define if using system-helper */
-#undef USE_SYSTEM_HELPER
 
 /* Enable large inode numbers on Mac OS X 10.5.  */
 #ifndef _DARWIN_USE_64_BIT_INODE
