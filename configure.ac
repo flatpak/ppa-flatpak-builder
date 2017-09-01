@@ -15,7 +15,7 @@ AC_PREREQ([2.63])
 
 m4_define([flatpak_builder_major_version], [0])
 m4_define([flatpak_builder_minor_version], [9])
-m4_define([flatpak_builder_micro_version], [8])
+m4_define([flatpak_builder_micro_version], [9])
 m4_define([flatpak_builder_version],
           [flatpak_builder_major_version.flatpak_builder_minor_version.flatpak_builder_micro_version])
 
@@ -27,7 +27,7 @@ AC_INIT([flatpak-builder],
 
 GLIB_REQS=2.44
 OSTREE_REQS=2017.10
-FLATPAK_REQS=0.9.8
+FLATPAK_REQS=0.9.9
 
 AC_USE_SYSTEM_EXTENSIONS
 AC_SYS_LARGEFILE
