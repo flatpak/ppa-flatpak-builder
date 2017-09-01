@@ -1,11 +1,12 @@
-flatpak-builder (0.9.9-1) UNRELEASED; urgency=medium
+flatpak-builder (0.9.9-1) experimental; urgency=medium
 
   * Fix debian/watch to look at
     https://github.com/flatpak/flatpak-builder
   * New upstream release
+    - Bump flatpak dependency to 0.9.9
   * Mark patch as forwarded upstream
 
- -- Simon McVittie <smcv@debian.org>  Fri, 01 Sep 2017 16:43:58 +0100
+ -- Simon McVittie <smcv@debian.org>  Fri, 01 Sep 2017 17:23:07 +0100
 
 flatpak-builder (0.9.8+16+g4ff21f43-1) experimental; urgency=medium
 
