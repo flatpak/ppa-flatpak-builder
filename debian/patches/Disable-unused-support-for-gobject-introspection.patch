@@ -9,7 +9,7 @@ Forwarded: https://github.com/flatpak/flatpak-builder/pull/30
  1 file changed, 2 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index a344f75..66ccf52 100644
+index 949d46d..41bf267 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -170,8 +170,6 @@ if test x$enable_documentation = xyes; then
