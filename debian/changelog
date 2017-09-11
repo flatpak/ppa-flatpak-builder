@@ -4,6 +4,8 @@ flatpak-builder (0.9.9-2) UNRELEASED; urgency=medium
   * Declare compliance with Policy 4.1.0
   * d/copyright: Reinstate GPL-2+ text for one source file, which means
     the binary is effectively GPL-2+.
+  * debian/upstream/signing-key.asc: Remove. Upstream no longer routinely
+    sign releases.
 
  -- Simon McVittie <smcv@debian.org>  Fri, 08 Sep 2017 15:59:45 +0100
 
