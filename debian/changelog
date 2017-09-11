@@ -6,6 +6,8 @@ flatpak-builder (0.9.9-2) UNRELEASED; urgency=medium
     the binary is effectively GPL-2+.
   * debian/upstream/signing-key.asc: Remove. Upstream no longer routinely
     sign releases.
+  * flatpak-builder-tests: Add Breaks/Replaces on versions of
+    flatpak-tests that contain flatpak-builder tests
 
  -- Simon McVittie <smcv@debian.org>  Fri, 08 Sep 2017 15:59:45 +0100
 

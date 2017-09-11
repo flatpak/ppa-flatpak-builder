@@ -68,6 +68,10 @@ Description: Flatpak application building helper
 Package: flatpak-builder-tests
 Architecture: linux-any
 Section: misc
+Breaks:
+ flatpak-tests (<< 0.9.10),
+Replaces:
+ flatpak-tests (<< 0.9.10),
 Depends:
  attr,
  ca-certificates,
