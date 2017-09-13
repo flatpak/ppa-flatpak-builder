@@ -1,3 +1,10 @@
+flatpak-builder (0.9.11-1) UNRELEASED; urgency=medium
+
+  * New upstream release
+    - Drop all patches
+
+ -- Simon McVittie <smcv@debian.org>  Wed, 13 Sep 2017 20:37:15 +0100
+
 flatpak-builder (0.9.9-2) experimental; urgency=medium
 
   * Add patch from upstream to fix FTBFS on non-x86 non-ARM architectures
