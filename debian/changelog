@@ -1,9 +1,10 @@
-flatpak-builder (0.9.11-2) UNRELEASED; urgency=medium
+flatpak-builder (0.9.11-2) unstable; urgency=medium
 
   * Update flatpak-builder-tests' Breaks/Replaces on flatpak-tests to
     account for versions 0.9.11~builder0.9.11 and 0.9.12~builder0.9.11
+  * Upload to unstable
 
- -- Simon McVittie <smcv@debian.org>  Fri, 22 Sep 2017 19:04:25 +0100
+ -- Simon McVittie <smcv@debian.org>  Fri, 22 Sep 2017 19:05:30 +0100
 
 flatpak-builder (0.9.11-1) experimental; urgency=medium
 
