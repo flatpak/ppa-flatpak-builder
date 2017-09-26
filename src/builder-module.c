@@ -1574,8 +1574,10 @@ builder_module_build_helper (BuilderModule  *self,
 
   if (make_cmd)
     {
+      g_auto(GStrv) make_args = builder_options_get_make_args (self->build_options, context, self->make_args);
+
       if (!build (app_dir, self->name, context, source_dir, build_dir_relative, build_args, env, error,
-                  make_cmd, make_j ? make_j : skip_arg, make_l ? make_l : skip_arg, strv_arg, self->make_args, NULL))
+                  make_cmd, make_j ? make_j : skip_arg, make_l ? make_l : skip_arg, strv_arg, make_args, NULL))
         return FALSE;
     }
 
@@ -1589,9 +1591,10 @@ builder_module_build_helper (BuilderModule  *self,
 
   if (!self->no_make_install && make_cmd)
     {
+      g_auto(GStrv) make_install_args = builder_options_get_make_install_args (self->build_options, context, self->make_install_args);
       if (!build (app_dir, self->name, context, source_dir, build_dir_relative, build_args, env, error,
                   make_cmd, self->install_rule ? self->install_rule : "install",
-                  strv_arg, self->make_install_args, NULL))
+                  strv_arg, make_install_args, NULL))
         return FALSE;
     }
 
@@ -1766,9 +1769,9 @@ builder_module_checksum (BuilderModule  *self,
   builder_cache_checksum_boolean (cache, self->no_python_timestamp_fix);
   builder_cache_checksum_boolean (cache, self->cmake);
   builder_cache_checksum_boolean (cache, self->builddir);
-  builder_cache_checksum_compat_strv (cache, self->build_commands);
-  builder_cache_checksum_compat_str (cache, self->buildsystem);
-  builder_cache_checksum_compat_str (cache, self->install_rule);
+  builder_cache_checksum_strv (cache, self->build_commands);
+  builder_cache_checksum_str (cache, self->buildsystem);
+  builder_cache_checksum_str (cache, self->install_rule);
 
   if (self->build_options)
     builder_options_checksum (self->build_options, cache, context);

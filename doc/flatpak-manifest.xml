@@ -276,6 +276,14 @@
                     <listitem><para>This is an array containing extra options to pass to configure.</para></listitem>
                 </varlistentry>
                 <varlistentry>
+                    <term><option>make-args</option> (array of strings)</term>
+                    <listitem><para>An array of extra arguments that will be passed to make</para></listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><option>make-install-args</option> (array of strings)</term>
+                    <listitem><para>An array of extra arguments that will be passed to make install</para></listitem>
+                </varlistentry>
+                <varlistentry>
                     <term><option>strip</option> (boolean)</term>
                     <listitem><para>If this is true (the default is false) then all ELF files will be stripped after install.</para></listitem>
                 </varlistentry>
@@ -317,7 +325,7 @@
               are supported, and put directly into the metadata file:
               autodelete, no-autodownload, subdirectories,
               add-ld-path, download-if, enable-if, merge-dirs,
-              subdirectory-suffix, version, versions.
+              subdirectory-suffix, locale-subset, version, versions.
             </para>
         </refsect2>
         <refsect2>
@@ -512,7 +520,11 @@
                     </varlistentry>
                     <varlistentry>
                         <term><option>branch</option> (string)</term>
-                        <listitem><para>The branch/tag to use from the git repository</para></listitem>
+                        <listitem><para>The branch to use from the git repository</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><option>tag</option> (string)</term>
+                        <listitem><para>The tag to use from the git repository</para></listitem>
                     </varlistentry>
                     <varlistentry>
                         <term><option>commit</option> (string)</term>
