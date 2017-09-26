@@ -1,11 +1,11 @@
-flatpak-builder (0.9.98-1) UNRELEASED; urgency=medium
+flatpak-builder (0.9.98-1) unstable; urgency=medium
 
   * New upstream release
     - Depend on flatpak 0.9.98
   * Skip tests if bwrap cannot unshare IPC, net and PID namespaces
     (see #876743)
 
- -- Simon McVittie <smcv@debian.org>  Tue, 26 Sep 2017 09:05:20 +0100
+ -- Simon McVittie <smcv@debian.org>  Tue, 26 Sep 2017 09:51:14 +0100
 
 flatpak-builder (0.9.11-2) unstable; urgency=medium
 
