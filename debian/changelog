@@ -1,3 +1,10 @@
+flatpak-builder (0.9.98-1) UNRELEASED; urgency=medium
+
+  * New upstream release
+    - Depend on flatpak 0.9.98
+
+ -- Simon McVittie <smcv@debian.org>  Tue, 26 Sep 2017 09:05:20 +0100
+
 flatpak-builder (0.9.11-2) unstable; urgency=medium
 
   * Update flatpak-builder-tests' Breaks/Replaces on flatpak-tests to
