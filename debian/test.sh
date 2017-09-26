@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-if ! bwrap --ro-bind / / /bin/true; then
+if ! bwrap --unshare-ipc --unshare-net --unshare-pid --ro-bind / / /bin/true; then
     echo "SKIP: Cannot run bwrap"
     exit 0
 fi
