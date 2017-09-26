@@ -15,7 +15,7 @@ AC_PREREQ([2.63])
 
 m4_define([flatpak_builder_major_version], [0])
 m4_define([flatpak_builder_minor_version], [9])
-m4_define([flatpak_builder_micro_version], [11])
+m4_define([flatpak_builder_micro_version], [98])
 m4_define([flatpak_builder_version],
           [flatpak_builder_major_version.flatpak_builder_minor_version.flatpak_builder_micro_version])
 
@@ -27,7 +27,7 @@ AC_INIT([flatpak-builder],
 
 GLIB_REQS=2.44
 OSTREE_REQS=2017.10
-FLATPAK_REQS=0.9.9
+FLATPAK_REQS=0.9.13
 
 AC_USE_SYSTEM_EXTENSIONS
 AC_SYS_LARGEFILE
@@ -43,7 +43,7 @@ if test "x$FLATPAK" = xfalse; then
 else
    FLATPAK_VERSION=`$FLATPAK --version | sed 's,.*\ \([0-9]*\.[0-9]*\.[0-9]*\)$,\1,'`
    AX_COMPARE_VERSION([$FLATPAK_REQS],[gt],[$FLATPAK_VERSION],
-         AC_MSG_ERROR([You need at least version $FLATPAK_REQS of flatpak, your version is $FLATPAK_VERSION]))
+                      [AC_MSG_ERROR([You need at least version $FLATPAK_REQS of flatpak, your version is $FLATPAK_VERSION])])
 fi
 
 
@@ -90,8 +90,8 @@ AX_VALGRIND_CHECK
 PKG_PROG_PKG_CONFIG([0.24])
 
 AC_CHECK_FUNCS(fdwalk)
-AC_CHECK_HEADER([sys/xattr.h], [], AC_MSG_ERROR([You must have sys/xattr.h from glibc]))
-AC_CHECK_HEADER([sys/capability.h], have_caps=yes, AC_MSG_ERROR([sys/capability.h header not found]))
+AC_CHECK_HEADER([sys/xattr.h], [], [AC_MSG_ERROR([You must have sys/xattr.h from glibc])])
+AC_CHECK_HEADER([sys/capability.h], have_caps=yes, [AC_MSG_ERROR([sys/capability.h header not found])])
 
 PKG_CHECK_MODULES(BASE, [glib-2.0 >= $GLIB_REQS gio-2.0 gio-unix-2.0 libsoup-2.4 ostree-1 >= $OSTREE_REQS json-glib-1.0])
 

@@ -1566,7 +1566,7 @@ builder_manifest_checksum_for_finish (BuilderManifest *self,
   builder_cache_checksum_str (cache, BUILDER_MANIFEST_CHECKSUM_FINISH_VERSION);
   builder_cache_checksum_strv (cache, self->finish_args);
   builder_cache_checksum_str (cache, self->command);
-  builder_cache_checksum_compat_strv (cache, self->inherit_extensions);
+  builder_cache_checksum_strv (cache, self->inherit_extensions);
 
   for (l = self->add_extensions; l != NULL; l = l->next)
     {
@@ -2571,7 +2571,8 @@ builder_manifest_finish (BuilderManifest *self,
           extension_contents = g_strdup_printf ("\n"
                                                 "[Extension %s]\n"
                                                 "directory=%s\n"
-                                                "autodelete=true\n",
+                                                "autodelete=true\n"
+                                                "locale-subset=true\n",
                                                 locale_id,
                                                 LOCALES_SEPARATE_DIR);
 
@@ -2832,8 +2833,6 @@ builder_manifest_create_platform (BuilderManifest *self,
       if (changes == NULL)
         return FALSE;
 
-      g_ptr_array_sort (changes, cmpstringp);
-
       for (i = 0; i < changes->len; i++)
         {
           const char *changed = g_ptr_array_index (changes, i);
@@ -2942,7 +2941,8 @@ builder_manifest_create_platform (BuilderManifest *self,
           extension_contents = g_strdup_printf ("\n"
                                                 "[Extension %s]\n"
                                                 "directory=%s\n"
-                                                "autodelete=true\n",
+                                                "autodelete=true\n"
+                                                "locale-subset=true\n",
                                                 locale_id,
                                                 LOCALES_SEPARATE_DIR);
 
@@ -3254,6 +3254,7 @@ builder_manifest_run (BuilderManifest *self,
   g_ptr_array_add (args, g_strdup ("flatpak"));
   g_ptr_array_add (args, g_strdup ("build"));
   g_ptr_array_add (args, g_strdup ("--die-with-parent"));
+  g_ptr_array_add (args, g_strdup ("--with-appdir"));
 
   build_dir_path = g_file_get_path (builder_context_get_build_dir (context));
   g_ptr_array_add (args, g_strdup_printf ("--bind-mount=/run/%s=%s",
