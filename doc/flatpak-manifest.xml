@@ -191,6 +191,10 @@
                     <term><option>cleanup-platform-commands</option> (array of strings)</term>
                     <listitem><para>An array of commandlines that are run during the cleanup phase of the platform.</para></listitem>
                 </varlistentry>
+                <varlistentry>
+                    <term><option>prepare-platform-commands</option> (array of strings)</term>
+                    <listitem><para>An array of commandlines that are run after importing the base platform, but before applying the new files from the sdk. This is a good place to e.g. delete things from the base that may conflict with the files added in the sdk. </para></listitem>
+                </varlistentry>
                <varlistentry>
                     <term><option>finish-args</option> (array of strings)</term>
                     <listitem><para>An array of arguments passed to the <command>flatpak build-finish</command> command.</para></listitem>
@@ -206,6 +210,15 @@
                 <varlistentry>
                     <term><option>rename-icon</option> (string)</term>
                     <listitem><para>Any icon with this name will be renamed to a name based on id during the cleanup phase. Note that this is the icon name, not the full filenames, so it should not include a filename extension. </para></listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><option>appdata-license</option> (string)</term>
+                    <listitem><para>Replace the appdata
+                    project_license field with this string. This is
+                    useful as the upstream license is typically only
+                    about the application itself, whereas the bundled
+                    app can contain other licenses
+                    too. </para></listitem>
                 </varlistentry>
                 <varlistentry>
                     <term><option>copy-icon</option> (boolean)</term>
@@ -291,6 +304,10 @@
                     <term><option>no-debuginfo</option> (boolean)</term>
                     <listitem><para>By default (if strip is not true) flatpak-builder extracts all debug info in ELF files to a separate files
                     and puts this in an extension. If you want to disable this, set no-debuginfo to true.</para></listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><option>no-debuginfo-compression</option> (boolean)</term>
+                    <listitem><para>By default when extracting debuginfo we compress the debug sections. If you want to disable this, set no-debuginfo-compression to true.</para></listitem>
                 </varlistentry>
                 <varlistentry>
                     <term><option>arch</option> (object)</term>
@@ -637,6 +654,35 @@
                     <varlistentry>
                         <term><option>options</option> (array of strings)</term>
                         <listitem><para>Extra options to pass to the patch command.</para></listitem>
+                    </varlistentry>
+                </variablelist>
+            </refsect3>
+            <refsect3>
+                <title>Extra data sources</title>
+                <variablelist>
+                    <varlistentry>
+                        <term><option>type</option></term>
+                        <listitem><para>"extra-data"</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><option>filename</option> (string)</term>
+                        <listitem><para>The name to use for the downloaded extra data</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><option>url</option> (string)</term>
+                        <listitem><para>The url to the extra data.</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><option>sha256</option> (string)</term>
+                        <listitem><para>The sha256 of the extra data.</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><option>size</option> (string)</term>
+                        <listitem><para>The size of the extra data.</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><option>installed-size</option> (string)</term>
+                        <listitem><para>The extra installed size this adds to the app (optional).</para></listitem>
                     </varlistentry>
                 </variablelist>
             </refsect3>

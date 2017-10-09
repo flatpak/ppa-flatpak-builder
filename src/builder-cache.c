@@ -1005,6 +1005,53 @@ get_changes (BuilderCache *self,
 }
 
 
+/* This returns removals too */
+static GPtrArray *
+get_all_changes (BuilderCache *self,
+                 GFile       *from,
+                 GFile       *to,
+                 GError      **error)
+{
+  g_autoptr(GPtrArray) added = g_ptr_array_new_with_free_func (g_object_unref);
+  g_autoptr(GPtrArray) modified = g_ptr_array_new_with_free_func ((GDestroyNotify) ostree_diff_item_unref);
+  g_autoptr(GPtrArray) removed = g_ptr_array_new_with_free_func (g_object_unref);
+  g_autoptr(GPtrArray) changed_paths = g_ptr_array_new_with_free_func (g_free);
+  int i;
+
+  if (!ostree_diff_dirs (OSTREE_DIFF_FLAGS_NONE,
+                         from,
+                         to,
+                         modified,
+                         removed,
+                         added,
+                         NULL, error))
+    return NULL;
+
+  for (i = 0; i < added->len; i++)
+    {
+      char *path = g_file_get_relative_path (to, g_ptr_array_index (added, i));
+      g_ptr_array_add (changed_paths, path);
+    }
+
+  for (i = 0; i < modified->len; i++)
+    {
+      OstreeDiffItem *modified_item = g_ptr_array_index (modified, i);
+      char *path = g_file_get_relative_path (to, modified_item->target);
+      g_ptr_array_add (changed_paths, path);
+    }
+
+  for (i = 0; i < removed->len; i++)
+    {
+      char *path = g_file_get_relative_path (to, g_ptr_array_index (removed, i));
+      g_ptr_array_add (changed_paths, path);
+    }
+
+  g_ptr_array_sort (changed_paths, cmpstringp);
+
+  return g_steal_pointer (&changed_paths);
+}
+
+/* This returns removals too */
 GPtrArray *
 builder_cache_get_all_changes (BuilderCache *self,
                                GError      **error)
@@ -1028,7 +1075,7 @@ builder_cache_get_all_changes (BuilderCache *self,
   if (!ostree_repo_read_commit (self->repo, finish_commit, &finish_root, NULL, NULL, error))
     return NULL;
 
-  return get_changes (self, init_root, finish_root, error);
+  return get_all_changes (self, init_root, finish_root, error);
 }
 
 static GPtrArray   *
@@ -1037,8 +1084,6 @@ builder_cache_get_changes_to (BuilderCache *self,
                               GError      **error)
 {
   g_autoptr(GFile) parent_root = NULL;
-  g_autoptr(GVariant) variant = NULL;
-  g_autofree char *parent_commit = NULL;
 
   if (self->last_parent != NULL &&
       !ostree_repo_read_commit (self->repo, self->last_parent, &parent_root, NULL, NULL, error))
@@ -1237,6 +1282,24 @@ builder_cache_checksum_uint32 (BuilderCache *self,
   v[2] = (val >> 16) & 0xff;
   v[3] = (val >> 24) & 0xff;
   g_checksum_update (self->checksum, v, 4);
+}
+
+void
+builder_cache_checksum_uint64 (BuilderCache *self,
+                               guint64       val)
+{
+  guchar v[8];
+
+  v[0] = (val >> 0) & 0xff;
+  v[1] = (val >> 8) & 0xff;
+  v[2] = (val >> 16) & 0xff;
+  v[3] = (val >> 24) & 0xff;
+  v[4] = (val >> 32) & 0xff;
+  v[5] = (val >> 40) & 0xff;
+  v[6] = (val >> 48) & 0xff;
+  v[7] = (val >> 56) & 0xff;
+
+  g_checksum_update (self->checksum, v, 8);
 }
 
 void
