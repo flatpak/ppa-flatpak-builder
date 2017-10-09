@@ -6,6 +6,9 @@ if ! bwrap --unshare-ipc --unshare-net --unshare-pid --ro-bind / / /bin/true; th
     exit 0
 fi
 
+# The tests want /sbin/ldconfig to be in PATH
+export PATH="$PATH:/usr/sbin:/sbin"
+
 tmpdir="$(mktemp -d -p /var/tmp)"
 
 if ! setfattr -n user.test-xattr-support -v yes "$tmpdir"; then

@@ -3,12 +3,15 @@
 set -e
 exec 2>&1
 
-e=0
+# The tests want /sbin/ldconfig to be in PATH
+export PATH="$PATH:/usr/sbin:/sbin"
 
 # Don't pollute the home directory unless this looks like a dedicated
 # autopkgtest environment
-if [ "$(id -nu)" = adt ]; then
-	install -d ~/.flatpak-tests/
-fi
+case "$(id -nu)" in
+	(adt|debci)
+		install -d ~/.flatpak-tests/
+		;;
+esac
 
 exec gnome-desktop-testing-runner flatpak-builder

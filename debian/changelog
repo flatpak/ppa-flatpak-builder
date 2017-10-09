@@ -2,6 +2,10 @@ flatpak-builder (0.9.99-1) UNRELEASED; urgency=medium
 
   * New upstream release
     - Build-depend on libxml 2.4
+  * Update test wrapper scripts from flatpak 0.9.99-1
+    - Make sure /sbin/ldconfig is in PATH
+    - Remove an unused variable
+    - Treat debci as a test-specific user
 
  -- Simon McVittie <smcv@debian.org>  Mon, 09 Oct 2017 14:13:50 +0100
 
