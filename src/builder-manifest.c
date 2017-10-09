@@ -34,6 +34,8 @@
 #include "builder-post-process.h"
 #include "builder-extension.h"
 
+#include <libxml/parser.h>
+
 #include "libglnx/libglnx.h"
 
 #define LOCALES_SEPARATE_DIR "share/runtime/locale"
@@ -78,11 +80,13 @@ struct BuilderManifest
   char          **cleanup_commands;
   char          **cleanup_platform;
   char          **cleanup_platform_commands;
+  char          **prepare_platform_commands;
   char          **finish_args;
   char          **inherit_extensions;
   char          **tags;
   char           *rename_desktop_file;
   char           *rename_appdata_file;
+  char           *appdata_license;
   char           *rename_icon;
   gboolean        copy_icon;
   char           *desktop_file_name_prefix;
@@ -135,6 +139,7 @@ enum {
   PROP_CLEANUP_COMMANDS,
   PROP_CLEANUP_PLATFORM_COMMANDS,
   PROP_CLEANUP_PLATFORM,
+  PROP_PREPARE_PLATFORM_COMMANDS,
   PROP_BUILD_RUNTIME,
   PROP_BUILD_EXTENSION,
   PROP_SEPARATE_LOCALES,
@@ -147,6 +152,7 @@ enum {
   PROP_TAGS,
   PROP_RENAME_DESKTOP_FILE,
   PROP_RENAME_APPDATA_FILE,
+  PROP_APPDATA_LICENSE,
   PROP_RENAME_ICON,
   PROP_COPY_ICON,
   PROP_DESKTOP_FILE_NAME_PREFIX,
@@ -184,11 +190,13 @@ builder_manifest_finalize (GObject *object)
   g_strfreev (self->cleanup_commands);
   g_strfreev (self->cleanup_platform);
   g_strfreev (self->cleanup_platform_commands);
+  g_strfreev (self->prepare_platform_commands);
   g_strfreev (self->finish_args);
   g_strfreev (self->inherit_extensions);
   g_strfreev (self->tags);
   g_free (self->rename_desktop_file);
   g_free (self->rename_appdata_file);
+  g_free (self->appdata_license);
   g_free (self->rename_icon);
   g_free (self->desktop_file_name_prefix);
   g_free (self->desktop_file_name_suffix);
@@ -347,6 +355,10 @@ builder_manifest_get_property (GObject    *object,
       g_value_set_boxed (value, self->cleanup_platform_commands);
       break;
 
+    case PROP_PREPARE_PLATFORM_COMMANDS:
+      g_value_set_boxed (value, self->prepare_platform_commands);
+      break;
+
     case PROP_FINISH_ARGS:
       g_value_set_boxed (value, self->finish_args);
       break;
@@ -397,6 +409,10 @@ builder_manifest_get_property (GObject    *object,
 
     case PROP_RENAME_APPDATA_FILE:
       g_value_set_string (value, self->rename_appdata_file);
+      break;
+
+    case PROP_APPDATA_LICENSE:
+      g_value_set_string (value, self->appdata_license);
       break;
 
     case PROP_RENAME_ICON:
@@ -557,6 +573,12 @@ builder_manifest_set_property (GObject      *object,
       g_strfreev (tmp);
       break;
 
+    case PROP_PREPARE_PLATFORM_COMMANDS:
+      tmp = self->prepare_platform_commands;
+      self->prepare_platform_commands = g_strdupv (g_value_get_boxed (value));
+      g_strfreev (tmp);
+      break;
+
     case PROP_FINISH_ARGS:
       tmp = self->finish_args;
       self->finish_args = g_strdupv (g_value_get_boxed (value));
@@ -619,6 +641,11 @@ builder_manifest_set_property (GObject      *object,
     case PROP_RENAME_APPDATA_FILE:
       g_free (self->rename_appdata_file);
       self->rename_appdata_file = g_value_dup_string (value);
+      break;
+
+    case PROP_APPDATA_LICENSE:
+      g_free (self->appdata_license);
+      self->appdata_license = g_value_dup_string (value);
       break;
 
     case PROP_RENAME_ICON:
@@ -822,6 +849,13 @@ builder_manifest_class_init (BuilderManifestClass *klass)
                                                        G_TYPE_STRV,
                                                        G_PARAM_READWRITE));
   g_object_class_install_property (object_class,
+                                   PROP_PREPARE_PLATFORM_COMMANDS,
+                                   g_param_spec_boxed ("prepare-platform-commands",
+                                                       "",
+                                                       "",
+                                                       G_TYPE_STRV,
+                                                       G_PARAM_READWRITE));
+  g_object_class_install_property (object_class,
                                    PROP_FINISH_ARGS,
                                    g_param_spec_boxed ("finish-args",
                                                        "",
@@ -901,6 +935,13 @@ builder_manifest_class_init (BuilderManifestClass *klass)
   g_object_class_install_property (object_class,
                                    PROP_RENAME_APPDATA_FILE,
                                    g_param_spec_string ("rename-appdata-file",
+                                                        "",
+                                                        "",
+                                                        NULL,
+                                                        G_PARAM_READWRITE));
+  g_object_class_install_property (object_class,
+                                   PROP_APPDATA_LICENSE,
+                                   g_param_spec_string ("appdata-license",
                                                         "",
                                                         "",
                                                         NULL,
@@ -1543,6 +1584,7 @@ builder_manifest_checksum_for_cleanup (BuilderManifest *self,
   builder_cache_checksum_strv (cache, self->cleanup_commands);
   builder_cache_checksum_str (cache, self->rename_desktop_file);
   builder_cache_checksum_str (cache, self->rename_appdata_file);
+  builder_cache_checksum_str (cache, self->appdata_license);
   builder_cache_checksum_str (cache, self->rename_icon);
   builder_cache_checksum_boolean (cache, self->copy_icon);
   builder_cache_checksum_str (cache, self->desktop_file_name_prefix);
@@ -1611,6 +1653,7 @@ builder_manifest_checksum_for_platform (BuilderManifest *self,
   builder_cache_checksum_str (cache, self->metadata_platform);
   builder_cache_checksum_strv (cache, self->cleanup_platform);
   builder_cache_checksum_strv (cache, self->cleanup_platform_commands);
+  builder_cache_checksum_strv (cache, self->prepare_platform_commands);
   builder_cache_checksum_strv (cache, self->platform_extensions);
 
   if (self->metadata_platform)
@@ -2028,6 +2071,97 @@ strcatv (char **strv1,
     return retval;
 }
 
+static gboolean
+rewrite_appdata (GFile *file,
+                 const char *license,
+                 GError **error)
+{
+  g_autofree gchar *data = NULL;
+  gsize data_len;
+  g_autoptr(xmlDoc) doc = NULL;
+  xml_autofree xmlChar *xmlbuff = NULL;
+  int buffersize;
+  xmlNode *root_element, *component_node;
+
+  if (!g_file_load_contents (file, NULL, &data, &data_len, NULL, error))
+    return FALSE;
+
+  doc = xmlReadMemory (data, data_len, NULL, NULL,  0);
+  if (doc == NULL)
+    return flatpak_fail (error, _("Error parsing appstream"));
+
+  root_element = xmlDocGetRootElement (doc);
+
+  for (component_node = root_element; component_node; component_node = component_node->next)
+    {
+      xmlNode *sub_node = NULL;
+      xmlNode *license_node = NULL;
+
+      if (component_node->type != XML_ELEMENT_NODE ||
+          strcmp ((char *)component_node->name, "component") != 0)
+        continue;
+
+      for (sub_node = component_node->children; sub_node; sub_node = sub_node->next)
+        {
+          if (sub_node->type != XML_ELEMENT_NODE ||
+              strcmp ((char *)sub_node->name, "project_license") != 0)
+            continue;
+
+          license_node = sub_node;
+          break;
+        }
+
+      if (license_node)
+        xmlNodeSetContent(license_node, (xmlChar *)license);
+      else
+        xmlNewChild(component_node, NULL, (xmlChar *)"project_license", (xmlChar *)license);
+    }
+
+  xmlDocDumpFormatMemory (doc, &xmlbuff, &buffersize, 1);
+
+  if (!g_file_set_contents (flatpak_file_get_path_cached (file),
+                            (gchar *)xmlbuff, buffersize,
+                            error))
+    return FALSE;
+
+  return TRUE;
+}
+
+static GFile *
+builder_manifest_find_appdata_file (BuilderManifest *self,
+				    GFile *app_root)
+{
+  const char *extensions[] = {
+    ".metainfo.xml",
+    ".appdata.xml",
+  };
+  const char *dirs[] = {
+    "share/metainfo",
+    "share/appdata",
+  };
+  g_autoptr(GFile) source = NULL;
+
+  int i, j;
+  for (j = 0; j < G_N_ELEMENTS (dirs); j++)
+    {
+      g_autoptr(GFile) appdata_dir = g_file_resolve_relative_path (app_root, dirs[j]);
+      for (i = 0; i < G_N_ELEMENTS (extensions); i++)
+	{
+	  g_autofree char *basename = NULL;
+
+	  if (self->rename_appdata_file != NULL)
+	    basename = g_strdup (self->rename_appdata_file);
+	  else
+	    basename = g_strconcat (self->id, extensions[i], NULL);
+
+	  source = g_file_get_child (appdata_dir, basename);
+	  if (g_file_query_exists (source, NULL))
+	    return g_steal_pointer (&source);
+	}
+    }
+  return NULL;
+}
+
 gboolean
 builder_manifest_cleanup (BuilderManifest *self,
                           BuilderCache    *cache,
@@ -2037,8 +2171,6 @@ builder_manifest_cleanup (BuilderManifest *self,
   g_autoptr(GFile) app_root = NULL;
   GList *l;
   g_auto(GStrv) env = NULL;
-  g_autoptr(GFile) appdata_dir = NULL;
-  g_autofree char *appdata_basename = NULL;
   g_autoptr(GFile) appdata_file = NULL;
   g_autoptr(GFile) appdata_source = NULL;
   int i;
@@ -2101,24 +2233,32 @@ builder_manifest_cleanup (BuilderManifest *self,
 
       app_root = g_file_get_child (app_dir, "files");
 
-      appdata_basename = g_strdup_printf ("%s.appdata.xml", self->id);
-      appdata_dir = g_file_resolve_relative_path (app_root, "share/appdata");
-      appdata_source = g_file_get_child (appdata_dir, self->rename_appdata_file ? self->rename_appdata_file : appdata_basename);
-      if (!g_file_query_exists (appdata_source, NULL))
-        {
-          g_object_unref (appdata_dir);
-          appdata_dir = g_file_resolve_relative_path (app_root, "share/metainfo");
-        }
-      appdata_file = g_file_get_child (appdata_dir, appdata_basename);
+      appdata_source = builder_manifest_find_appdata_file (self, app_root);
+      if (appdata_source)
+	{
+	  /* We always use the old name / dir, in case the runtime has older appdata tools */
+	  g_autoptr(GFile) appdata_dir = g_file_resolve_relative_path (app_root, "share/appdata");
+	  g_autofree char *appdata_basename = g_strdup_printf ("%s.appdata.xml", self->id);
 
-      if (self->rename_appdata_file != NULL)
-        {
-          g_autoptr(GFile) src = g_file_get_child (appdata_dir, self->rename_appdata_file);
+	  appdata_file = g_file_get_child (appdata_dir, appdata_basename);
 
-          g_print ("Renaming %s to %s\n", self->rename_appdata_file, appdata_basename);
-          if (!g_file_move (src, appdata_file, 0, NULL, NULL, NULL, error))
-            return FALSE;
-        }
+	  if (!g_file_equal (appdata_source, appdata_file))
+	    {
+	      g_autofree char *src_basename = g_file_get_basename (appdata_source);
+	      g_print ("Renaming %s to share/appdata/%s\n", src_basename, appdata_basename);
+
+              if (!flatpak_mkdir_p (appdata_dir, NULL, error))
+                return FALSE;
+	      if (!g_file_move (appdata_source, appdata_file, 0, NULL, NULL, NULL, error))
+		return FALSE;
+	    }
+
+	  if (self->appdata_license != NULL && self->appdata_license[0] != 0)
+	    {
+	      if (!rewrite_appdata (appdata_file, self->appdata_license, error))
+		return FALSE;
+	    }
+	}
 
       if (self->rename_desktop_file != NULL)
         {
@@ -2131,7 +2271,7 @@ builder_manifest_cleanup (BuilderManifest *self,
           if (!g_file_move (src, dest, 0, NULL, NULL, NULL, error))
             return FALSE;
 
-          if (g_file_query_exists (appdata_file, NULL))
+          if (appdata_file != NULL)
             {
               g_autofree char *contents;
               const char *to_replace;
@@ -2277,8 +2417,7 @@ builder_manifest_cleanup (BuilderManifest *self,
             return FALSE;
         }
 
-      if (self->appstream_compose &&
-          g_file_query_exists (appdata_file, NULL))
+      if (self->appstream_compose && appdata_file != NULL)
         {
           g_autofree char *basename_arg = g_strdup_printf ("--basename=%s", self->id);
           g_print ("Running appstream-compose\n");
@@ -2492,6 +2631,12 @@ builder_manifest_finish (BuilderManifest *self,
 
       for (l = self->add_extensions; l != NULL; l = l->next)
         builder_extension_add_finish_args (l->data, args);
+
+      for (l = self->expanded_modules; l != NULL; l = l->next)
+        {
+          BuilderModule *m = l->data;
+          builder_module_finish_sources (m, args, context);
+        }
 
       g_ptr_array_add (args, g_file_get_path (app_dir));
       g_ptr_array_add (args, NULL);
@@ -2822,6 +2967,22 @@ builder_manifest_create_platform (BuilderManifest *self,
             }
         }
 
+      if (self->prepare_platform_commands)
+        {
+          g_auto(GStrv) env = builder_options_get_env (self->build_options, context);
+          g_auto(GStrv) build_args = builder_options_get_build_args (self->build_options, context, error);
+          if (!build_args)
+            return FALSE;
+          char *platform_args[] = { "--sdk-dir=platform", "--metadata=metadata.platform", NULL };
+          g_auto(GStrv) extra_args = strcatv (build_args, platform_args);
+
+          for (i = 0; self->prepare_platform_commands[i] != NULL; i++)
+            {
+              if (!command (app_dir, env, extra_args, self->prepare_platform_commands[i], error))
+                return FALSE;
+            }
+        }
+
       for (l = self->expanded_modules; l != NULL; l = l->next)
         {
           BuilderModule *m = l->data;
@@ -2829,6 +2990,7 @@ builder_manifest_create_platform (BuilderManifest *self,
           builder_module_cleanup_collect (m, TRUE, context, to_remove_ht);
         }
 
+      /* This returns both additiona and removals */
       changes = builder_cache_get_all_changes (cache, error);
       if (changes == NULL)
         return FALSE;
@@ -2848,27 +3010,39 @@ builder_manifest_create_platform (BuilderManifest *self,
               !g_str_equal (changed, "usr/lib/debug/app"))
             continue;
 
-          if (g_hash_table_contains (to_remove_ht, changed))
-            {
-              g_print ("Ignoring %s\n", changed);
-              continue;
-            }
-
           src = g_file_resolve_relative_path (app_dir, changed);
           dest = g_file_resolve_relative_path (platform_dir, changed + strlen ("usr/"));
 
           info = g_file_query_info (src, "standard::type,standard::symlink-target",
                                     G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
                                     NULL, &my_error);
-          if (info == NULL)
+          if (info == NULL &&
+              !g_error_matches (my_error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
             {
-              if (g_error_matches (my_error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
-                continue;
-
               g_propagate_error (error, g_steal_pointer (&my_error));
               return FALSE;
             }
           g_clear_error (&my_error);
+
+          if (info == NULL)
+            {
+              /* File was removed from sdk, remove from platform also if it exists there */
+
+              if (!g_file_delete (dest, NULL, &my_error) &&
+                  !g_error_matches (my_error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
+                {
+                  g_propagate_error (error, g_steal_pointer (&my_error));
+                  return FALSE;
+                }
+
+              continue;
+            }
+
+          if (g_hash_table_contains (to_remove_ht, changed))
+            {
+              g_print ("Ignoring %s\n", changed);
+              continue;
+            }
 
           if (g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY)
             {
