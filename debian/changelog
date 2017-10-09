@@ -6,8 +6,9 @@ flatpak-builder (0.9.99-1) unstable; urgency=medium
     - Make sure /sbin/ldconfig is in PATH
     - Remove an unused variable
     - Treat debci as a test-specific user
+  * Standards-Version: 4.1.1 (no changes required)
 
- -- Simon McVittie <smcv@debian.org>  Mon, 09 Oct 2017 14:15:26 +0100
+ -- Simon McVittie <smcv@debian.org>  Mon, 09 Oct 2017 14:17:02 +0100
 
 flatpak-builder (0.9.98-1) unstable; urgency=medium
 
