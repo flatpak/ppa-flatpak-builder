@@ -1,6 +1,7 @@
 flatpak-builder (0.9.99-1) UNRELEASED; urgency=medium
 
   * New upstream release
+    - Build-depend on libxml 2.4
 
  -- Simon McVittie <smcv@debian.org>  Mon, 09 Oct 2017 14:13:50 +0100
 

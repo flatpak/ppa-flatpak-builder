@@ -30,6 +30,7 @@ Build-Depends:
  libjson-glib-dev,
  libostree-dev (>= 2017.10),
  libsoup2.4-dev,
+ libxml2-dev (>= 2.4),
  ostree <!nocheck>,
  procps,
  python3,
