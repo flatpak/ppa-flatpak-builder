@@ -1,3 +1,9 @@
+flatpak-builder (0.9.99-2) UNRELEASED; urgency=medium
+
+  * Remove unused override for --with-html-dir
+
+ -- Simon McVittie <smcv@debian.org>  Mon, 16 Oct 2017 10:26:41 +0100
+
 flatpak-builder (0.9.99-1) unstable; urgency=medium
 
   * New upstream release
