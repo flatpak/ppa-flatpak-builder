@@ -6,12 +6,21 @@ export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
 %:
 	dh $@
 
+configure_options =
+
+ifneq ($(filter nodoc,$(DEB_BUILD_OPTIONS)),)
+configure_options += --disable-docbook-docs
+configure_options += --disable-documentation
+else
+configure_options += --enable-docbook-docs
+configure_options += --enable-documentation
+endif
+
 override_dh_auto_configure:
 	dh_auto_configure -- \
-		--enable-docbook-docs \
 		--enable-installed-tests \
 		--libexecdir=/usr/lib/flatpak \
-		$(NULL)
+		$(configure_options)
 
 override_dh_missing:
 	dh_missing --fail-missing
