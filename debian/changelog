@@ -1,7 +1,10 @@
-flatpak-builder (0.9.99-2) UNRELEASED; urgency=medium
+flatpak-builder (0.10.0-1) UNRELEASED; urgency=medium
 
   * d/watch: Track stable-branches (x.y.z where y is even), and fix to
     cope with multi-digit minor versions
+  * New upstream stable release 0.10.0
+    - Increase ostree dependency to 2017.12
+    - Increase flatpak dependency to 0.10.0
   * Remove unused override for --with-html-dir
   * Do not force --disable-silent-rules, debhelper does this now
   * Disable documentation generation under nodoc DEB_BUILD_OPTIONS
