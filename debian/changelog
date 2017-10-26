@@ -1,4 +1,4 @@
-flatpak-builder (0.10.0-1) UNRELEASED; urgency=medium
+flatpak-builder (0.10.0-1) unstable; urgency=medium
 
   * d/watch: Track stable-branches (x.y.z where y is even), and fix to
     cope with multi-digit minor versions
@@ -9,7 +9,7 @@ flatpak-builder (0.10.0-1) UNRELEASED; urgency=medium
   * Do not force --disable-silent-rules, debhelper does this now
   * Disable documentation generation under nodoc DEB_BUILD_OPTIONS
 
- -- Simon McVittie <smcv@debian.org>  Mon, 16 Oct 2017 10:26:41 +0100
+ -- Simon McVittie <smcv@debian.org>  Thu, 26 Oct 2017 12:41:56 +0100
 
 flatpak-builder (0.9.99-1) unstable; urgency=medium
 
