@@ -1,3 +1,9 @@
+flatpak-builder (0.10.1-1) UNRELEASED; urgency=medium
+
+  * New upstream release
+
+ -- Simon McVittie <smcv@debian.org>  Fri, 27 Oct 2017 12:25:48 +0100
+
 flatpak-builder (0.10.0-1) unstable; urgency=medium
 
   * d/watch: Track stable-branches (x.y.z where y is even), and fix to
