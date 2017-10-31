@@ -50,12 +50,110 @@ git (GFile   *dir,
   return res;
 }
 
+static gboolean
+cp (GError **error,
+     ...)
+{
+  gboolean res;
+  va_list ap;
+
+  va_start (ap, error);
+  res = flatpak_spawn (NULL, NULL, 0, error, "cp", ap);
+  va_end (ap);
+
+  return res;
+}
+
+static gboolean
+git_get_version (GError **error,
+                 int *major,
+                 int *minor,
+                 int *micro,
+                 int *extra)
+{
+  g_autofree char *output = NULL;
+  char *p;
+
+  *major = *minor = *micro = *extra = 0;
+
+  if (!git (NULL, &output, 0, error,
+            "--version", NULL))
+    return FALSE;
+
+  /* Trim trailing whitespace */
+  g_strchomp (output);
+
+  if (!g_str_has_prefix (output, "git version "))
+    return flatpak_fail (error, "Unexpected git --version output");
+
+  p = output + strlen ("git version ");
+
+  *major = strtol (p, &p, 10);
+  while (*p == '.')
+    p++;
+  *minor = strtol (p, &p, 10);
+  while (*p == '.')
+    p++;
+  *micro = strtol (p, &p, 10);
+  while (*p == '.')
+    p++;
+  *extra = strtol (p, &p, 10);
+  while (*p == '.')
+    p++;
+
+  return TRUE;
+}
+
+static gboolean
+git_has_version (int major,
+                 int minor,
+                 int micro,
+                 int extra)
+{
+  g_autoptr(GError) error = NULL;
+  int git_major, git_minor, git_micro, git_extra;
+
+  if (!git_get_version (&error, &git_major, &git_minor, &git_micro, &git_extra))
+    {
+      g_warning ("Failed to get git version: %s\n", error->message);
+      return FALSE;
+    }
+
+  g_debug ("Git version: %d.%d.%d.%d", git_major, git_minor, git_micro, git_extra);
+
+  if (git_major > major)
+    return TRUE;
+  if (git_major < major)
+    return FALSE;
+  /* git_major == major */
+
+  if (git_minor > minor)
+    return TRUE;
+  if (git_minor < minor)
+    return FALSE;
+  /* git_minor == minor */
+
+  if (git_micro > micro)
+    return TRUE;
+  if (git_micro < micro)
+    return FALSE;
+  /* git_micro == micro */
+
+  if (git_extra > extra)
+    return TRUE;
+  if (git_extra < extra)
+    return FALSE;
+  /* git_extra == extra */
+
+  return TRUE;
+}
+
 static GHashTable *
 git_ls_remote (GFile *repo_dir,
                const char *remote,
                GError **error)
 {
-  char *output = NULL;
+  g_autofree char *output = NULL;
   g_autoptr(GHashTable) refs = NULL;
   g_auto(GStrv) lines = NULL;
   int i;
@@ -81,7 +179,6 @@ lookup_full_ref (GHashTable *refs, const char *ref)
 {
   int i;
   const char *prefixes[] = {
-    "",
     "refs/",
     "refs/tags/",
     "refs/heads/"
@@ -102,7 +199,8 @@ lookup_full_ref (GHashTable *refs, const char *ref)
       const char *key_ref = key;
       const char *commit = value;
 
-      if (g_ascii_strncasecmp (commit, ref, strlen (ref)) == 0)
+      if (g_str_has_prefix (key_ref, "refs/") &&
+          g_ascii_strncasecmp (commit, ref, strlen (ref)) == 0)
         {
           char *full_ref = g_strdup (key_ref);
           if (g_str_has_suffix (full_ref, "^{}"))
@@ -329,6 +427,8 @@ builder_git_mirror_repo (const char     *repo_location,
   gboolean was_shallow = FALSE;
   gboolean do_disable_shallow = FALSE;
 
+  gboolean git_supports_fsck_and_shallow = git_has_version (1,8,3,2);
+
   cache_mirror_dir = git_get_mirror_dir (repo_location, context);
 
   if (destination_path != NULL)
@@ -410,7 +510,7 @@ builder_git_mirror_repo (const char     *repo_location,
         }
 
       if (!git (mirror_dir, NULL, 0, error,
-                "config", "transfer.fsckObjects", disable_fsck ? "0" : "1", NULL))
+                "config", "transfer.fsckObjects", (disable_fsck || (!git_supports_fsck_and_shallow && !do_disable_shallow)) ? "0" : "1", NULL))
         return FALSE;
 
       if (!do_disable_shallow)
@@ -668,14 +768,24 @@ builder_git_checkout_dir (const char     *repo_location,
   g_autoptr(GFile) mirror_dir = NULL;
   g_autofree char *mirror_dir_path = NULL;
   g_autofree char *dest_path = NULL;
+  g_autofree char *dest_path_git = NULL;
 
   mirror_dir = git_get_mirror_dir (repo_location, context);
 
   mirror_dir_path = g_file_get_path (mirror_dir);
   dest_path = g_file_get_path (dest);
+  dest_path_git = g_build_filename (dest_path, ".git", NULL);
 
-  if (!git (NULL, NULL, 0, error,
-            "clone", "-n", mirror_dir_path, dest_path, NULL))
+  g_mkdir_with_parents (dest_path, 0755);
+
+  if (!cp (error,
+           "-al",
+           mirror_dir_path, dest_path_git, NULL))
+    return FALSE;
+
+  /* Then we need to convert to regular */
+  if (!git (dest, NULL, 0, error,
+            "config", "--bool", "core.bare", "false", NULL))
     return FALSE;
 
   if (!git (dest, NULL, 0, error,
@@ -703,11 +813,11 @@ builder_git_checkout (const char     *repo_location,
   dest_path = g_file_get_path (dest);
   dest_path_git = g_build_filename (dest_path, ".git", NULL);
 
-  /* We need to clone with --mirror so that we get all refs, including non-branch/tags */
-  if (!git (NULL, NULL, 0, error,
-            "clone",
-            "--mirror",
-            mirror_dir_path, dest_path_git, NULL))
+  g_mkdir_with_parents (dest_path, 0755);
+
+  if (!cp (error,
+           "-al",
+           mirror_dir_path, dest_path_git, NULL))
     return FALSE;
 
   /* Then we need to convert to regular */
@@ -720,11 +830,6 @@ builder_git_checkout (const char     *repo_location,
     return FALSE;
 
   if (!git_extract_submodule (repo_location, dest, branch, context, error))
-    return FALSE;
-
-  if (!git (dest, NULL, 0, error,
-            "config", "--local", "remote.origin.url",
-            repo_location, NULL))
     return FALSE;
 
   return TRUE;
