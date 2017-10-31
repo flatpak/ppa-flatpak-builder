@@ -1,4 +1,4 @@
-flatpak-builder (0.10.3-1) UNRELEASED; urgency=medium
+flatpak-builder (0.10.3-1) unstable; urgency=medium
 
   * New upstream release
   * Version the dh-exec build-dependency to (>= 0.23~).
@@ -8,7 +8,7 @@ flatpak-builder (0.10.3-1) UNRELEASED; urgency=medium
   * debian/control: Set Rules-Requires-Root: no. This package does not
     contain any file not owned by root.
 
- -- Simon McVittie <smcv@debian.org>  Fri, 27 Oct 2017 15:13:51 +0100
+ -- Simon McVittie <smcv@debian.org>  Tue, 31 Oct 2017 14:03:31 +0000
 
 flatpak-builder (0.10.1-1) unstable; urgency=medium
 
