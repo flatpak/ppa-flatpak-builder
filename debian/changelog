@@ -1,6 +1,6 @@
-flatpak-builder (0.10.2-1) UNRELEASED; urgency=medium
+flatpak-builder (0.10.3-1) UNRELEASED; urgency=medium
 
-  * New upstream release 0.10.2
+  * New upstream release
   * Version the dh-exec build-dependency to (>= 0.23~).
     The version in oldstable doesn't support build profiles. Strictly
     speaking 0.15 might be enough, but I'm not going to test with anything
