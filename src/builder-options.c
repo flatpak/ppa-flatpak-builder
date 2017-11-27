@@ -45,9 +45,11 @@ struct BuilderOptions
   char       *ldflags;
   char       *append_path;
   char       *append_ld_library_path;
+  char       *append_pkg_config_path;
   char       *prefix;
   char      **env;
   char      **build_args;
+  char      **test_args;
   char      **config_opts;
   char      **make_args;
   char      **make_install_args;
@@ -77,11 +79,13 @@ enum {
   PROP_NO_DEBUGINFO_COMPRESSION,
   PROP_ARCH,
   PROP_BUILD_ARGS,
+  PROP_TEST_ARGS,
   PROP_CONFIG_OPTS,
   PROP_MAKE_ARGS,
   PROP_MAKE_INSTALL_ARGS,
   PROP_APPEND_PATH,
   PROP_APPEND_LD_LIBRARY_PATH,
+  PROP_APPEND_PKG_CONFIG_PATH,
   LAST_PROP
 };
 
@@ -97,9 +101,11 @@ builder_options_finalize (GObject *object)
   g_free (self->ldflags);
   g_free (self->append_path);
   g_free (self->append_ld_library_path);
+  g_free (self->append_pkg_config_path);
   g_free (self->prefix);
   g_strfreev (self->env);
   g_strfreev (self->build_args);
+  g_strfreev (self->test_args);
   g_strfreev (self->config_opts);
   g_strfreev (self->make_args);
   g_strfreev (self->make_install_args);
@@ -142,6 +148,10 @@ builder_options_get_property (GObject    *object,
       g_value_set_string (value, self->append_ld_library_path);
       break;
 
+    case PROP_APPEND_PKG_CONFIG_PATH:
+      g_value_set_string (value, self->append_pkg_config_path);
+      break;
+
     case PROP_PREFIX:
       g_value_set_string (value, self->prefix);
       break;
@@ -156,6 +166,10 @@ builder_options_get_property (GObject    *object,
 
     case PROP_BUILD_ARGS:
       g_value_set_boxed (value, self->build_args);
+      break;
+
+    case PROP_TEST_ARGS:
+      g_value_set_boxed (value, self->test_args);
       break;
 
     case PROP_CONFIG_OPTS:
@@ -228,6 +242,11 @@ builder_options_set_property (GObject      *object,
       self->append_ld_library_path = g_value_dup_string (value);
       break;
 
+    case PROP_APPEND_PKG_CONFIG_PATH:
+      g_clear_pointer (&self->append_pkg_config_path, g_free);
+      self->append_pkg_config_path = g_value_dup_string (value);
+      break;
+
     case PROP_PREFIX:
       g_clear_pointer (&self->prefix, g_free);
       self->prefix = g_value_dup_string (value);
@@ -248,6 +267,12 @@ builder_options_set_property (GObject      *object,
     case PROP_BUILD_ARGS:
       tmp = self->build_args;
       self->build_args = g_strdupv (g_value_get_boxed (value));
+      g_strfreev (tmp);
+      break;
+
+    case PROP_TEST_ARGS:
+      tmp = self->test_args;
+      self->test_args = g_strdupv (g_value_get_boxed (value));
       g_strfreev (tmp);
       break;
 
@@ -338,6 +363,13 @@ builder_options_class_init (BuilderOptionsClass *klass)
                                                         NULL,
                                                         G_PARAM_READWRITE));
   g_object_class_install_property (object_class,
+                                   PROP_APPEND_PKG_CONFIG_PATH,
+                                   g_param_spec_string ("append-pkg-config-path",
+                                                        "",
+                                                        "",
+                                                        NULL,
+                                                        G_PARAM_READWRITE));
+  g_object_class_install_property (object_class,
                                    PROP_PREFIX,
                                    g_param_spec_string ("prefix",
                                                         "",
@@ -361,6 +393,13 @@ builder_options_class_init (BuilderOptionsClass *klass)
   g_object_class_install_property (object_class,
                                    PROP_BUILD_ARGS,
                                    g_param_spec_boxed ("build-args",
+                                                       "",
+                                                       "",
+                                                       G_TYPE_STRV,
+                                                       G_PARAM_READWRITE));
+  g_object_class_install_property (object_class,
+                                   PROP_TEST_ARGS,
+                                   g_param_spec_boxed ("test-args",
                                                        "",
                                                        "",
                                                        G_TYPE_STRV,
@@ -730,6 +769,24 @@ builder_options_update_ld_path (BuilderOptions *self, BuilderContext *context, c
 }
 
 static char **
+builder_options_update_pkg_config_path (BuilderOptions *self, BuilderContext *context, char **envp)
+{
+  g_autofree char *path = NULL;
+  const char *old = NULL;
+
+  old = g_environ_getenv (envp, "PKG_CONFIG_PATH");
+  if (old == NULL)
+    old = "/app/lib/pkgconfig:/app/share/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig";
+
+  path = builder_options_get_appended_path (self, context, old,
+                                            G_STRUCT_OFFSET (BuilderOptions, append_pkg_config_path));
+  if (path)
+    envp = g_environ_setenv (envp, "PKG_CONFIG_PATH", path, TRUE);
+
+  return envp;
+}
+
+static char **
 builder_options_update_path (BuilderOptions *self, BuilderContext *context, char **envp)
 {
   g_autofree char *path = NULL;
@@ -865,6 +922,7 @@ builder_options_get_env (BuilderOptions *self, BuilderContext *context)
 
   envp = builder_options_update_path (self, context, envp);
   envp = builder_options_update_ld_path (self, context, envp);
+  envp = builder_options_update_pkg_config_path (self, context, envp);
 
   return envp;
 }
@@ -896,6 +954,44 @@ builder_options_get_build_args (BuilderOptions *self,
   if (array->len > 0 && builder_context_get_sandboxed (context))
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED, "Can't specify build-args in sandboxed build");
+      return NULL;
+    }
+
+  g_ptr_array_add (array, NULL);
+
+  return (char **) g_ptr_array_free (g_steal_pointer (&array), FALSE);
+}
+
+char **
+builder_options_get_test_args (BuilderOptions *self,
+                               BuilderContext *context,
+                               GError **error)
+{
+  g_autoptr(GList) options = get_all_options (self, context);
+  GList *l;
+  int i;
+  g_autoptr(GPtrArray) array = g_ptr_array_new_with_free_func (g_free);
+
+  /* Last argument wins, so reverse the list for per-module to win */
+  options = g_list_reverse (options);
+
+  /* Always run tests readonly */
+  g_ptr_array_add (array, g_strdup ("--readonly"));
+
+  for (l = options; l != NULL; l = l->next)
+    {
+      BuilderOptions *o = l->data;
+
+      if (o->test_args)
+        {
+          for (i = 0; o->test_args[i] != NULL; i++)
+            g_ptr_array_add (array, g_strdup (o->test_args[i]));
+        }
+    }
+
+  if (array->len > 0 && builder_context_get_sandboxed (context))
+    {
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED, "Can't specify test-args in sandboxed build");
       return NULL;
     }
 
@@ -981,12 +1077,17 @@ builder_options_checksum (BuilderOptions *self,
   builder_cache_checksum_str (cache, self->prefix);
   builder_cache_checksum_strv (cache, self->env);
   builder_cache_checksum_strv (cache, self->build_args);
+  builder_cache_checksum_compat_strv (cache, self->test_args);
   builder_cache_checksum_strv (cache, self->config_opts);
   builder_cache_checksum_strv (cache, self->make_args);
   builder_cache_checksum_strv (cache, self->make_install_args);
   builder_cache_checksum_boolean (cache, self->strip);
   builder_cache_checksum_boolean (cache, self->no_debuginfo);
   builder_cache_checksum_boolean (cache, self->no_debuginfo_compression);
+
+  builder_cache_checksum_compat_str (cache, self->append_path);
+  builder_cache_checksum_compat_str (cache, self->append_ld_library_path);
+  builder_cache_checksum_compat_str (cache, self->append_pkg_config_path);
 
   arch_options = g_hash_table_lookup (self->arch, builder_context_get_arch (context));
   if (arch_options)

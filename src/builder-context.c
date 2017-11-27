@@ -44,6 +44,7 @@ struct BuilderContext
   GFile          *app_dir;
   GFile          *run_dir; /* directory flatpak-builder was started from */
   GFile          *base_dir; /* directory with json manifest, origin for source files */
+  char           *state_subdir;
   SoupSession    *soup_session;
   char           *arch;
   char           *stop_at;
@@ -75,6 +76,7 @@ struct BuilderContext
   gboolean        rebuild_on_sdk_change;
   gboolean        use_rofiles;
   gboolean        have_rofiles;
+  gboolean        run_tests;
 };
 
 typedef struct
@@ -88,6 +90,7 @@ enum {
   PROP_0,
   PROP_APP_DIR,
   PROP_RUN_DIR,
+  PROP_STATE_SUBDIR,
   LAST_PROP
 };
 
@@ -110,6 +113,7 @@ builder_context_finalize (GObject *object)
   g_clear_object (&self->soup_session);
   g_clear_object (&self->options);
   g_free (self->arch);
+  g_free (self->state_subdir);
   g_free (self->stop_at);
   g_strfreev (self->cleanup);
   g_strfreev (self->cleanup_platform);
@@ -139,6 +143,10 @@ builder_context_get_property (GObject    *object,
       g_value_set_object (value, self->app_dir);
       break;
 
+    case PROP_STATE_SUBDIR:
+      g_value_set_string (value, self->state_subdir);
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -162,6 +170,11 @@ builder_context_set_property (GObject      *object,
       g_set_object (&self->app_dir, g_value_get_object (value));
       break;
 
+    case PROP_STATE_SUBDIR:
+      g_free (self->state_subdir);
+      self->state_subdir = g_value_dup_string (value);
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -172,7 +185,7 @@ builder_context_constructed (GObject *object)
 {
   BuilderContext *self = BUILDER_CONTEXT (object);
 
-  self->state_dir = g_file_get_child (self->run_dir, ".flatpak-builder");
+  self->state_dir = g_file_resolve_relative_path (self->run_dir, self->state_subdir ? self->state_subdir : ".flatpak-builder");
   self->download_dir = g_file_get_child (self->state_dir, "downloads");
   self->build_dir = g_file_get_child (self->state_dir, "build");
   self->cache_dir = g_file_get_child (self->state_dir, "cache");
@@ -203,6 +216,13 @@ builder_context_class_init (BuilderContextClass *klass)
                                                         "",
                                                         "",
                                                         G_TYPE_FILE,
+                                                        G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+  g_object_class_install_property (object_class,
+                                   PROP_STATE_SUBDIR,
+                                   g_param_spec_string ("state-subdir",
+                                                        "",
+                                                        "",
+                                                        "",
                                                         G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
 }
 
@@ -827,6 +847,19 @@ builder_context_set_use_rofiles (BuilderContext *self,
 }
 
 gboolean
+builder_context_get_run_tests (BuilderContext *self)
+{
+  return self->run_tests;
+}
+
+void
+builder_context_set_run_tests (BuilderContext *self,
+                               gboolean run_tests)
+{
+  self->run_tests = run_tests;
+}
+
+gboolean
 builder_context_get_rebuild_on_sdk_change (BuilderContext *self)
 {
   return self->rebuild_on_sdk_change;
@@ -899,10 +932,12 @@ builder_context_extend_env (BuilderContext *self,
 
 BuilderContext *
 builder_context_new (GFile *run_dir,
-                     GFile *app_dir)
+                     GFile *app_dir,
+                     const char *state_subdir)
 {
   return g_object_new (BUILDER_TYPE_CONTEXT,
                        "run-dir", run_dir,
                        "app-dir", app_dir,
+                       "state-subdir", state_subdir,
                        NULL);
 }
