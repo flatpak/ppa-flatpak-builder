@@ -676,6 +676,8 @@ NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
+OSTREE_CFLAGS = @OSTREE_CFLAGS@
+OSTREE_LIBS = @OSTREE_LIBS@
 OTOOL = @OTOOL@
 OTOOL64 = @OTOOL64@
 PACKAGE = @PACKAGE@
@@ -2706,7 +2708,8 @@ uninstall-am: uninstall-binPROGRAMS \
 
 
 @ENABLE_INSTALLED_TESTS_TRUE@%.test: %$(EXEEXT) Makefile
-@ENABLE_INSTALLED_TESTS_TRUE@	$(AM_V_GEN) (echo '[Test]' > $@.tmp; \
+@ENABLE_INSTALLED_TESTS_TRUE@	$(AM_V_GEN) (mkdir -p $(@D); \
+@ENABLE_INSTALLED_TESTS_TRUE@	echo '[Test]' > $@.tmp; \
 @ENABLE_INSTALLED_TESTS_TRUE@	echo 'Type=session' >> $@.tmp; \
 @ENABLE_INSTALLED_TESTS_TRUE@	echo 'Exec=env G_TEST_SRCDIR=$(installed_testdir) G_TEST_BUILDDIR=$(installed_testdir)  $(installed_testdir)/$(notdir $<) --tap' >> $@.tmp; \
 @ENABLE_INSTALLED_TESTS_TRUE@	echo 'Output=TAP' >> $@.tmp; \

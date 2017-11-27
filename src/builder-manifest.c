@@ -2131,13 +2131,16 @@ static GFile *
 builder_manifest_find_appdata_file (BuilderManifest *self,
 				    GFile *app_root)
 {
+  /* We order these so that share/appdata/XXX.appdata.xml if found
+     first, as this is the target name, and apps may have both, which will
+     cause issues with the rename. */
   const char *extensions[] = {
-    ".metainfo.xml",
     ".appdata.xml",
+    ".metainfo.xml",
   };
   const char *dirs[] = {
-    "share/metainfo",
     "share/appdata",
+    "share/metainfo",
   };
   g_autoptr(GFile) source = NULL;
 
@@ -3407,6 +3410,8 @@ builder_manifest_run (BuilderManifest *self,
                       FlatpakContext  *arg_context,
                       char           **argv,
                       int              argc,
+                      gboolean         log_session_bus,
+                      gboolean         log_system_bus,
                       GError         **error)
 {
   g_autoptr(GPtrArray) args = NULL;
@@ -3456,6 +3461,12 @@ builder_manifest_run (BuilderManifest *self,
 
   /* Just add something so that we get the default rules (own our own id) */
   g_ptr_array_add (args, g_strdup ("--talk-name=org.freedesktop.DBus"));
+
+  if (log_session_bus)
+    g_ptr_array_add (args, g_strdup ("--log-session-bus"));
+
+  if (log_system_bus)
+    g_ptr_array_add (args, g_strdup ("--log-system-bus"));
 
   /* Inherit all finish args except --filesystem and some that
    * build doesn't understand so the command gets the same access
