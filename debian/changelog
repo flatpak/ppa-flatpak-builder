@@ -1,9 +1,9 @@
-flatpak-builder (0.10.5-1) UNRELEASED; urgency=medium
+flatpak-builder (0.10.5-1) unstable; urgency=medium
 
   * New upstream release
     - (Build-)depend on flatpak 0.10.1
 
- -- Simon McVittie <smcv@debian.org>  Mon, 27 Nov 2017 09:12:38 +0000
+ -- Simon McVittie <smcv@debian.org>  Mon, 27 Nov 2017 09:14:05 +0000
 
 flatpak-builder (0.10.4-1) unstable; urgency=medium
 
