@@ -1,10 +1,10 @@
-flatpak-builder (0.10.6-1) UNRELEASED; urgency=medium
+flatpak-builder (0.10.6-1) unstable; urgency=medium
 
   * New upstream release
     - (Build-)depend on flatpak 0.10.2 and ostree 2017.14
   * Standards-Version: 4.1.2 (no changes required)
 
- -- Simon McVittie <smcv@debian.org>  Fri, 08 Dec 2017 19:14:46 +0000
+ -- Simon McVittie <smcv@debian.org>  Fri, 15 Dec 2017 15:34:20 +0000
 
 flatpak-builder (0.10.5-1) unstable; urgency=medium
 
