@@ -67,10 +67,13 @@ flatpak_write_update_checksum (GOutputStream  *out,
                                gconstpointer   data,
                                gsize           len,
                                gsize          *out_bytes_written,
-                               GChecksum      *checksum,
+                               GChecksum     **checksums,
+                               gsize           n_checksums,
                                GCancellable   *cancellable,
                                GError        **error)
 {
+  gsize i;
+
   if (out)
     {
       if (!g_output_stream_write_all (out, data, len, out_bytes_written,
@@ -82,8 +85,8 @@ flatpak_write_update_checksum (GOutputStream  *out,
       *out_bytes_written = len;
     }
 
-  if (checksum)
-    g_checksum_update (checksum, data, len);
+  for (i = 0; i < n_checksums; i++)
+    g_checksum_update (checksums[i], data, len);
 
   return TRUE;
 }
@@ -91,7 +94,8 @@ flatpak_write_update_checksum (GOutputStream  *out,
 gboolean
 flatpak_splice_update_checksum (GOutputStream  *out,
                                 GInputStream   *in,
-                                GChecksum      *checksum,
+                                GChecksum     **checksums,
+                                gsize           n_checksums,
                                 FlatpakLoadUriProgress progress,
                                 gpointer        progress_data,
                                 GCancellable   *cancellable,
@@ -108,7 +112,8 @@ flatpak_splice_update_checksum (GOutputStream  *out,
       if (!g_input_stream_read_all (in, buf, sizeof buf, &bytes_read, cancellable, error))
         return FALSE;
 
-      if (!flatpak_write_update_checksum (out, buf, bytes_read, &bytes_written, checksum,
+      if (!flatpak_write_update_checksum (out, buf, bytes_read, &bytes_written,
+                                          checksums, n_checksums,
                                           cancellable, error))
         return FALSE;
 
@@ -201,6 +206,7 @@ flatpak_path_match_prefix (const char *pattern,
   return NULL; /* Should not be reached */
 }
 
+#if !defined(__i386__) && !defined(__x86_64__) && !defined(__aarch64__) && !defined(__arm__)
 static const char *
 flatpak_get_kernel_arch (void)
 {
@@ -250,6 +256,7 @@ flatpak_get_kernel_arch (void)
 
   return arch;
 }
+#endif  /* !__i386__ && !__x86_64__ && !__aarch64__ && !__arm__ */
 
 /* This maps the kernel-reported uname to a single string representing
  * the cpu family, in the sense that all members of this family would
@@ -279,8 +286,9 @@ flatpak_get_arch (void)
 #else
   return "armeb";
 #endif
-#endif
+#else
   return flatpak_get_kernel_arch ();
+#endif
 }
 
 gboolean
@@ -391,8 +399,7 @@ char *
 flatpak_compose_ref (gboolean    app,
                      const char *name,
                      const char *branch,
-                     const char *arch,
-                     GError    **error)
+                     const char *arch)
 {
   if (app)
     return flatpak_build_app_ref (name, branch, arch);
