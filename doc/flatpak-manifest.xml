@@ -376,8 +376,12 @@
                     <listitem><para>If true, skip this module</para></listitem>
                 </varlistentry>
                 <varlistentry>
-                    <term><option>sources</option> (array of objects)</term>
-                    <listitem><para>An array of objects defining sources that will be downloaded and extracted in order</para></listitem>
+                    <term><option>sources</option> (array of objects or string)</term>
+                    <listitem><para>An array of objects defining
+                    sources that will be downloaded and extracted in
+                    order. String members in the array are interpreted
+                    as the name of a separate json file that contains
+                    sources.  See below for details.</para></listitem>
                 </varlistentry>
                 <varlistentry>
                     <term><option>config-opts</option> (array of strings)</term>
@@ -499,6 +503,11 @@
                 These contain a pointer to the source that will be extracted into the source directory before
                 the build starts. They can be of several types, distinguished by the type property.
             </para>
+            <para>
+                Additionally, the sources list can contain a plain string, which is interpreted as the name
+                of a separate json file that is read and inserted at this point. The json file can contain
+                a single source, or an array of sources.
+            </para>
             <refsect3>
                 <title>All sources</title>
                 <variablelist>
@@ -532,8 +541,24 @@
                         <listitem><para>The URL of a remote archive that will be downloaded. This overrides path if both are specified.</para></listitem>
                     </varlistentry>
                     <varlistentry>
+                        <term><option>md5</option> (string)</term>
+                        <listitem><para>The md5 checksum of the file, verified after download</para>
+                        <para>Note that md5 is no longer considered a safe checksum, we recommend you use at least sha256.</para>
+                        </listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><option>sha1</option> (string)</term>
+                        <listitem><para>The sha1 checksum of the file, verified after download</para>
+                        <para>Note that sha1 is no longer considered a safe checksum, we recommend you use at least sha256.</para>
+                        </listitem>
+                    </varlistentry>
+                    <varlistentry>
                         <term><option>sha256</option> (string)</term>
                         <listitem><para>The sha256 checksum of the file, verified after download</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><option>sha512</option> (string)</term>
+                        <listitem><para>The sha512 checksum of the file, verified after download</para></listitem>
                     </varlistentry>
                     <varlistentry>
                         <term><option>strip-components</option> (integer)</term>
@@ -612,8 +637,24 @@
                         <listitem><para>The URL of a remote file that will be downloaded and copied into the source dir. This overrides path if both are specified.</para></listitem>
                     </varlistentry>
                     <varlistentry>
+                        <term><option>md5</option> (string)</term>
+                        <listitem><para>The md5 checksum of the file, verified after download. This is optional for local files.</para>
+                        <para>Note that md5 is no longer considered a safe checksum, we recommend you use at least sha256.</para>
+                        </listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><option>sha1</option> (string)</term>
+                        <listitem><para>The sha1 checksum of the file, verified after download. This is optional for local files.</para>
+                        <para>Note that sha1 is no longer considered a safe checksum, we recommend you use at least sha256.</para>
+                        </listitem>
+                    </varlistentry>
+                    <varlistentry>
                         <term><option>sha256</option> (string)</term>
                         <listitem><para>The sha256 checksum of the file, verified after download. This is optional for local files.</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><option>sha512</option> (string)</term>
+                        <listitem><para>The sha512 checksum of the file, verified after download. This is optional for local files.</para></listitem>
                     </varlistentry>
                     <varlistentry>
                         <term><option>dest-filename</option> (string)</term>
