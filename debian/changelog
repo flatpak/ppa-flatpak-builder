@@ -1,9 +1,9 @@
-flatpak-builder (0.10.6-2) UNRELEASED; urgency=medium
+flatpak-builder (0.10.6-2) unstable; urgency=medium
 
   * Set Vcs-* to salsa.debian.org
   * Standards-Version: 4.1.3 (no changes required)
 
- -- Simon McVittie <smcv@debian.org>  Mon, 15 Jan 2018 01:39:58 +0000
+ -- Simon McVittie <smcv@debian.org>  Wed, 17 Jan 2018 14:27:22 +0000
 
 flatpak-builder (0.10.6-1) unstable; urgency=medium
 
