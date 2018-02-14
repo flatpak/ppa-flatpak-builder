@@ -897,6 +897,23 @@ flatpak_rm_rf (GFile         *dir,
                                cancellable, error);
 }
 
+gboolean flatpak_file_rename (GFile *from,
+                              GFile *to,
+                              GCancellable  *cancellable,
+                              GError       **error)
+{
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    return FALSE;
+
+  if (rename (flatpak_file_get_path_cached (from),
+              flatpak_file_get_path_cached (to)) < 0)
+    {
+      glnx_set_error_from_errno (error);
+      return FALSE;
+    }
+
+  return TRUE;
+}
 
 #define OSTREE_GIO_FAST_QUERYINFO ("standard::name,standard::type,standard::size,standard::is-symlink,standard::symlink-target," \
                                    "unix::device,unix::inode,unix::mode,unix::uid,unix::gid,unix::rdev")
@@ -1277,6 +1294,7 @@ typedef enum {
   FLATPAK_CONTEXT_SOCKET_PULSEAUDIO  = 1 << 2,
   FLATPAK_CONTEXT_SOCKET_SESSION_BUS = 1 << 3,
   FLATPAK_CONTEXT_SOCKET_SYSTEM_BUS  = 1 << 4,
+  FLATPAK_CONTEXT_SOCKET_FALLBACK_X11 = 1 << 5, /* For backwards compat, also set SOCKET_X11 */
 } FlatpakContextSockets;
 
 /* Same order as enum */
@@ -1286,6 +1304,7 @@ const char *flatpak_context_sockets[] = {
   "pulseaudio",
   "session-bus",
   "system-bus",
+  "fallback-x11",
   NULL
 };
 
@@ -1924,6 +1943,9 @@ option_socket_cb (const gchar *option_name,
   if (socket == 0)
     return FALSE;
 
+  if (socket == FLATPAK_CONTEXT_SOCKET_FALLBACK_X11)
+    socket |= FLATPAK_CONTEXT_SOCKET_X11;
+
   flatpak_context_add_sockets (context, socket);
 
   return TRUE;
@@ -1941,6 +1963,9 @@ option_nosocket_cb (const gchar *option_name,
   socket = flatpak_context_socket_from_string (value, error);
   if (socket == 0)
     return FALSE;
+
+  if (socket == FLATPAK_CONTEXT_SOCKET_FALLBACK_X11)
+    socket |= FLATPAK_CONTEXT_SOCKET_X11;
 
   flatpak_context_remove_sockets (context, socket);
 
