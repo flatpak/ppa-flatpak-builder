@@ -29,12 +29,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <sys/xattr.h>
-/* From systemd/src/shared/util.h */
-/* When we include libgen.h because we need dirname() we immediately
- * undefine basename() since libgen.h defines it as a macro to the XDG
- * version which is really broken. */
+// For dirname(), and previously basename()
 #include <libgen.h>
-#undef basename
 
 #include <glnx-macros.h>
 #include <glnx-errors.h>
@@ -47,7 +43,12 @@ G_BEGIN_DECLS
 static inline
 const char *glnx_basename (const char *path)
 {
-  return (basename) (path);
+  gchar *base = strrchr (path, G_DIR_SEPARATOR);
+
+  if (base)
+    return base + 1;
+
+  return path;
 }
 
 /* Utilities for standard FILE* */
@@ -292,6 +293,41 @@ glnx_fstatat (int           dfd,
 {
   if (TEMP_FAILURE_RETRY (fstatat (dfd, path, buf, flags)) != 0)
     return glnx_throw_errno_prefix (error, "fstatat(%s)", path);
+  return TRUE;
+}
+
+/**
+ * glnx_fstatat_allow_noent:
+ * @dfd: Directory FD to stat beneath
+ * @path: Path to stat beneath @dfd
+ * @buf: (out caller-allocates) (allow-none): Return location for stat details
+ * @flags: Flags to pass to fstatat()
+ * @error: Return location for a #GError, or %NULL
+ *
+ * Like glnx_fstatat(), but handles `ENOENT` in a non-error way.  Instead,
+ * on success `errno` will be zero, otherwise it will be preserved.  Hence
+ * you can test `if (errno == 0)` to conditionalize on the file existing,
+ * or `if (errno == ENOENT)` for non-existence.
+ *
+ * Returns: %TRUE on success, %FALSE otherwise (errno is preserved)
+ * Since: UNRELEASED
+ */
+static inline gboolean
+glnx_fstatat_allow_noent (int               dfd,
+                          const char       *path,
+                          struct stat      *out_buf,
+                          int               flags,
+                          GError          **error)
+{
+  G_GNUC_UNUSED struct stat unused_stbuf;
+  if (TEMP_FAILURE_RETRY (fstatat (dfd, path, out_buf ? out_buf : &unused_stbuf, flags)) != 0)
+    {
+      if (errno != ENOENT)
+        return glnx_throw_errno_prefix (error, "fstatat(%s)", path);
+      /* Note we preserve errno as ENOENT */
+    }
+  else
+    errno = 0;
   return TRUE;
 }
 

@@ -1,6 +1,6 @@
 /* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*-
  *
- * Copyright (C) 2012,2013,2015 Colin Walters <walters@verbum.org>.
+ * Copyright (C) 2017 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,21 +20,15 @@
 
 #pragma once
 
-#include <gio/gio.h>
+typedef GError _GLnxTestAutoError;
+static inline void
+_glnx_test_auto_error_cleanup (_GLnxTestAutoError *autoerror)
+{
+  g_assert_no_error (autoerror);
+  /* We could add a clear call here, but no point...we'll have aborted */
+}
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(_GLnxTestAutoError, _glnx_test_auto_error_cleanup);
 
-G_BEGIN_DECLS
-
-#include <glnx-macros.h>
-#include <glnx-missing.h>
-#include <glnx-local-alloc.h>
-#include <glnx-backport-autocleanups.h>
-#include <glnx-backports.h>
-#include <glnx-lockfile.h>
-#include <glnx-errors.h>
-#include <glnx-dirfd.h>
-#include <glnx-shutil.h>
-#include <glnx-xattrs.h>
-#include <glnx-console.h>
-#include <glnx-fdio.h>
-
-G_END_DECLS
+#define _GLNX_TEST_DECLARE_ERROR(local_error, error)      \
+  g_autoptr(_GLnxTestAutoError) local_error = NULL; \
+  GError **error = &local_error

@@ -1,8 +1,14 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* Define if we should avoid using O_TMPFILE */
+#undef DISABLE_OTMPFILE
+
 /* Define to 1 if translation of program messages to the user's native
    language is requested. */
 #undef ENABLE_NLS
+
+/* Define if we should be compatible with wrpseudo */
+#undef ENABLE_WRPSEUDO_COMPAT
 
 /* Define if peer to peer support should be enabled */
 #undef FLATPAK_ENABLE_P2P
@@ -21,6 +27,18 @@
 /* Define if the GNU dcgettext() function is already present or preinstalled.
    */
 #undef HAVE_DCGETTEXT
+
+/* Define to 1 if you have the declaration of `copy_file_range', and to 0 if
+   you don't. */
+#undef HAVE_DECL_COPY_FILE_RANGE
+
+/* Define to 1 if you have the declaration of `memfd_create', and to 0 if you
+   don't. */
+#undef HAVE_DECL_MEMFD_CREATE
+
+/* Define to 1 if you have the declaration of `renameat2', and to 0 if you
+   don't. */
+#undef HAVE_DECL_RENAMEAT2
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
