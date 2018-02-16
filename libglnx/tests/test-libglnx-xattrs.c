@@ -82,7 +82,7 @@ do_write_run (GLnxDirFdIterator *dfd_iter, GError **error)
     {
       guint32 randname_v = g_random_int ();
       g_autofree char *randname = g_strdup_printf ("file%u", randname_v);
-      glnx_fd_close int fd = -1;
+      glnx_autofd int fd = -1;
 
     again:
       fd = openat (dfd_iter->fd, randname, O_CREAT | O_EXCL, 0644);
@@ -113,7 +113,7 @@ do_write_run (GLnxDirFdIterator *dfd_iter, GError **error)
           if (!dent)
             break;
 
-          glnx_fd_close int fd = -1;
+          glnx_autofd int fd = -1;
           if (!glnx_openat_rdonly (dfd_iter->fd, dent->d_name, FALSE, &fd, error))
             return FALSE;
 
@@ -157,7 +157,7 @@ do_read_run (GLnxDirFdIterator *dfd_iter,
       if (!dent)
         break;
 
-      glnx_fd_close int fd = -1;
+      glnx_autofd int fd = -1;
       if (!glnx_openat_rdonly (dfd_iter->fd, dent->d_name, FALSE, &fd, error))
         return FALSE;
 
@@ -223,19 +223,17 @@ test_xattr_races (void)
   GThread *threads[nprocs];
   g_autoptr(GError) local_error = NULL;
   GError **error = &local_error;
-  glnx_fd_close int dfd = -1;
-  g_autofree char *tmpdir = g_strdup_printf ("%s/libglnx-xattrs-XXXXXX",
-                                             getenv ("TMPDIR") ?: "/var/tmp");
+  g_auto(GLnxTmpDir) tmpdir = { 0, };
+  g_autofree char *tmpdir_path = g_strdup_printf ("%s/libglnx-xattrs-XXXXXX",
+                                                  getenv ("TMPDIR") ?: "/var/tmp");
   guint nread = 0;
 
-  if (!glnx_mkdtempat (AT_FDCWD, tmpdir, 0700, error))
-    goto out;
-
-  if (!glnx_opendirat (AT_FDCWD, tmpdir, TRUE, &dfd, error))
+  if (!glnx_mkdtempat (AT_FDCWD, tmpdir_path, 0700,
+                       &tmpdir, error))
     goto out;
 
   /* Support people building/testing on tmpfs https://github.com/flatpak/flatpak/issues/686 */
-  if (fsetxattr (dfd, "user.test", "novalue", strlen ("novalue"), 0) < 0)
+  if (fsetxattr (tmpdir.fd, "user.test", "novalue", strlen ("novalue"), 0) < 0)
     {
       if (errno == EOPNOTSUPP)
         {
@@ -252,7 +250,7 @@ test_xattr_races (void)
   for (guint i = 0; i < nprocs; i++)
     {
       struct XattrWorker *worker = &wdata[i];
-      worker->dfd = dfd;
+      worker->dfd = tmpdir.fd;
       worker->is_writer = i % 2 == 0;
       threads[i] = g_thread_new (NULL, xattr_thread, worker);
     }
@@ -266,8 +264,6 @@ test_xattr_races (void)
     }
 
   g_print ("Read %u xattrs race free!\n", nread);
-
-  (void) glnx_shutil_rm_rf_at (AT_FDCWD, tmpdir, NULL, NULL);
 
  out:
   g_assert_no_error (local_error);

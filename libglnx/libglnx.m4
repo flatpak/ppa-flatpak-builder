@@ -2,7 +2,8 @@ AC_DEFUN([LIBGLNX_CONFIGURE],
 [
 AC_CHECK_DECLS([
         renameat2,
-        ],
+        memfd_create,
+        copy_file_range],
         [], [], [[
 #include <sys/types.h>
 #include <unistd.h>
