@@ -1,7 +1,7 @@
-flatpak-builder (0.10.8-2) UNRELEASED; urgency=medium
+flatpak-builder (0.10.9-1) UNRELEASED; urgency=medium
 
-  * d/p/Include-sys-mman.h-when-checking-for-memfd_create.patch:
-    Add patch from Aurelien Jarno to fix FTBFS with glibc 2.27
+  * New upstream release
+  - Includes patch from Aurelien Jarno to fix FTBFS with glibc 2.27
     (Closes: #890722)
 
  -- Simon McVittie <smcv@debian.org>  Mon, 19 Feb 2018 09:34:50 +0000
