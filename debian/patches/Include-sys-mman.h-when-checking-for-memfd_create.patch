@@ -1,0 +1,27 @@
+From: Aurelien Jarno <aurel32@debian.org>
+Date: Sat, 17 Feb 2018 23:57:53 +0100
+Subject: Include sys/mman.h when checking for memfd_create
+
+glibc 2.27 added support for memfd_create. Unfortunately flatpak-builder,
+or rather the included libglnx library, also has such a function to
+wrap the corresponding syscall. It correctly tries to detect it in
+the configure script to disabled the wrapper in case glibc provides
+it. However it doesn't work due to a missing include.
+
+Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=890722
+---
+ libglnx/libglnx.m4 | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/libglnx/libglnx.m4 b/libglnx/libglnx.m4
+index d5bcc2f..34caf20 100644
+--- a/libglnx/libglnx.m4
++++ b/libglnx/libglnx.m4
+@@ -12,6 +12,7 @@ AC_CHECK_DECLS([
+ #include <sched.h>
+ #include <linux/loop.h>
+ #include <linux/random.h>
++#include <sys/mman.h>
+ ]])
+ 
+ AC_ARG_ENABLE(otmpfile,
