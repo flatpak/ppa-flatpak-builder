@@ -9,6 +9,8 @@ the configure script to disabled the wrapper in case glibc provides
 it. However it doesn't work due to a missing include.
 
 Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=890722
+Applied-upstream: commit:https://github.com/GNOME/libglnx/commit/0c82203cd459a35cc3f471e3205355e9fb79160f
+Applied-upstream: 0.10.9, commit:https://github.com/flatpak/flatpak-builder/commit/5aae9184f2a876baaf694f1e5f0bf690529c4f29
 ---
  libglnx/libglnx.m4 | 1 +
  1 file changed, 1 insertion(+)
