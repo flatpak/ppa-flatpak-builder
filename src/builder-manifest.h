@@ -40,7 +40,7 @@ typedef struct BuilderManifest BuilderManifest;
 /* Bump this if format changes in incompatible ways to force rebuild */
 #define BUILDER_MANIFEST_CHECKSUM_VERSION "5"
 #define BUILDER_MANIFEST_CHECKSUM_CLEANUP_VERSION "1"
-#define BUILDER_MANIFEST_CHECKSUM_FINISH_VERSION "2"
+#define BUILDER_MANIFEST_CHECKSUM_FINISH_VERSION "3"
 #define BUILDER_MANIFEST_CHECKSUM_BUNDLE_SOURCES_VERSION "1"
 #define BUILDER_MANIFEST_CHECKSUM_PLATFORM_VERSION "1"
 
@@ -58,10 +58,12 @@ char *          builder_manifest_get_locale_id_platform (BuilderManifest *self);
 BuilderOptions *builder_manifest_get_build_options (BuilderManifest *self);
 GList *         builder_manifest_get_modules (BuilderManifest *self);
 GList *         builder_manifest_get_add_extensions (BuilderManifest *self);
+GList *         builder_manifest_get_add_build_extensions (BuilderManifest *self);
 const char *    builder_manifest_get_branch (BuilderManifest *self);
 void            builder_manifest_set_default_branch (BuilderManifest *self,
                                                      const char *default_branch);
 const char *    builder_manifest_get_collection_id (BuilderManifest *self);
+const char *    builder_manifest_get_extension_tag (BuilderManifest *self);
 void            builder_manifest_set_default_collection_id (BuilderManifest *self,
                                                             const char      *default_collection_id);
 

@@ -119,8 +119,9 @@ gboolean        builder_context_set_checksum_for (BuilderContext  *self,
 BuilderContext *builder_context_new (GFile *run_dir,
                                      GFile *app_dir,
                                      const char *state_subdir);
-gboolean        builder_context_enable_ccache (BuilderContext *self,
-                                               GError        **error);
+gboolean        builder_context_set_enable_ccache (BuilderContext *self,
+                                                   gboolean        enabled,
+                                                   GError        **error);
 gboolean        builder_context_enable_rofiles (BuilderContext *self,
                                                 GError        **error);
 gboolean        builder_context_disable_rofiles (BuilderContext *self,
@@ -132,6 +133,9 @@ void            builder_context_set_use_rofiles (BuilderContext *self,
 gboolean        builder_context_get_run_tests (BuilderContext *self);
 void            builder_context_set_run_tests (BuilderContext *self,
                                                gboolean run_tests);
+void            builder_context_set_no_shallow_clone (BuilderContext *self,
+                                                      gboolean        no_shallow_clone);
+gboolean        builder_context_get_no_shallow_clone (BuilderContext *self);
 char **         builder_context_extend_env (BuilderContext *self,
                                             char          **envp);
 

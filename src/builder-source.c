@@ -33,7 +33,9 @@
 #include "builder-source-patch.h"
 #include "builder-source-git.h"
 #include "builder-source-bzr.h"
+#include "builder-source-svn.h"
 #include "builder-source-file.h"
+#include "builder-source-dir.h"
 #include "builder-source-script.h"
 #include "builder-source-shell.h"
 #include "builder-source-extra-data.h"
@@ -249,6 +251,8 @@ builder_source_to_json (BuilderSource *self)
     type = "archive";
   else if (BUILDER_IS_SOURCE_FILE (self))
     type = "file";
+  else if (BUILDER_IS_SOURCE_DIR (self))
+    type = "dir";
   else if (BUILDER_IS_SOURCE_SCRIPT (self))
     type = "script";
   else if (BUILDER_IS_SOURCE_SHELL (self))
@@ -261,6 +265,8 @@ builder_source_to_json (BuilderSource *self)
     type = "git";
   else if (BUILDER_IS_SOURCE_BZR (self))
     type = "bzr";
+  else if (BUILDER_IS_SOURCE_SVN (self))
+    type = "svn";
   else
     g_warning ("Unknown source type");
 
@@ -284,6 +290,8 @@ builder_source_from_json (JsonNode *node)
     return (BuilderSource *) json_gobject_deserialize (BUILDER_TYPE_SOURCE_ARCHIVE, node);
   else if (strcmp (type, "file") == 0)
     return (BuilderSource *) json_gobject_deserialize (BUILDER_TYPE_SOURCE_FILE, node);
+  else if (strcmp (type, "dir") == 0)
+    return (BuilderSource *) json_gobject_deserialize (BUILDER_TYPE_SOURCE_DIR, node);
   else if (strcmp (type, "script") == 0)
     return (BuilderSource *) json_gobject_deserialize (BUILDER_TYPE_SOURCE_SCRIPT, node);
   else if (strcmp (type, "shell") == 0)
@@ -296,6 +304,8 @@ builder_source_from_json (JsonNode *node)
     return (BuilderSource *) json_gobject_deserialize (BUILDER_TYPE_SOURCE_GIT, node);
   else if (strcmp (type, "bzr") == 0)
     return (BuilderSource *) json_gobject_deserialize (BUILDER_TYPE_SOURCE_BZR, node);
+  else if (strcmp (type, "svn") == 0)
+    return (BuilderSource *) json_gobject_deserialize (BUILDER_TYPE_SOURCE_SVN, node);
   else
     g_warning ("Unknown source type %s", type);
 

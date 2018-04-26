@@ -15,7 +15,7 @@ AC_PREREQ([2.63])
 
 m4_define([flatpak_builder_major_version], [0])
 m4_define([flatpak_builder_minor_version], [10])
-m4_define([flatpak_builder_micro_version], [9])
+m4_define([flatpak_builder_micro_version], [10])
 m4_define([flatpak_builder_version],
           [flatpak_builder_major_version.flatpak_builder_minor_version.flatpak_builder_micro_version])
 
@@ -145,6 +145,17 @@ AS_IF([test "x$with_dwarf_header" = "xyes"],
        AC_CHECK_HEADER([dwarf.h])
        AS_IF([test "x$ac_cv_header_dwarf_h" != "xyes"],
              [AC_MSG_ERROR([dwarf.h is required but was not found])])])
+
+AC_ARG_WITH([yaml],
+  [AS_HELP_STRING([--without-yaml],
+                  [Disable YAML support [default=auto]])])
+AS_IF([test "x$with_yaml" != "xno"],[
+  PKG_CHECK_MODULES(YAML, [yaml-0.1], [have_yaml=yes], [have_yaml=no])
+], [have_yaml=no])
+AS_IF([test "x$have_yaml" = "xno"],[
+  AS_IF([test "x$with_yaml" = "xyes"],
+        [AC_MSG_ERROR([yaml-0.1 was not found, which is needed for --with-yaml])])
+], [AC_DEFINE([FLATPAK_BUILDER_ENABLE_YAML],[1],[Define if yaml supported])])
 
 # Do we enable building peer to peer support using libostree’s experimental (non-stable) API?
 # If so, OSTREE_ENABLE_EXPERIMENTAL_API needs to be #defined before ostree.h is
