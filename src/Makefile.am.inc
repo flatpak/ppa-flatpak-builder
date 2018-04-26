@@ -22,6 +22,8 @@ flatpak_builder_SOURCES = \
 	src/builder-source-git.h \
 	src/builder-source-bzr.c \
 	src/builder-source-bzr.h \
+	src/builder-source-svn.c \
+	src/builder-source-svn.h \
 	src/builder-source-file.c \
 	src/builder-source-file.h \
 	src/builder-source-script.c \
@@ -32,6 +34,8 @@ flatpak_builder_SOURCES = \
 	src/builder-source-extra-data.h \
 	src/builder-source-patch.c \
 	src/builder-source-patch.h \
+	src/builder-source-dir.c \
+	src/builder-source-dir.h \
 	src/builder-context.c \
 	src/builder-context.h \
 	src/builder-cache.c \
@@ -44,5 +48,5 @@ flatpak_builder_SOURCES = \
 	src/builder-git.h \
 	$(NULL)
 
-flatpak_builder_LDADD = $(AM_LDADD) $(BASE_LIBS) $(LIBELF_LIBS) libglnx.la
-flatpak_builder_CFLAGS = $(AM_CFLAGS) $(BASE_CFLAGS)
+flatpak_builder_LDADD = $(AM_LDADD) $(BASE_LIBS) $(LIBELF_LIBS) $(YAML_LIBS) libglnx.la
+flatpak_builder_CFLAGS = $(AM_CFLAGS) $(BASE_CFLAGS) $(YAML_CFLAGS)

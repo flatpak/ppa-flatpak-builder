@@ -41,6 +41,7 @@ static gboolean opt_disable_cache;
 static gboolean opt_disable_tests;
 static gboolean opt_disable_rofiles;
 static gboolean opt_download_only;
+static gboolean opt_no_shallow_clone;
 static gboolean opt_bundle_sources;
 static gboolean opt_build_only;
 static gboolean opt_finish_only;
@@ -133,6 +134,7 @@ static GOptionEntry entries[] = {
   { "installation", 0, 0, G_OPTION_ARG_STRING, &opt_installation, "Install dependencies in a specific system-wide installation", "NAME" },
   { "state-dir", 0, 0, G_OPTION_ARG_FILENAME, &opt_state_dir, "Use this directory for state instead of .flatpak-builder", "PATH" },
   { "assumeyes", 'y', 0, G_OPTION_ARG_NONE, &opt_yes, N_("Automatically answer yes for all questions"), NULL },
+  { "no-shallow-clone", 0, 0, G_OPTION_ARG_NONE, &opt_no_shallow_clone, "Don't use shallow clones when mirroring git repos", NULL },
   { NULL }
 };
 
@@ -280,8 +282,6 @@ do_install (BuilderContext *build_context,
 
   g_ptr_array_add (args, g_strdup ("--reinstall"));
 
-  g_ptr_array_add (args, g_strdup ("--subpath="));
-
   ref = flatpak_build_untyped_ref (id, branch,
                                    builder_context_get_arch (build_context));
 
@@ -312,9 +312,9 @@ main (int    argc,
   g_autoptr(BuilderManifest) manifest = NULL;
   g_autoptr(GOptionContext) context = NULL;
   const char *app_dir_path = NULL, *manifest_rel_path;
-  g_autofree gchar *json = NULL;
-  g_autofree gchar *json_sha256 = NULL;
-  g_autofree gchar *old_json_sha256 = NULL;
+  g_autofree gchar *manifest_contents = NULL;
+  g_autofree gchar *manifest_sha256 = NULL;
+  g_autofree gchar *old_manifest_sha256 = NULL;
   g_autoptr(BuilderContext) build_context = NULL;
   g_autoptr(GFile) base_dir = NULL;
   g_autoptr(GFile) manifest_file = NULL;
@@ -438,6 +438,7 @@ main (int    argc,
 
   builder_context_set_use_rofiles (build_context, !opt_disable_rofiles);
   builder_context_set_run_tests (build_context, !opt_disable_tests);
+  builder_context_set_no_shallow_clone (build_context, opt_no_shallow_clone);
   builder_context_set_keep_build_dirs (build_context, opt_keep_build_dirs);
   builder_context_set_delete_build_dirs (build_context, opt_delete_build_dirs);
   builder_context_set_sandboxed (build_context, opt_sandboxed);
@@ -483,8 +484,7 @@ main (int    argc,
       builder_context_set_stop_at (build_context, opt_stop_at);
     }
 
-  if (opt_ccache &&
-      !builder_context_enable_ccache (build_context, &error))
+  if (!builder_context_set_enable_ccache (build_context, opt_ccache, &error))
     {
       g_printerr ("Can't initialize ccache use: %s\n", error->message);
       return 1;
@@ -536,18 +536,18 @@ main (int    argc,
 
   builder_context_set_base_dir (build_context, base_dir);
 
-  if (!g_file_get_contents (flatpak_file_get_path_cached (manifest_file), &json, NULL, &error))
+  if (!g_file_get_contents (flatpak_file_get_path_cached (manifest_file), &manifest_contents, NULL, &error))
     {
       g_printerr ("Can't load '%s': %s\n", manifest_rel_path, error->message);
       return 1;
     }
 
-  json_sha256 = g_compute_checksum_for_string (G_CHECKSUM_SHA256, json, -1);
+  manifest_sha256 = g_compute_checksum_for_string (G_CHECKSUM_SHA256, manifest_contents, -1);
 
   if (opt_skip_if_unchanged)
     {
-      old_json_sha256 = builder_context_get_checksum_for (build_context, manifest_basename);
-      if (old_json_sha256 != NULL && strcmp (json_sha256, old_json_sha256) == 0)
+      old_manifest_sha256 = builder_context_get_checksum_for (build_context, manifest_basename);
+      if (old_manifest_sha256 != NULL && strcmp (manifest_sha256, old_manifest_sha256) == 0)
         {
           g_print ("No changes to manifest, skipping\n");
           return 42;
@@ -557,8 +557,8 @@ main (int    argc,
   /* Can't push this as user data to the demarshalling :/ */
   builder_manifest_set_demarshal_base_dir (builder_context_get_base_dir (build_context));
 
-  manifest = (BuilderManifest *) json_gobject_from_data (BUILDER_TYPE_MANIFEST,
-                                                         json, -1, &error);
+  manifest = (BuilderManifest *) builder_gobject_from_data (BUILDER_TYPE_MANIFEST, manifest_rel_path,
+                                                            manifest_contents, &error);
 
   builder_manifest_set_demarshal_base_dir (NULL);
 
@@ -682,7 +682,7 @@ main (int    argc,
       }
   }
 
-  if (!builder_context_set_checksum_for (build_context, manifest_basename, json_sha256, &error))
+  if (!builder_context_set_checksum_for (build_context, manifest_basename, manifest_sha256, &error))
     {
       g_printerr ("Failed to set checksum for ‘%s’: %s\n", manifest_basename, error->message);
       return 1;
@@ -793,7 +793,7 @@ main (int    argc,
         }
 
       if (builder_context_get_bundle_sources (build_context) &&
-          !builder_manifest_bundle_sources (manifest, json, cache, build_context, &error))
+          !builder_manifest_bundle_sources (manifest, manifest_contents, cache, build_context, &error))
         {
           g_printerr ("Error: %s\n", error->message);
           return 1;

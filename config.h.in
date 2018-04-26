@@ -10,6 +10,9 @@
 /* Define if we should be compatible with wrpseudo */
 #undef ENABLE_WRPSEUDO_COMPAT
 
+/* Define if yaml supported */
+#undef FLATPAK_BUILDER_ENABLE_YAML
+
 /* Define if peer to peer support should be enabled */
 #undef FLATPAK_ENABLE_P2P
 
