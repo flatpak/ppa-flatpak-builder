@@ -1,3 +1,12 @@
+flatpak-builder (0.10.10-1) UNRELEASED; urgency=medium
+
+  * New upstream release
+    - d/copyright: Update
+    - Explicitly enable YAML support
+    - Add subversion to Recommends
+
+ -- Simon McVittie <smcv@debian.org>  Thu, 26 Apr 2018 17:18:28 +0100
+
 flatpak-builder (0.10.9-1) unstable; urgency=medium
 
   * New upstream release

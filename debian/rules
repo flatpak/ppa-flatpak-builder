@@ -20,6 +20,7 @@ override_dh_auto_configure:
 	dh_auto_configure -- \
 		--enable-installed-tests \
 		--libexecdir=/usr/lib/flatpak \
+		--with-yaml \
 		$(configure_options)
 
 override_dh_missing:
