@@ -12,6 +12,7 @@ Copyright:
  © 2014-2018 Red Hat, Inc
  © 2016-2017 Free Software Foundation, Inc.
  © 2016 Zbigniew Jędrzejewski-Szmek
+ © 2018 Codethink Limited
 License: LGPL-2.1+
 
 Files:
@@ -46,7 +47,7 @@ Files:
  debian/*
 Copyright:
  © 2015 David King <amigadave@amigadave.com>
- © 2016 Collabora Ltd.
+ © 2016-2018 Collabora Ltd.
 License: LGPL-2.1+
 
 License: GPL-2+
