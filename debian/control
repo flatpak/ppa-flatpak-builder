@@ -23,6 +23,7 @@ Build-Depends:
  libarchive-dev (>= 2.8.0),
  libattr1-dev,
  libcap-dev,
+ libcurl4-gnutls-dev,
  libdw-dev,
  libelf-dev,
  libflatpak-dev (>= 0.10.2),
