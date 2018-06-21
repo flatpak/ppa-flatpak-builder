@@ -1,4 +1,4 @@
-flatpak-builder (0.99.1-1) UNRELEASED; urgency=medium
+flatpak-builder (0.99.1-1) unstable; urgency=medium
 
   * New upstream release
   * d/watch: Watch for odd-numbered releases too
@@ -6,7 +6,7 @@ flatpak-builder (0.99.1-1) UNRELEASED; urgency=medium
   * Build-depend on libcurl4-gnutls-dev
   * d/copyright: Update
 
- -- Simon McVittie <smcv@debian.org>  Thu, 21 Jun 2018 19:20:02 +0100
+ -- Simon McVittie <smcv@debian.org>  Thu, 21 Jun 2018 22:54:10 +0100
 
 flatpak-builder (0.10.10-1) unstable; urgency=medium
 
