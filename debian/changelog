@@ -1,5 +1,6 @@
-flatpak-builder (0.10.10-2) UNRELEASED; urgency=medium
+flatpak-builder (0.99.1-1) UNRELEASED; urgency=medium
 
+  * New upstream release
   * d/watch: Watch for odd-numbered releases too
 
  -- Simon McVittie <smcv@debian.org>  Thu, 21 Jun 2018 19:20:02 +0100
