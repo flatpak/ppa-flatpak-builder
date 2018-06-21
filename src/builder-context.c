@@ -46,6 +46,7 @@ struct BuilderContext
   GFile          *base_dir; /* directory with json manifest, origin for source files */
   char           *state_subdir;
   SoupSession    *soup_session;
+  CURL           *curl_session;
   char           *arch;
   char           *stop_at;
 
@@ -78,6 +79,8 @@ struct BuilderContext
   gboolean        have_rofiles;
   gboolean        run_tests;
   gboolean        no_shallow_clone;
+
+  BuilderSdkConfig *sdk_config;
 };
 
 typedef struct
@@ -113,6 +116,7 @@ builder_context_finalize (GObject *object)
   g_clear_object (&self->base_dir);
   g_clear_object (&self->soup_session);
   g_clear_object (&self->options);
+  g_clear_object (&self->sdk_config);
   g_free (self->arch);
   g_free (self->state_subdir);
   g_free (self->stop_at);
@@ -122,6 +126,10 @@ builder_context_finalize (GObject *object)
 
   g_clear_pointer (&self->sources_dirs, g_ptr_array_unref);
   g_clear_pointer (&self->sources_urls, g_ptr_array_unref);
+
+  curl_easy_cleanup (self->curl_session);
+  self->curl_session = NULL;
+  curl_global_cleanup ();
 
   G_OBJECT_CLASS (builder_context_parent_class)->finalize (object);
 }
@@ -354,6 +362,7 @@ builder_context_set_sources_urls (BuilderContext *self,
 gboolean
 builder_context_download_uri (BuilderContext *self,
                               const char     *url,
+                              const char    **mirrors,
                               GFile          *dest,
                               const char     *checksums[BUILDER_CHECKSUMS_LEN],
                               GChecksumType   checksums_type[BUILDER_CHECKSUMS_LEN],
@@ -361,6 +370,7 @@ builder_context_download_uri (BuilderContext *self,
 {
   int i;
   g_autoptr(SoupURI) original_uri = soup_uri_new (url);
+  g_autoptr(GError) first_error = NULL;
 
   if (original_uri == NULL)
     return flatpak_fail (error, _("Could not parse URI “%s”"), url);
@@ -383,11 +393,11 @@ builder_context_download_uri (BuilderContext *self,
           if (builder_download_uri (mirror_uri,
                                     dest,
                                     checksums, checksums_type,
-                                    builder_context_get_soup_session (self),
+                                    builder_context_get_curl_session (self),
                                     &my_error))
             return TRUE;
 
-          if (!g_error_matches (my_error, SOUP_HTTP_ERROR, SOUP_STATUS_NOT_FOUND))
+          if (!g_error_matches (my_error, BUILDER_CURL_ERROR, CURLE_REMOTE_FILE_NOT_FOUND))
             g_warning ("Error downloading from mirror: %s\n", my_error->message);
         }
     }
@@ -395,9 +405,41 @@ builder_context_download_uri (BuilderContext *self,
   if (!builder_download_uri (original_uri,
                              dest,
                              checksums, checksums_type,
-                             builder_context_get_soup_session (self),
-                             error))
-    return FALSE;
+                             builder_context_get_curl_session (self),
+                             &first_error))
+    {
+      gboolean mirror_ok = FALSE;
+
+      if (mirrors != NULL && mirrors[0] != NULL)
+        {
+          g_print ("Error downloading, trying mirrors\n");
+          for (i = 0; mirrors[i] != NULL; i++)
+            {
+              g_autoptr(GError) mirror_error = NULL;
+              g_autoptr(SoupURI) mirror_uri = soup_uri_new (mirrors[i]);
+              g_print ("Trying mirror %s\n", mirrors[i]);
+              if (!builder_download_uri (mirror_uri,
+                                         dest,
+                                         checksums, checksums_type,
+                                         builder_context_get_curl_session (self),
+                                         &mirror_error))
+                {
+                  g_print ("Error downloading mirror: %s\n", mirror_error->message);
+                }
+              else
+                {
+                  mirror_ok = TRUE;
+                  break;
+                }
+            }
+        }
+
+      if (!mirror_ok)
+        {
+          g_propagate_error (error, g_steal_pointer (&first_error));
+          return FALSE;
+        }
+    }
 
   return TRUE;
 }
@@ -493,6 +535,15 @@ builder_context_get_soup_session (BuilderContext *self)
     self->soup_session = flatpak_create_soup_session ("flatpak-builder " PACKAGE_VERSION);
 
   return self->soup_session;
+}
+
+CURL *
+builder_context_get_curl_session (BuilderContext *self)
+{
+  if (self->curl_session == NULL)
+    self->curl_session = flatpak_create_curl_session ("flatpak-builder " PACKAGE_VERSION);
+
+  return self->curl_session;
 }
 
 const char *
@@ -978,6 +1029,34 @@ builder_context_extend_env (BuilderContext *self,
   envp = g_environ_setenv (envp, "PATH", path, TRUE);
 
   return envp;
+}
+
+gboolean
+builder_context_load_sdk_config (BuilderContext   *self,
+                                 const char       *sdk_path,
+                                 GError          **error)
+{
+  g_autoptr(GFile) root = g_file_new_for_path (sdk_path);
+  g_autoptr(GFile) config_file = g_file_resolve_relative_path (root, "files/etc/flatpak-builder/defaults.json");
+  g_autoptr(GError) local_error = NULL;
+  g_autoptr(BuilderSdkConfig) sdk_config = NULL;
+
+  sdk_config = builder_sdk_config_from_file (config_file, &local_error);
+  if (sdk_config == NULL &&
+      !g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
+    {
+      g_propagate_error (error, g_steal_pointer (&local_error));
+      return FALSE;
+    }
+
+  g_set_object (&self->sdk_config, sdk_config);
+  return TRUE;
+}
+
+BuilderSdkConfig *
+builder_context_get_sdk_config (BuilderContext *self)
+{
+  return self->sdk_config;
 }
 
 BuilderContext *

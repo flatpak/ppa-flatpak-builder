@@ -1463,14 +1463,44 @@ flatpak_info (gboolean opt_user,
   return NULL;
 }
 
+static char *
+flatpak_info_show_path (const char *id,
+                        const char *branch,
+                        BuilderContext  *context)
+{
+  g_autofree char *sdk_info = NULL;
+  g_autofree char *arch_option = NULL;
+  g_auto(GStrv) sdk_info_lines = NULL;
+  int i;
+
+  /* Unfortunately there is not flatpak info --show-path, so we have to look at the full flatpak info output */
+
+  arch_option = g_strdup_printf ("--arch=%s", builder_context_get_arch (context));
+
+  sdk_info = flatpak (NULL, "info", arch_option, id, branch, NULL);
+  if (sdk_info == NULL)
+    return NULL;
+
+  sdk_info_lines = g_strsplit (sdk_info, "\n", -1);
+  for (i = 0; sdk_info_lines[i] != NULL; i++)
+    {
+      if (g_str_has_prefix (sdk_info_lines[i], "Location:"))
+        return g_strstrip (g_strdup (sdk_info_lines[i] + strlen ("Location:")));
+    }
+
+  return NULL;
+}
+
 gboolean
 builder_manifest_start (BuilderManifest *self,
+                        gboolean download_only,
                         gboolean allow_missing_runtimes,
                         BuilderContext  *context,
                         GError         **error)
 {
   g_autofree char *arch_option = NULL;
   g_autoptr(GHashTable) names = g_hash_table_new (g_str_hash, g_str_equal);
+  g_autofree char *sdk_path = NULL;
   const char *stop_at;
 
   if (self->sdk == NULL)
@@ -1484,14 +1514,19 @@ builder_manifest_start (BuilderManifest *self,
 
   self->sdk_commit = flatpak (NULL, "info", arch_option, "--show-commit", self->sdk,
                               builder_manifest_get_runtime_version (self), NULL);
-  if (!allow_missing_runtimes && self->sdk_commit == NULL)
+  if (!download_only && !allow_missing_runtimes && self->sdk_commit == NULL)
     return flatpak_fail (error, "Unable to find sdk %s version %s",
                          self->sdk,
                          builder_manifest_get_runtime_version (self));
 
+  sdk_path = flatpak_info_show_path (self->sdk, builder_manifest_get_runtime_version (self), context);
+  if (sdk_path != NULL &&
+      !builder_context_load_sdk_config (context, sdk_path, error))
+    return FALSE;
+
   self->runtime_commit = flatpak (NULL, "info", arch_option, "--show-commit", self->runtime,
                                   builder_manifest_get_runtime_version (self), NULL);
-  if (!allow_missing_runtimes && self->runtime_commit == NULL)
+  if (!download_only && !allow_missing_runtimes && self->runtime_commit == NULL)
     return flatpak_fail (error, "Unable to find runtime %s version %s",
                          self->runtime,
                          builder_manifest_get_runtime_version (self));
@@ -1500,7 +1535,7 @@ builder_manifest_start (BuilderManifest *self,
     {
       self->base_commit = flatpak (NULL, "info", arch_option, "--show-commit", self->base,
                                    builder_manifest_get_base_version (self), NULL);
-      if (self->base_commit == NULL)
+      if (!download_only && self->base_commit == NULL)
         return flatpak_fail (error, "Unable to find app %s version %s",
                              self->base, builder_manifest_get_base_version (self));
     }
@@ -2385,35 +2420,54 @@ builder_manifest_cleanup (BuilderManifest *self,
 
           if (appdata_file != NULL)
             {
-              g_autofree char *contents;
-              const char *to_replace;
-              const char *match;
-              g_autofree char *replace_src = NULL;
-              g_autofree char *replace_dst = NULL;
+              FlatpakXml *n_id;
+              FlatpakXml *n_root;
+              FlatpakXml *n_text;
+              g_autoptr(FlatpakXml) xml_root = NULL;
+              g_autoptr(GInputStream) in = NULL;
               g_autoptr(GString) new_contents = NULL;
 
-              if (!g_file_load_contents (appdata_file, NULL, &contents, NULL, NULL, error))
+              in = (GInputStream *) g_file_read (appdata_file, NULL, error);
+              if (!in)
+                return FALSE;
+              xml_root = flatpak_xml_parse (in, FALSE, NULL, error);
+              if (!xml_root)
                 return FALSE;
 
-              new_contents = g_string_sized_new (strlen (contents));
-
-              to_replace = contents;
-
-              /* We only want to replace entire matches to id tag, so add the brackets
-               * and the end-tag. That way we don't do partial matches, or match
-               * other tags, while still handling e.g. <id type="desktop">foo.desktop</id> */
-              replace_src = g_strdup_printf (">%s</id", self->rename_desktop_file);
-              replace_dst = g_strdup_printf (">%s</id", desktop_basename);
-
-              while ((match = strstr (to_replace, replace_src)) != NULL)
+              /* replace component/id */
+              n_root = flatpak_xml_find (xml_root, "component", NULL);
+              if (!n_root)
+                n_root = flatpak_xml_find (xml_root, "application", NULL);
+              if (!n_root)
                 {
-                  g_string_append_len (new_contents, to_replace, match - to_replace);
-                  g_string_append (new_contents, replace_dst);
-                  to_replace = match + strlen (replace_src);
+                  g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED, "no <component> node");
+                  return FALSE;
+                }
+              n_id = flatpak_xml_find (n_root, "id", NULL);
+              if (n_id)
+                {
+                  n_text = n_id->first_child;
+                  if (n_text && g_strcmp0 (n_text->text, self->rename_desktop_file) == 0)
+                    {
+                      g_free (n_text->text);
+                      n_text->text = g_strdup (self->id);
+                    }
                 }
 
-              g_string_append (new_contents, to_replace);
+              /* replace any optional launchable */
+              n_id = flatpak_xml_find (n_root, "launchable", NULL);
+              if (n_id)
+                {
+                  n_text = n_id->first_child;
+                  if (n_text && g_strcmp0 (n_text->text, self->rename_desktop_file) == 0)
+                    {
+                      g_free (n_text->text);
+                      n_text->text = g_strdup (desktop_basename);
+                    }
+                }
 
+              new_contents = g_string_new ("");
+              flatpak_xml_to_string (xml_root, new_contents);
               if (!g_file_set_contents (flatpak_file_get_path_cached (appdata_file),
                                         new_contents->str,
                                         new_contents->len,
@@ -3531,8 +3585,7 @@ builder_manifest_install_dep (BuilderManifest *self,
       g_ptr_array_add (args, g_strdup (remote));
     }
 
-  if (opt_yes)
-    g_ptr_array_add (args, "-y");
+  g_ptr_array_add (args, g_strdup ("-y"));
 
   g_ptr_array_add (args, g_strdup (ref));
   g_ptr_array_add (args, NULL);
@@ -3615,6 +3668,8 @@ builder_manifest_install_deps (BuilderManifest *self,
                                gboolean opt_yes,
                                GError **error)
 {
+  GList *l;
+
   /* Sdk */
   g_print ("Dependency Sdk: %s %s\n", self->sdk, builder_manifest_get_runtime_version (self));
   if (!builder_manifest_install_dep (self, context, remote, opt_user, opt_installation,
@@ -3655,7 +3710,7 @@ builder_manifest_install_deps (BuilderManifest *self,
                                                 error))
     return FALSE;
 
-  for (GList *l = self->add_build_extensions; l != NULL; l = l->next)
+  for (l = self->add_build_extensions; l != NULL; l = l->next)
     {
       BuilderExtension *extension = l->data;
       const char *name = builder_extension_get_name (extension);

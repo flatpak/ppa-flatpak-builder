@@ -40,9 +40,13 @@ struct BuilderOptions
   gboolean    no_debuginfo;
   gboolean    no_debuginfo_compression;
   char       *cflags;
+  gboolean    cflags_override;
   char       *cppflags;
+  gboolean    cppflags_override;
   char       *cxxflags;
+  gboolean    cxxflags_override;
   char       *ldflags;
+  gboolean    ldflags_override;
   char       *append_path;
   char       *prepend_path;
   char       *append_ld_library_path;
@@ -50,6 +54,7 @@ struct BuilderOptions
   char       *append_pkg_config_path;
   char       *prepend_pkg_config_path;
   char       *prefix;
+  char       *libdir;
   char      **env;
   char      **build_args;
   char      **test_args;
@@ -72,10 +77,15 @@ G_DEFINE_TYPE_WITH_CODE (BuilderOptions, builder_options, G_TYPE_OBJECT,
 enum {
   PROP_0,
   PROP_CFLAGS,
+  PROP_CFLAGS_OVERRIDE,
   PROP_CPPFLAGS,
+  PROP_CPPFLAGS_OVERRIDE,
   PROP_CXXFLAGS,
+  PROP_CXXFLAGS_OVERRIDE,
   PROP_LDFLAGS,
+  PROP_LDFLAGS_OVERRIDE,
   PROP_PREFIX,
+  PROP_LIBDIR,
   PROP_ENV,
   PROP_STRIP,
   PROP_NO_DEBUGINFO,
@@ -112,6 +122,7 @@ builder_options_finalize (GObject *object)
   g_free (self->append_pkg_config_path);
   g_free (self->prepend_pkg_config_path);
   g_free (self->prefix);
+  g_free (self->libdir);
   g_strfreev (self->env);
   g_strfreev (self->build_args);
   g_strfreev (self->test_args);
@@ -137,16 +148,32 @@ builder_options_get_property (GObject    *object,
       g_value_set_string (value, self->cflags);
       break;
 
+    case PROP_CFLAGS_OVERRIDE:
+      g_value_set_boolean (value, self->cflags_override);
+      break;
+
     case PROP_CPPFLAGS:
       g_value_set_string (value, self->cppflags);
+      break;
+
+    case PROP_CPPFLAGS_OVERRIDE:
+      g_value_set_boolean (value, self->cppflags_override);
       break;
 
     case PROP_CXXFLAGS:
       g_value_set_string (value, self->cxxflags);
       break;
 
+    case PROP_CXXFLAGS_OVERRIDE:
+      g_value_set_boolean (value, self->cxxflags_override);
+      break;
+
     case PROP_LDFLAGS:
       g_value_set_string (value, self->ldflags);
+      break;
+
+    case PROP_LDFLAGS_OVERRIDE:
+      g_value_set_boolean (value, self->ldflags_override);
       break;
 
     case PROP_APPEND_PATH:
@@ -175,6 +202,10 @@ builder_options_get_property (GObject    *object,
 
     case PROP_PREFIX:
       g_value_set_string (value, self->prefix);
+      break;
+
+    case PROP_LIBDIR:
+      g_value_set_string (value, self->libdir);
       break;
 
     case PROP_ENV:
@@ -238,9 +269,17 @@ builder_options_set_property (GObject      *object,
       self->cflags = g_value_dup_string (value);
       break;
 
+    case PROP_CFLAGS_OVERRIDE:
+      self->cflags_override = g_value_get_boolean (value);
+      break;
+
     case PROP_CXXFLAGS:
       g_clear_pointer (&self->cxxflags, g_free);
       self->cxxflags = g_value_dup_string (value);
+      break;
+
+    case PROP_CXXFLAGS_OVERRIDE:
+      self->cxxflags_override = g_value_get_boolean (value);
       break;
 
     case PROP_CPPFLAGS:
@@ -248,9 +287,17 @@ builder_options_set_property (GObject      *object,
       self->cppflags = g_value_dup_string (value);
       break;
 
+    case PROP_CPPFLAGS_OVERRIDE:
+      self->cppflags_override = g_value_get_boolean (value);
+      break;
+
     case PROP_LDFLAGS:
       g_clear_pointer (&self->ldflags, g_free);
       self->ldflags = g_value_dup_string (value);
+      break;
+
+    case PROP_LDFLAGS_OVERRIDE:
+      self->ldflags_override = g_value_get_boolean (value);
       break;
 
     case PROP_APPEND_PATH:
@@ -286,6 +333,11 @@ builder_options_set_property (GObject      *object,
     case PROP_PREFIX:
       g_clear_pointer (&self->prefix, g_free);
       self->prefix = g_value_dup_string (value);
+      break;
+
+    case PROP_LIBDIR:
+      g_clear_pointer (&self->libdir, g_free);
+      self->libdir = g_value_dup_string (value);
       break;
 
     case PROP_ENV:
@@ -364,12 +416,26 @@ builder_options_class_init (BuilderOptionsClass *klass)
                                                         NULL,
                                                         G_PARAM_READWRITE));
   g_object_class_install_property (object_class,
+                                   PROP_CFLAGS_OVERRIDE,
+                                   g_param_spec_boolean ("cflags-override",
+                                                         "",
+                                                         "",
+                                                         FALSE,
+                                                         G_PARAM_READWRITE));
+  g_object_class_install_property (object_class,
                                    PROP_CXXFLAGS,
                                    g_param_spec_string ("cxxflags",
                                                         "",
                                                         "",
                                                         NULL,
                                                         G_PARAM_READWRITE));
+  g_object_class_install_property (object_class,
+                                   PROP_CXXFLAGS_OVERRIDE,
+                                   g_param_spec_boolean ("cxxflags-override",
+                                                         "",
+                                                         "",
+                                                         FALSE,
+                                                         G_PARAM_READWRITE));
   g_object_class_install_property (object_class,
                                    PROP_CPPFLAGS,
                                    g_param_spec_string ("cppflags",
@@ -378,12 +444,26 @@ builder_options_class_init (BuilderOptionsClass *klass)
                                                         NULL,
                                                         G_PARAM_READWRITE));
   g_object_class_install_property (object_class,
+                                   PROP_CPPFLAGS_OVERRIDE,
+                                   g_param_spec_boolean ("cppflags-override",
+                                                         "",
+                                                         "",
+                                                         FALSE,
+                                                         G_PARAM_READWRITE));
+  g_object_class_install_property (object_class,
                                    PROP_LDFLAGS,
                                    g_param_spec_string ("ldflags",
                                                         "",
                                                         "",
                                                         NULL,
                                                         G_PARAM_READWRITE));
+  g_object_class_install_property (object_class,
+                                   PROP_LDFLAGS_OVERRIDE,
+                                   g_param_spec_boolean ("ldflags-override",
+                                                         "",
+                                                         "",
+                                                         FALSE,
+                                                         G_PARAM_READWRITE));
   g_object_class_install_property (object_class,
                                    PROP_APPEND_PATH,
                                    g_param_spec_string ("append-path",
@@ -429,6 +509,13 @@ builder_options_class_init (BuilderOptionsClass *klass)
   g_object_class_install_property (object_class,
                                    PROP_PREFIX,
                                    g_param_spec_string ("prefix",
+                                                        "",
+                                                        "",
+                                                        NULL,
+                                                        G_PARAM_READWRITE));
+  g_object_class_install_property (object_class,
+                                   PROP_LIBDIR,
+                                   g_param_spec_string ("libdir",
                                                         "",
                                                         "",
                                                         NULL,
@@ -503,6 +590,7 @@ builder_options_class_init (BuilderOptionsClass *klass)
                                                          "",
                                                          FALSE,
                                                          G_PARAM_READWRITE));
+
 }
 
 static void
@@ -718,11 +806,20 @@ get_all_options (BuilderOptions *self, BuilderContext *context)
 }
 
 static const char *
-builder_options_get_flags (BuilderOptions *self, BuilderContext *context, size_t field_offset)
+builder_options_get_flags (BuilderOptions *self,
+                           BuilderContext *context,
+                           size_t          field_offset,
+                           size_t          override_field_offset,
+                           const char     *sdk_flags)
 {
   g_autoptr(GList) options = get_all_options (self, context);
   GList *l;
   GString *flags = NULL;
+
+  if (sdk_flags && sdk_flags[0])
+    {
+      flags = g_string_new (sdk_flags);
+    }
 
   /* Last command flag wins, so reverse order */
   options = g_list_reverse (options);
@@ -731,6 +828,10 @@ builder_options_get_flags (BuilderOptions *self, BuilderContext *context, size_t
     {
       BuilderOptions *o = l->data;
       const char *flag = G_STRUCT_MEMBER (const char *, o, field_offset);
+      gboolean override = G_STRUCT_MEMBER (gboolean, o, override_field_offset);
+
+      if (override && flags)
+        g_string_truncate (flags, 0);
 
       if (flag)
         {
@@ -750,28 +851,45 @@ builder_options_get_flags (BuilderOptions *self, BuilderContext *context, size_t
   return NULL;
 }
 
+static const char *
+get_sdk_flags (BuilderOptions *self, BuilderContext *context, const char *(*method)(BuilderSdkConfig *self))
+{
+  BuilderSdkConfig *sdk_config = builder_context_get_sdk_config (context);
+  if (sdk_config)
+    return (*method) (sdk_config);
+  return NULL;
+}
+
 const char *
 builder_options_get_cflags (BuilderOptions *self, BuilderContext *context)
 {
-  return builder_options_get_flags (self, context, G_STRUCT_OFFSET (BuilderOptions, cflags));
+  return builder_options_get_flags (self, context, G_STRUCT_OFFSET (BuilderOptions, cflags),
+                                    G_STRUCT_OFFSET (BuilderOptions, cflags_override),
+                                    get_sdk_flags (self, context, builder_sdk_config_get_cflags));
 }
 
 const char *
 builder_options_get_cxxflags (BuilderOptions *self, BuilderContext *context)
 {
-  return builder_options_get_flags (self, context, G_STRUCT_OFFSET (BuilderOptions, cxxflags));
+  return builder_options_get_flags (self, context, G_STRUCT_OFFSET (BuilderOptions, cxxflags),
+                                    G_STRUCT_OFFSET (BuilderOptions, cxxflags_override),
+                                    get_sdk_flags (self, context, builder_sdk_config_get_cxxflags));
 }
 
 const char *
 builder_options_get_cppflags (BuilderOptions *self, BuilderContext *context)
 {
-  return builder_options_get_flags (self, context, G_STRUCT_OFFSET (BuilderOptions, cppflags));
+  return builder_options_get_flags (self, context, G_STRUCT_OFFSET (BuilderOptions, cppflags),
+                                    G_STRUCT_OFFSET (BuilderOptions, cppflags_override),
+                                    get_sdk_flags (self, context, builder_sdk_config_get_cppflags));
 }
 
 const char *
 builder_options_get_ldflags (BuilderOptions *self, BuilderContext *context)
 {
-  return builder_options_get_flags (self, context, G_STRUCT_OFFSET (BuilderOptions, ldflags));
+  return builder_options_get_flags (self, context, G_STRUCT_OFFSET (BuilderOptions, ldflags),
+                                    G_STRUCT_OFFSET (BuilderOptions, ldflags_override),
+                                    get_sdk_flags (self, context, builder_sdk_config_get_ldflags));
 }
 
 static char *
@@ -887,6 +1005,25 @@ builder_options_get_prefix (BuilderOptions *self, BuilderContext *context)
     return "/usr";
 
   return "/app";
+}
+
+const char *
+builder_options_get_libdir (BuilderOptions *self, BuilderContext *context)
+{
+  g_autoptr(GList) options = get_all_options (self, context);
+  GList *l;
+
+  for (l = options; l != NULL; l = l->next)
+    {
+      BuilderOptions *o = l->data;
+      if (o->libdir)
+        return o->libdir;
+    }
+
+  if (builder_context_get_build_runtime (context))
+    return get_sdk_flags (self, context, builder_sdk_config_get_libdir);
+
+  return NULL;
 }
 
 gboolean
@@ -1150,10 +1287,15 @@ builder_options_checksum (BuilderOptions *self,
 
   builder_cache_checksum_str (cache, BUILDER_OPTION_CHECKSUM_VERSION);
   builder_cache_checksum_str (cache, self->cflags);
+  builder_cache_checksum_compat_boolean (cache, self->cflags_override);
   builder_cache_checksum_str (cache, self->cxxflags);
+  builder_cache_checksum_compat_boolean (cache, self->cxxflags_override);
   builder_cache_checksum_str (cache, self->cppflags);
+  builder_cache_checksum_compat_boolean (cache, self->cppflags_override);
   builder_cache_checksum_str (cache, self->ldflags);
+  builder_cache_checksum_compat_boolean (cache, self->ldflags_override);
   builder_cache_checksum_str (cache, self->prefix);
+  builder_cache_checksum_compat_str (cache, self->libdir);
   builder_cache_checksum_strv (cache, self->env);
   builder_cache_checksum_strv (cache, self->build_args);
   builder_cache_checksum_compat_strv (cache, self->test_args);

@@ -23,8 +23,10 @@
 
 #include <gio/gio.h>
 #include <libsoup/soup.h>
+#include <curl/curl.h>
 #include "builder-options.h"
 #include "builder-utils.h"
+#include "builder-sdk-config.h"
 
 G_BEGIN_DECLS
 
@@ -62,11 +64,13 @@ void            builder_context_set_sources_urls (BuilderContext *self,
                                                   GPtrArray      *sources_urls);
 gboolean        builder_context_download_uri (BuilderContext *self,
                                               const char     *url,
+                                              const char    **mirrors,
                                               GFile          *dest,
                                               const char     *checksums[BUILDER_CHECKSUMS_LEN],
                                               GChecksumType   checksums_type[BUILDER_CHECKSUMS_LEN],
                                               GError        **error);
 SoupSession *   builder_context_get_soup_session (BuilderContext *self);
+CURL *          builder_context_get_curl_session (BuilderContext *self);
 const char *    builder_context_get_arch (BuilderContext *self);
 void            builder_context_set_arch (BuilderContext *self,
                                           const char     *arch);
@@ -138,6 +142,12 @@ void            builder_context_set_no_shallow_clone (BuilderContext *self,
 gboolean        builder_context_get_no_shallow_clone (BuilderContext *self);
 char **         builder_context_extend_env (BuilderContext *self,
                                             char          **envp);
+
+gboolean        builder_context_load_sdk_config (BuilderContext       *self,
+                                                 const char           *sdk_path,
+                                                 GError              **error);
+
+BuilderSdkConfig * builder_context_get_sdk_config (BuilderContext *self);
 
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (BuilderContext, g_object_unref)
 

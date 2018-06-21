@@ -14,8 +14,8 @@ AC_PREREQ([2.63])
 # on the unstable (ie master), interface age = 0
 
 m4_define([flatpak_builder_major_version], [0])
-m4_define([flatpak_builder_minor_version], [10])
-m4_define([flatpak_builder_micro_version], [10])
+m4_define([flatpak_builder_minor_version], [99])
+m4_define([flatpak_builder_micro_version], [1])
 m4_define([flatpak_builder_version],
           [flatpak_builder_major_version.flatpak_builder_minor_version.flatpak_builder_micro_version])
 
@@ -27,7 +27,7 @@ AC_INIT([flatpak-builder],
 
 GLIB_REQS=2.44
 OSTREE_REQS=2017.14
-FLATPAK_REQS=0.10.2
+FLATPAK_REQS=0.11.8
 
 AC_USE_SYSTEM_EXTENSIONS
 AC_SYS_LARGEFILE
@@ -35,6 +35,7 @@ LIBGLNX_CONFIGURE
 
 AC_PROG_CC
 AM_PROG_CC_C_O
+AC_PROG_CC_STDC
 AC_DISABLE_STATIC
 
 AC_CHECK_PROG([FLATPAK], [flatpak], [flatpak], [false])
@@ -94,7 +95,7 @@ AC_CHECK_FUNCS(fdwalk)
 AC_CHECK_HEADER([sys/xattr.h], [], [AC_MSG_ERROR([You must have sys/xattr.h from glibc])])
 AC_CHECK_HEADER([sys/capability.h], have_caps=yes, [AC_MSG_ERROR([sys/capability.h header not found])])
 
-PKG_CHECK_MODULES(BASE, [glib-2.0 >= $GLIB_REQS gio-2.0 gio-unix-2.0 libsoup-2.4 ostree-1 >= $OSTREE_REQS json-glib-1.0 libxml-2.0 >= 2.4])
+PKG_CHECK_MODULES(BASE, [glib-2.0 >= $GLIB_REQS gio-2.0 gio-unix-2.0 libsoup-2.4 ostree-1 >= $OSTREE_REQS json-glib-1.0 libxml-2.0 >= 2.4 libcurl])
 
 dnl ************************
 dnl *** check for libelf ***

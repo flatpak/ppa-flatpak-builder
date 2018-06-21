@@ -332,6 +332,7 @@ main (int    argc,
   gboolean is_run = FALSE;
   gboolean is_show_deps = FALSE;
   gboolean app_dir_is_empty = FALSE;
+  gboolean prune_unused_stages = FALSE;
   g_autoptr(FlatpakContext) arg_context = NULL;
   g_autoptr(FlatpakTempDir) cleanup_manifest_dir = NULL;
   g_autofree char *manifest_basename = NULL;
@@ -354,6 +355,15 @@ main (int    argc,
     g_setenv ("GIO_USE_VFS", old_env, TRUE);
   else
     g_unsetenv ("GIO_USE_VFS");
+
+
+  /* Work around libsoup/glib race condition, as per:
+     https://bugzilla.gnome.org/show_bug.cgi?id=796031 and
+     https://bugzilla.gnome.org/show_bug.cgi?id=674885#c87 */
+  g_type_ensure (G_TYPE_SOCKET_FAMILY);
+  g_type_ensure (G_TYPE_SOCKET_TYPE);
+  g_type_ensure (G_TYPE_SOCKET_PROTOCOL);
+  g_type_ensure (G_TYPE_SOCKET_ADDRESS);
 
   orig_argv = g_memdup (argv, sizeof (char *) * argc);
   orig_argc = argc;
@@ -667,20 +677,21 @@ main (int    argc,
     }
 
   /* Verify that cache and build dir is on same filesystem */
-  {
-    g_autofree char *state_path = g_file_get_path (builder_context_get_state_dir (build_context));
-    g_autoptr(GFile) app_parent = g_file_get_parent (builder_context_get_app_dir (build_context));
-    g_autofree char *app_parent_path = g_file_get_path (app_parent);
-    struct stat buf1, buf2;
+  if (!opt_download_only)
+    {
+      g_autofree char *state_path = g_file_get_path (builder_context_get_state_dir (build_context));
+      g_autoptr(GFile) app_parent = g_file_get_parent (builder_context_get_app_dir (build_context));
+      g_autofree char *app_parent_path = g_file_get_path (app_parent);
+      struct stat buf1, buf2;
 
-    if (stat (app_parent_path, &buf1) == 0 && stat (state_path, &buf2) == 0 &&
-        buf1.st_dev != buf2.st_dev)
-      {
-        g_printerr ("The state dir (%s) is not on the same filesystem as the target dir (%s)\n",
-                    state_path, app_parent_path);
-        return 1;
-      }
-  }
+      if (stat (app_parent_path, &buf1) == 0 && stat (state_path, &buf2) == 0 &&
+          buf1.st_dev != buf2.st_dev)
+        {
+          g_printerr ("The state dir (%s) is not on the same filesystem as the target dir (%s)\n",
+                      state_path, app_parent_path);
+          return 1;
+        }
+    }
 
   if (!builder_context_set_checksum_for (build_context, manifest_basename, manifest_sha256, &error))
     {
@@ -688,7 +699,7 @@ main (int    argc,
       return 1;
     }
 
-  if (!builder_manifest_start (manifest, opt_allow_missing_runtimes, build_context, &error))
+  if (!builder_manifest_start (manifest, opt_download_only, opt_allow_missing_runtimes, build_context, &error))
     {
       g_printerr ("Failed to init: %s\n", error->message);
       return 1;
@@ -1054,7 +1065,10 @@ main (int    argc,
         }
     }
 
-  if (!builder_gc (cache, &error))
+  if (!opt_finish_only && !opt_export_only)
+    prune_unused_stages = TRUE;
+
+  if (!builder_gc (cache, prune_unused_stages, &error))
     {
       g_warning ("Failed to GC build cache: %s", error->message);
       g_clear_error (&error);
