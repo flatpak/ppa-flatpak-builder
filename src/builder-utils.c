@@ -39,6 +39,7 @@
 #include "builder-flatpak-utils.h"
 #include "builder-utils.h"
 
+G_DEFINE_QUARK (builder-curl-error, builder_curl_error)
 G_DEFINE_QUARK (builder-yaml-parse-error, builder_yaml_parse_error)
 
 #ifdef FLATPAK_BUILDER_ENABLE_YAML
@@ -1693,8 +1694,10 @@ builder_host_spawnv (GFile                *dir,
   for (i = 0; env_vars[i] != NULL; i++)
     {
       const char *env_var = env_vars[i];
-      g_variant_builder_add (env_builder, "{ss}", env_var, g_getenv (env_var));
+      if (strcmp (env_var, "LANGUAGE") != 0)
+        g_variant_builder_add (env_builder, "{ss}", env_var, g_getenv (env_var));
     }
+  g_variant_builder_add (env_builder, "{ss}", "LANGUAGE", "C");
 
   sigterm_id = g_unix_signal_add (SIGTERM, sigterm_handler, &data);
   sigint_id = g_unix_signal_add (SIGINT, sigint_handler, &data);
@@ -1876,29 +1879,62 @@ builder_verify_checksums (const char *name,
 }
 
 typedef struct {
-  int stage;
-  gboolean printed_something;
-} DownloadPromptData;
+  GOutputStream  *out;
+  GChecksum     **checksums;
+  gsize           n_checksums;
+  GError        **error;
+} CURLWriteData;
 
-static void
-download_progress (guint64 downloaded_bytes,
-                   gpointer user_data)
+static gsize
+builder_curl_write_cb (gpointer *buffer,
+                       gsize     size,
+                       gsize     nmemb,
+                       gpointer *userdata)
 {
-  DownloadPromptData *progress_data = user_data;
-  char chrs[] = { '|', '/', '-', '\\' };
+  gsize bytes_written;
+  CURLWriteData *write_data = (CURLWriteData *) userdata;
 
-  if (progress_data->printed_something)
-    g_print ("\b");
-  progress_data->printed_something = TRUE;
-  g_print ("%c", chrs[progress_data->stage]);
-  progress_data->stage =  (progress_data->stage + 1) % G_N_ELEMENTS(chrs);
+  flatpak_write_update_checksum (write_data->out, buffer, size * nmemb, &bytes_written,
+                                 write_data->checksums, write_data->n_checksums,
+                                 NULL, write_data->error);
+
+  return bytes_written;
 }
 
-static void
-download_progress_cleanup (DownloadPromptData *progress_data)
+static gboolean
+builder_download_uri_curl (SoupURI        *uri,
+                           CURL           *session,
+                           GOutputStream  *out,
+                           GChecksum     **checksums,
+                           gsize           n_checksums,
+                           GError        **error)
 {
-  if (progress_data->printed_something)
-    g_print ("\b");
+  CURLcode retcode;
+  CURLWriteData write_data;
+  static gchar error_buffer[CURL_ERROR_SIZE];
+  g_autofree gchar *url = soup_uri_to_string (uri, FALSE);
+
+  curl_easy_setopt (session, CURLOPT_URL, url);
+  curl_easy_setopt (session, CURLOPT_WRITEFUNCTION, builder_curl_write_cb);
+  curl_easy_setopt (session, CURLOPT_WRITEDATA, &write_data);
+  curl_easy_setopt (session, CURLOPT_ERRORBUFFER, error_buffer);
+
+  write_data.out = out;
+  write_data.checksums = checksums;
+  write_data.n_checksums = n_checksums;
+  write_data.error = error;
+
+  *error_buffer = '\0';
+  retcode = curl_easy_perform (session);
+
+  if (retcode != CURLE_OK)
+    {
+      g_set_error_literal (error, BUILDER_CURL_ERROR, retcode,
+                           *error_buffer ? error_buffer : curl_easy_strerror (retcode));
+      return FALSE;
+    }
+
+  return TRUE;
 }
 
 gboolean
@@ -1906,16 +1942,13 @@ builder_download_uri (SoupURI        *uri,
                       GFile          *dest,
                       const char     *checksums[BUILDER_CHECKSUMS_LEN],
                       GChecksumType   checksums_type[BUILDER_CHECKSUMS_LEN],
-                      SoupSession    *session,
+                      CURL           *curl_session,
                       GError        **error)
 {
-  g_autoptr(SoupRequest) req = NULL;
-  g_autoptr(GInputStream) input = NULL;
   g_autoptr(GFileOutputStream) out = NULL;
   g_autoptr(GFile) tmp = NULL;
   g_autoptr(GFile) dir = NULL;
   g_autoptr(GPtrArray) checksum_array = g_ptr_array_new_with_free_func ((GDestroyNotify)g_checksum_free);
-  DownloadPromptData progress_data = {0};
   g_autofree char *basename = g_file_get_basename (dest);
   g_autofree char *template = g_strconcat (".", basename, "XXXXXX", NULL);
   gsize i;
@@ -1936,27 +1969,12 @@ builder_download_uri (SoupURI        *uri,
   if (out == NULL)
     return FALSE;
 
-  req = soup_session_request_uri (session, uri, error);
-  if (req == NULL)
-    return FALSE;
-
-  input = soup_request_send (req, NULL, error);
-  if (input == NULL)
-    return FALSE;
-
-  if (SOUP_IS_REQUEST_HTTP (req))
-    {
-      g_autoptr(SoupMessage) msg = soup_request_http_get_message (SOUP_REQUEST_HTTP(req));
-      if (!SOUP_STATUS_IS_SUCCESSFUL(msg->status_code))
-        {
-          g_set_error_literal (error, SOUP_HTTP_ERROR, msg->status_code, msg->reason_phrase);
-          return FALSE;
-        }
-    }
-
-  if (!flatpak_splice_update_checksum (G_OUTPUT_STREAM (out), input,
-                                       (GChecksum **)checksum_array->pdata, checksum_array->len,
-                                       download_progress, &progress_data, NULL, error))
+  if (!builder_download_uri_curl (uri,
+                                  curl_session,
+                                  G_OUTPUT_STREAM (out),
+                                  (GChecksum **)checksum_array->pdata,
+                                  checksum_array->len,
+                                  error))
     {
       unlink (flatpak_file_get_path_cached (tmp));
       return FALSE;
@@ -1968,8 +1986,6 @@ builder_download_uri (SoupURI        *uri,
       unlink (flatpak_file_get_path_cached (tmp));
       return FALSE;
     }
-
-  download_progress_cleanup (&progress_data);
 
   for (i = 0; checksums[i] != NULL; i++)
     {
@@ -2018,4 +2034,273 @@ builder_set_term_title (const gchar *format,
   va_end (args);
 
   g_print ("\033]2;flatpak-builder: %s\007", message);
+}
+
+typedef struct
+{
+  FlatpakXml *current;
+} XmlData;
+
+FlatpakXml *
+flatpak_xml_new (const gchar *element_name)
+{
+  FlatpakXml *node = g_new0 (FlatpakXml, 1);
+
+  node->element_name = g_strdup (element_name);
+  return node;
+}
+
+FlatpakXml *
+flatpak_xml_new_text (const gchar *text)
+{
+  FlatpakXml *node = g_new0 (FlatpakXml, 1);
+
+  node->text = g_strdup (text);
+  return node;
+}
+
+void
+flatpak_xml_add (FlatpakXml *parent, FlatpakXml *node)
+{
+  node->parent = parent;
+
+  if (parent->first_child == NULL)
+    parent->first_child = node;
+  else
+    parent->last_child->next_sibling = node;
+  parent->last_child = node;
+}
+
+static void
+xml_start_element (GMarkupParseContext *context,
+                   const gchar         *element_name,
+                   const gchar        **attribute_names,
+                   const gchar        **attribute_values,
+                   gpointer             user_data,
+                   GError             **error)
+{
+  XmlData *data = user_data;
+  FlatpakXml *node;
+
+  node = flatpak_xml_new (element_name);
+  node->attribute_names = g_strdupv ((char **) attribute_names);
+  node->attribute_values = g_strdupv ((char **) attribute_values);
+
+  flatpak_xml_add (data->current, node);
+  data->current = node;
+}
+
+static void
+xml_end_element (GMarkupParseContext *context,
+                 const gchar         *element_name,
+                 gpointer             user_data,
+                 GError             **error)
+{
+  XmlData *data = user_data;
+
+  data->current = data->current->parent;
+}
+
+static void
+xml_text (GMarkupParseContext *context,
+          const gchar         *text,
+          gsize                text_len,
+          gpointer             user_data,
+          GError             **error)
+{
+  XmlData *data = user_data;
+  FlatpakXml *node;
+
+  node = flatpak_xml_new (NULL);
+  node->text = g_strndup (text, text_len);
+  flatpak_xml_add (data->current, node);
+}
+
+static void
+xml_passthrough (GMarkupParseContext *context,
+                 const gchar         *passthrough_text,
+                 gsize                text_len,
+                 gpointer             user_data,
+                 GError             **error)
+{
+}
+
+static GMarkupParser xml_parser = {
+  xml_start_element,
+  xml_end_element,
+  xml_text,
+  xml_passthrough,
+  NULL
+};
+
+void
+flatpak_xml_free (FlatpakXml *node)
+{
+  FlatpakXml *child;
+
+  if (node == NULL)
+    return;
+
+  child = node->first_child;
+  while (child != NULL)
+    {
+      FlatpakXml *next = child->next_sibling;
+      flatpak_xml_free (child);
+      child = next;
+    }
+
+  g_free (node->element_name);
+  g_free (node->text);
+  g_strfreev (node->attribute_names);
+  g_strfreev (node->attribute_values);
+  g_free (node);
+}
+
+
+void
+flatpak_xml_to_string (FlatpakXml *node, GString *res)
+{
+  int i;
+  FlatpakXml *child;
+
+  if (node->parent == NULL)
+    g_string_append (res, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+
+  if (node->element_name)
+    {
+      if (node->parent != NULL)
+        {
+          g_string_append (res, "<");
+          g_string_append (res, node->element_name);
+          if (node->attribute_names)
+            {
+              for (i = 0; node->attribute_names[i] != NULL; i++)
+                {
+                  g_string_append_printf (res, " %s=\"%s\"",
+                                          node->attribute_names[i],
+                                          node->attribute_values[i]);
+                }
+            }
+          if (node->first_child == NULL)
+            g_string_append (res, "/>");
+          else
+            g_string_append (res, ">");
+        }
+
+      child = node->first_child;
+      while (child != NULL)
+        {
+          flatpak_xml_to_string (child, res);
+          child = child->next_sibling;
+        }
+      if (node->parent != NULL)
+        {
+          if (node->first_child != NULL)
+            g_string_append_printf (res, "</%s>", node->element_name);
+        }
+
+    }
+  else if (node->text)
+    {
+      g_autofree char *escaped = g_markup_escape_text (node->text, -1);
+      g_string_append (res, escaped);
+    }
+}
+
+FlatpakXml *
+flatpak_xml_unlink (FlatpakXml *node,
+                    FlatpakXml *prev_sibling)
+{
+  FlatpakXml *parent = node->parent;
+
+  if (parent == NULL)
+    return node;
+
+  if (parent->first_child == node)
+    parent->first_child = node->next_sibling;
+
+  if (parent->last_child == node)
+    parent->last_child = prev_sibling;
+
+  if (prev_sibling)
+    prev_sibling->next_sibling = node->next_sibling;
+
+  node->parent = NULL;
+  node->next_sibling = NULL;
+
+  return node;
+}
+
+FlatpakXml *
+flatpak_xml_find (FlatpakXml  *node,
+                  const char  *type,
+                  FlatpakXml **prev_child_out)
+{
+  FlatpakXml *child = NULL;
+  FlatpakXml *prev_child = NULL;
+
+  child = node->first_child;
+  prev_child = NULL;
+  while (child != NULL)
+    {
+      FlatpakXml *next = child->next_sibling;
+
+      if (g_strcmp0 (child->element_name, type) == 0)
+        {
+          if (prev_child_out)
+            *prev_child_out = prev_child;
+          return child;
+        }
+
+      prev_child = child;
+      child = next;
+    }
+
+  return NULL;
+}
+
+
+FlatpakXml *
+flatpak_xml_parse (GInputStream *in,
+                   gboolean      compressed,
+                   GCancellable *cancellable,
+                   GError      **error)
+{
+  g_autoptr(GInputStream) real_in = NULL;
+  g_autoptr(FlatpakXml) xml_root = NULL;
+  XmlData data = { 0 };
+  char buffer[32 * 1024];
+  gssize len;
+  g_autoptr(GMarkupParseContext) ctx = NULL;
+
+  if (compressed)
+    {
+      g_autoptr(GZlibDecompressor) decompressor = NULL;
+      decompressor = g_zlib_decompressor_new (G_ZLIB_COMPRESSOR_FORMAT_GZIP);
+      real_in = g_converter_input_stream_new (in, G_CONVERTER (decompressor));
+    }
+  else
+    {
+      real_in = g_object_ref (in);
+    }
+
+  xml_root = flatpak_xml_new ("root");
+  data.current = xml_root;
+
+  ctx = g_markup_parse_context_new (&xml_parser,
+                                    G_MARKUP_PREFIX_ERROR_POSITION,
+                                    &data,
+                                    NULL);
+
+  while ((len = g_input_stream_read (real_in, buffer, sizeof (buffer),
+                                     cancellable, error)) > 0)
+    {
+      if (!g_markup_parse_context_parse (ctx, buffer, len, error))
+        return NULL;
+    }
+
+  if (len < 0)
+    return NULL;
+
+  return g_steal_pointer (&xml_root);
 }

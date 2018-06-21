@@ -24,6 +24,7 @@
 #include <gio/gio.h>
 #include <libsoup/soup.h>
 #include <json-glib/json-glib.h>
+#include <curl/curl.h>
 
 #include <libxml/tree.h>
 
@@ -61,6 +62,9 @@ void     flatpak_collect_matches_for_path_pattern (const char *path,
 gboolean builder_migrate_locale_dirs (GFile   *root_dir,
                                       GError **error);
 
+GQuark builder_curl_error_quark (void);
+#define BUILDER_CURL_ERROR (builder_curl_error_quark ())
+
 GQuark builder_yaml_parse_error_quark (void);
 #define BUILDER_YAML_PARSE_ERROR (builder_yaml_parse_error_quark ())
 
@@ -84,7 +88,7 @@ gboolean builder_download_uri (SoupURI        *uri,
                                GFile          *dest,
                                const char     *checksums[BUILDER_CHECKSUMS_LEN],
                                GChecksumType   checksums_type[BUILDER_CHECKSUMS_LEN],
-                               SoupSession    *soup_session,
+                               CURL           *curl_session,
                                GError        **error);
 
 gsize builder_get_all_checksums (const char *checksums[BUILDER_CHECKSUMS_LEN],
@@ -118,6 +122,39 @@ xml_autoptr_cleanup_generic_free (void *p)
 #define xml_autofree _GLIB_CLEANUP(xml_autoptr_cleanup_generic_free)
 
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (xmlDoc, xmlFreeDoc)
+
+typedef struct FlatpakXml FlatpakXml;
+
+struct FlatpakXml
+{
+  gchar      *element_name; /* NULL == text */
+  char      **attribute_names;
+  char      **attribute_values;
+  char       *text;
+  FlatpakXml *parent;
+  FlatpakXml *first_child;
+  FlatpakXml *last_child;
+  FlatpakXml *next_sibling;
+};
+
+FlatpakXml *flatpak_xml_new (const gchar *element_name);
+FlatpakXml *flatpak_xml_new_text (const gchar *text);
+void       flatpak_xml_add (FlatpakXml *parent,
+                            FlatpakXml *node);
+void       flatpak_xml_free (FlatpakXml *node);
+FlatpakXml *flatpak_xml_parse (GInputStream *in,
+                               gboolean      compressed,
+                               GCancellable *cancellable,
+                               GError      **error);
+void       flatpak_xml_to_string (FlatpakXml *node,
+                                  GString    *res);
+FlatpakXml *flatpak_xml_unlink (FlatpakXml *node,
+                                FlatpakXml *prev_sibling);
+FlatpakXml *flatpak_xml_find (FlatpakXml  *node,
+                              const char  *type,
+                              FlatpakXml **prev_child_out);
+
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (FlatpakXml, flatpak_xml_free);
 
 G_END_DECLS
 
