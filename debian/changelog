@@ -1,6 +1,7 @@
 flatpak-builder (0.99.3-1) UNRELEASED; urgency=medium
 
   * New upstream release
+  * Depend on flatpak (>= 0.99.1)
   * Standards-Version: 4.1.5 (no changes required)
   * Set libexecdir to /usr/libexec as allowed by FHS 3.0
 
