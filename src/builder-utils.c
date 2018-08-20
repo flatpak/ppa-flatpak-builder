@@ -1574,7 +1574,7 @@ sigterm_handler (gpointer user_data)
                                G_DBUS_CALL_FLAGS_NONE, -1,
                                NULL, NULL);
 
-  kill (getpid (), SIGTERM);
+  kill (getpid (), SIGKILL);
   return TRUE;
 }
 
@@ -1593,7 +1593,7 @@ sigint_handler (gpointer user_data)
                                G_DBUS_CALL_FLAGS_NONE, -1,
                                NULL, NULL);
 
-  kill (getpid (), SIGTERM);
+  kill (getpid (), SIGKILL);
   return TRUE;
 }
 
@@ -1618,8 +1618,18 @@ builder_host_spawnv (GFile                *dir,
   guint sigterm_id = 0, sigint_id = 0;
   g_autofree gchar *commandline = NULL;
   g_autoptr(GOutputStream) out = NULL;
+  g_autoptr(GFile) cwd = NULL;
+  glnx_fd_close int blocking_stdin_fd = -1;
   int pipefd[2];
+  int stdin_fd;
   int i;
+
+  if (dir == NULL)
+    {
+      g_autofree char *current_dir = g_get_current_dir ();
+      cwd = g_file_new_for_path (current_dir);
+      dir = cwd;
+    }
 
   commandline = flatpak_quote_argv ((const char **) argv);
   g_debug ("Running '%s' on host", commandline);
@@ -1643,7 +1653,20 @@ builder_host_spawnv (GFile                *dir,
                                                      host_command_exited_cb,
                                                      &data, NULL);
 
-  stdin_handle = g_unix_fd_list_append (fd_list, 0, error);
+  if ((flags & G_SUBPROCESS_FLAGS_STDIN_INHERIT) != 0)
+    stdin_fd = 0;
+  else
+    {
+      blocking_stdin_fd = open ("/dev/null", O_RDONLY| O_CLOEXEC);
+      if (blocking_stdin_fd == -1)
+        {
+          glnx_set_error_from_errno (error);
+          return FALSE;
+        }
+      stdin_fd = blocking_stdin_fd;
+    }
+
+  stdin_handle = g_unix_fd_list_append (fd_list, stdin_fd, error);
   if (stdin_handle == -1)
     return FALSE;
 
@@ -1766,7 +1789,7 @@ builder_maybe_host_spawnv (GFile                *dir,
                            const gchar * const  *argv)
 {
   if (flatpak_is_in_sandbox ())
-    return builder_host_spawnv (dir, output, 0, error, argv);
+    return builder_host_spawnv (dir, output, flags, error, argv);
 
   return flatpak_spawnv (dir, output, flags, error, argv);
 }
@@ -2040,17 +2063,180 @@ builder_download_uri (SoupURI        *uri,
   return TRUE;
 }
 
+typedef struct {
+  GParamSpec *pspec;
+  JsonNode *data;
+} BuilderXProperty;
+
+static BuilderXProperty *
+builder_x_property_new (const char *name)
+{
+  BuilderXProperty *property = g_new0 (BuilderXProperty, 1);
+  property->pspec = g_param_spec_boxed (name, "", "", JSON_TYPE_NODE, G_PARAM_READWRITE | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB);
+
+  return property;
+}
+
+static void
+builder_x_property_free (BuilderXProperty *prop)
+{
+  g_param_spec_unref (prop->pspec);
+  if (prop->data)
+    json_node_unref (prop->data);
+  g_free (prop);
+}
+
+static const char *
+builder_x_property_get_name (BuilderXProperty *prop)
+{
+  return g_param_spec_get_name (prop->pspec);
+}
+
 GParamSpec *
-builder_serializable_find_property_with_error (JsonSerializable *serializable,
-                                               const char       *name)
+builder_serializable_find_property (JsonSerializable *serializable,
+                                    const char       *name)
 {
   GParamSpec *pspec = g_object_class_find_property (G_OBJECT_GET_CLASS (serializable), name);
+
   if (pspec == NULL &&
-      !g_str_has_prefix (name, "x-") &&
+      g_str_has_prefix (name, "x-"))
+    {
+      GHashTable *x_props = g_object_get_data (G_OBJECT (serializable), "flatpak-x-props");
+      BuilderXProperty *prop;
+
+      if (x_props == NULL)
+        {
+          x_props = g_hash_table_new_full (g_str_hash, g_str_equal, NULL, (GDestroyNotify)builder_x_property_free);
+          g_object_set_data_full (G_OBJECT (serializable), "flatpak-x-props", x_props, (GDestroyNotify)g_hash_table_unref);
+        }
+
+      prop = g_hash_table_lookup (x_props, name);
+      if (prop == NULL)
+        {
+          prop = builder_x_property_new (name);
+          g_hash_table_insert (x_props, (char *)builder_x_property_get_name (prop), prop);
+        }
+
+      pspec = prop->pspec;
+    }
+
+  if (pspec == NULL &&
       !g_str_has_prefix (name, "__") &&
       !g_str_has_prefix (name, "//"))
     g_warning ("Unknown property %s for type %s", name, g_type_name_from_instance ((GTypeInstance *)serializable));
+
   return pspec;
+}
+
+GParamSpec **
+builder_serializable_list_properties (JsonSerializable *serializable,
+                                      guint            *n_pspecs)
+{
+  GPtrArray *res = g_ptr_array_new ();
+  guint n_normal, i;
+  g_autofree GParamSpec **normal = NULL;
+  GHashTable *x_props;
+
+  normal = g_object_class_list_properties (G_OBJECT_GET_CLASS (serializable), &n_normal);
+
+  for (i = 0; i < n_normal; i++)
+    g_ptr_array_add (res, normal[i]);
+
+  x_props = g_object_get_data (G_OBJECT (serializable), "flatpak-x-props");
+  if (x_props)
+    {
+      GLNX_HASH_TABLE_FOREACH_V (x_props, BuilderXProperty *, prop)
+        {
+          g_ptr_array_add (res, prop->pspec);
+        }
+    }
+
+  if (n_pspecs)
+    *n_pspecs = res->len;
+
+  g_ptr_array_add (res, NULL);
+
+  return (GParamSpec **)g_ptr_array_free (res, FALSE);
+}
+
+gboolean
+builder_serializable_deserialize_property (JsonSerializable *serializable,
+                                           const gchar      *property_name,
+                                           GValue           *value,
+                                           GParamSpec       *pspec,
+                                           JsonNode         *property_node)
+{
+  GHashTable *x_props = g_object_get_data (G_OBJECT (serializable), "flatpak-x-props");
+
+  if (x_props)
+    {
+      BuilderXProperty *prop = g_hash_table_lookup (x_props, property_name);
+      if (prop)
+        {
+          g_value_set_boxed (value, property_node);
+          return TRUE;
+        }
+    }
+
+  return json_serializable_default_deserialize_property (serializable, property_name, value, pspec, property_node);
+}
+
+JsonNode *
+builder_serializable_serialize_property (JsonSerializable *serializable,
+                                         const gchar      *property_name,
+                                         const GValue     *value,
+                                         GParamSpec       *pspec)
+{
+  GHashTable *x_props = g_object_get_data (G_OBJECT (serializable), "flatpak-x-props");
+
+  if (x_props)
+    {
+      BuilderXProperty *prop = g_hash_table_lookup (x_props, property_name);
+      if (prop)
+        return g_value_dup_boxed (value);
+    }
+
+  return json_serializable_default_serialize_property (serializable, property_name, value, pspec);
+}
+
+void
+builder_serializable_set_property (JsonSerializable *serializable,
+                                   GParamSpec       *pspec,
+                                   const GValue     *value)
+{
+  GHashTable *x_props = g_object_get_data (G_OBJECT (serializable), "flatpak-x-props");
+
+  if (x_props)
+    {
+      BuilderXProperty *prop = g_hash_table_lookup (x_props, g_param_spec_get_name (pspec));
+      if (prop)
+        {
+          prop->data = g_value_dup_boxed (value);
+          return;
+        }
+    }
+
+  g_object_set_property (G_OBJECT (serializable), pspec->name, value);
+}
+
+void
+builder_serializable_get_property (JsonSerializable *serializable,
+                                   GParamSpec       *pspec,
+                                   GValue           *value)
+{
+  GHashTable *x_props = g_object_get_data (G_OBJECT (serializable), "flatpak-x-props");
+
+  if (x_props)
+    {
+      BuilderXProperty *prop = g_hash_table_lookup (x_props, g_param_spec_get_name (pspec));
+      if (prop)
+        {
+          g_value_set_boxed (value, prop->data);
+          return;
+        }
+    }
+
+  g_object_get_property (G_OBJECT (serializable), pspec->name, value);
 }
 
 void

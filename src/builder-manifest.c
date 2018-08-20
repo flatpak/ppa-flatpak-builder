@@ -1113,10 +1113,10 @@ builder_manifest_serialize_property (JsonSerializable *serializable,
     }
   else
     {
-      return json_serializable_default_serialize_property (serializable,
-                                                           property_name,
-                                                           value,
-                                                           pspec);
+      return builder_serializable_serialize_property (serializable,
+                                                      property_name,
+                                                      value,
+                                                      pspec);
     }
 }
 
@@ -1252,10 +1252,10 @@ builder_manifest_deserialize_property (JsonSerializable *serializable,
     }
   else
     {
-      return json_serializable_default_deserialize_property (serializable,
-                                                             property_name,
-                                                             value,
-                                                             pspec, property_node);
+      return builder_serializable_deserialize_property (serializable,
+                                                        property_name,
+                                                        value,
+                                                        pspec, property_node);
     }
 }
 
@@ -1264,7 +1264,28 @@ serializable_iface_init (JsonSerializableIface *serializable_iface)
 {
   serializable_iface->serialize_property = builder_manifest_serialize_property;
   serializable_iface->deserialize_property = builder_manifest_deserialize_property;
-  serializable_iface->find_property = builder_serializable_find_property_with_error;
+  serializable_iface->find_property = builder_serializable_find_property;
+  serializable_iface->list_properties = builder_serializable_list_properties;
+  serializable_iface->set_property = builder_serializable_set_property;
+  serializable_iface->get_property = builder_serializable_get_property;
+}
+
+static char *
+builder_manifest_serialize (BuilderManifest *self)
+{
+  JsonNode *node;
+  JsonGenerator *generator;
+  char *json;
+
+  node = json_gobject_serialize (G_OBJECT (self));
+  generator = json_generator_new ();
+  json_generator_set_pretty (generator, TRUE);
+  json_generator_set_root (generator, node);
+  json = json_generator_to_data (generator, NULL);
+  g_object_unref (generator);
+  json_node_free (node);
+
+  return json;
 }
 
 const char *
@@ -1747,6 +1768,7 @@ builder_manifest_checksum_for_finish (BuilderManifest *self,
                                       BuilderContext  *context)
 {
   GList *l;
+  g_autofree char *json = NULL;
 
   builder_cache_checksum_str (cache, BUILDER_MANIFEST_CHECKSUM_FINISH_VERSION);
   builder_cache_checksum_strv (cache, self->finish_args);
@@ -1773,6 +1795,9 @@ builder_manifest_checksum_for_finish (BuilderManifest *self,
       else
         g_warning ("Can't load metadata file %s: %s", self->metadata, my_error->message);
     }
+
+  json = builder_manifest_serialize (self);
+  builder_cache_checksum_str (cache, json);
 }
 
 static void
@@ -2523,10 +2548,29 @@ builder_manifest_cleanup (BuilderManifest *self,
             return FALSE;
 
           if (self->rename_desktop_file)
-            g_key_file_set_string (keyfile,
-                                   G_KEY_FILE_DESKTOP_GROUP,
-                                   "X-Flatpak-RenamedFrom",
-                                   self->rename_desktop_file);
+            {
+              g_auto(GStrv) old_renames = g_key_file_get_string_list (keyfile,
+                                                                      G_KEY_FILE_DESKTOP_GROUP,
+                                                                      "X-Flatpak-RenamedFrom",
+                                                                      NULL, NULL);
+              const char **new_renames = NULL;
+              int old_rename_len = 0;
+              int new_rename_len = 0;
+
+              if (old_renames)
+                old_rename_len = g_strv_length (old_renames);
+
+              new_renames = g_new (const char *, old_rename_len + 2);
+              for (i = 0; i < old_rename_len; i++)
+                new_renames[new_rename_len++] = old_renames[i];
+              new_renames[new_rename_len++] = self->rename_desktop_file;
+              new_renames[new_rename_len] = NULL;
+
+              g_key_file_set_string_list (keyfile,
+                                          G_KEY_FILE_DESKTOP_GROUP,
+                                          "X-Flatpak-RenamedFrom",
+                                          new_renames, new_rename_len);
+            }
 
           desktop_keys = g_key_file_get_keys (keyfile,
                                               G_KEY_FILE_DESKTOP_GROUP,
@@ -2633,7 +2677,6 @@ maybe_format_extension_tag (const char *extension_tag)
   return g_strdup ("");
 }
 
-
 gboolean
 builder_manifest_finish (BuilderManifest *self,
                          BuilderCache    *cache,
@@ -2651,8 +2694,6 @@ builder_manifest_finish (BuilderManifest *self,
   g_autoptr(GSubprocess) subp = NULL;
   int i;
   GList *l;
-  JsonNode *node;
-  JsonGenerator *generator;
 
   builder_manifest_checksum_for_finish (self, cache, context);
   if (!builder_cache_lookup (cache, "finish"))
@@ -2855,13 +2896,7 @@ builder_manifest_finish (BuilderManifest *self,
           !g_subprocess_wait_check (subp, NULL, error))
         return FALSE;
 
-      node = json_gobject_serialize (G_OBJECT (self));
-      generator = json_generator_new ();
-      json_generator_set_pretty (generator, TRUE);
-      json_generator_set_root (generator, node);
-      json = json_generator_to_data (generator, NULL);
-      g_object_unref (generator);
-      json_node_free (node);
+      json = builder_manifest_serialize (self);
 
       if (self->build_runtime)
         manifest_file = g_file_resolve_relative_path (app_dir, "usr/manifest.json");
@@ -3831,10 +3866,21 @@ builder_manifest_run (BuilderManifest *self,
   commandline = flatpak_quote_argv ((const char **) args->pdata);
   g_debug ("Running '%s'", commandline);
 
-  if (execvp ((char *) args->pdata[0], (char **) args->pdata) == -1)
+
+  if (flatpak_is_in_sandbox ())
     {
-      g_set_error (error, G_IO_ERROR, g_io_error_from_errno (errno), "Unable to start flatpak build");
-      return FALSE;
+      if (builder_host_spawnv (NULL, NULL, G_SUBPROCESS_FLAGS_STDIN_INHERIT, NULL, (const gchar * const  *)args->pdata))
+        exit (1);
+      else
+        exit (0);
+    }
+  else
+    {
+      if (execvp ((char *) args->pdata[0], (char **) args->pdata) == -1)
+        {
+          g_set_error (error, G_IO_ERROR, g_io_error_from_errno (errno), "Unable to start flatpak build");
+          return FALSE;
+        }
     }
 
   /* Not reached */
