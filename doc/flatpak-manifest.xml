@@ -393,7 +393,11 @@
             <variablelist>
                 <varlistentry>
                     <term><option>directory</option> (string)</term>
-                    <listitem><para>The directory where the extension is mounted.</para></listitem>
+                    <listitem><para>
+                      The directory where the extension is mounted.
+                      If the extension point is for an application, this path is relative to /app,
+                      otherwise it is relative to /usr.
+                    </para></listitem>
                 </varlistentry>
                 <varlistentry>
                     <term><option>bundle</option> (boolean)</term>
@@ -416,6 +420,7 @@
               autodelete, no-autodownload, subdirectories,
               add-ld-path, download-if, enable-if, merge-dirs,
               subdirectory-suffix, locale-subset, version, versions.
+              See the flatpak metadata documentation for more information on these.
             </para>
         </refsect2>
         <refsect2>
@@ -825,6 +830,10 @@
                         <listitem><para>The path of a patch file that will be applied in the source dir</para></listitem>
                     </varlistentry>
                     <varlistentry>
+                        <term><option>paths</option> (array of strings)</term>
+                        <listitem><para>An list of paths to a patch files that will be applied in the source dir, in order</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
                         <term><option>strip-components</option> (integer)</term>
                         <listitem><para>The value of the -p argument to patch, defaults to 1.</para></listitem>
                     </varlistentry>
@@ -929,6 +938,10 @@
             <listitem><para>The number of jobs that flatpak-builder would normally use for make -j. Defaults to ncpus unless the module disabled parallel make.</para></listitem>
           </varlistentry>
           <varlistentry>
+            <term>FLATPAK_BUILDER_BUILDDIR</term>
+            <listitem><para>The path to the build directory of the module currently building. This is normally <filename>/run/build/$MODULE</filename>.</para></listitem>
+          </varlistentry>
+          <varlistentry>
             <term>PATH</term>
             <listitem><para><filename>/app/bin:/usr/bin</filename></para></listitem>
           </varlistentry>
@@ -1031,7 +1044,7 @@
             "sources": [
                 {
                     "type": "git",
-                    "url": "git://git.gnome.org/babl"
+                    "url": "https://gitlab.gnome.org/GNOME/babl.git"
                 }
             ]
         },
