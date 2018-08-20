@@ -2,6 +2,7 @@ flatpak-builder (1.0.0-1) UNRELEASED; urgency=medium
 
   * New upstream stable release
   * Standards-Version: 4.2.0
+  * d/watch: Only watch even-numbered (stable) branches
 
  -- Simon McVittie <smcv@debian.org>  Mon, 20 Aug 2018 15:03:30 +0100
 
