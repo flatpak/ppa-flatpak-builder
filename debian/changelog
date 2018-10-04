@@ -3,6 +3,8 @@ flatpak-builder (1.0.1-1) UNRELEASED; urgency=medium
   * New upstream release
   * Standards-Version: 4.2.1
   * Install the upstream NEWS and README.md files
+  * d/flatpak-builder-tests.lintian-overrides: Silence some overzealous
+    package-contains-documentation-outside-usr-share-doc tags
 
  -- Simon McVittie <smcv@debian.org>  Thu, 04 Oct 2018 15:04:56 +0100
 
