@@ -39,7 +39,7 @@ Build-Depends:
  shared-mime-info <!nocheck>,
  xmlto <!nodoc>,
  xsltproc <!nodoc>,
-Standards-Version: 4.2.0
+Standards-Version: 4.2.1
 Homepage: http://flatpak.org/
 Vcs-Git: https://salsa.debian.org/debian/flatpak-builder.git
 Vcs-Browser: https://salsa.debian.org/debian/flatpak-builder
