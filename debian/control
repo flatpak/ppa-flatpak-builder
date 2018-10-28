@@ -55,7 +55,7 @@ Depends:
  ${shlibs:Depends},
 Recommends:
  binutils,
- bzr,
+ bzr | brz,
  elfutils,
  git,
  patch,
