@@ -253,6 +253,46 @@ do_export (BuilderContext *build_context,
 }
 
 static gboolean
+flatpak_version_check (int major,
+                       int minor,
+                       int micro)
+{
+  static int flatpak_major = 0;
+  static int flatpak_minor = 0;
+  static int flatpak_micro = 0;
+
+  if (flatpak_major == 0 &&
+      flatpak_minor == 0 &&
+      flatpak_micro == 0)
+    {
+      const char * argv[] = { "flatpak", "--version", NULL };
+      g_autoptr(GSubprocess) subp = NULL;
+      g_autofree char *out = NULL;
+ 
+      subp = g_subprocess_newv (argv, G_SUBPROCESS_FLAGS_STDOUT_PIPE, NULL);
+      g_subprocess_communicate_utf8 (subp, NULL, NULL, &out, NULL, NULL);
+
+      if (sscanf (out, "Flatpak %d.%d.%d", &flatpak_major, &flatpak_minor, &flatpak_micro) != 3)
+        g_warning ("Failed to get flatpak version");
+
+      g_debug ("Using Flatpak version %d.%d.%d", flatpak_major, flatpak_minor, flatpak_micro);
+    }
+
+  if (flatpak_major > major)
+    return TRUE;
+  if (flatpak_major < major)
+    return FALSE;
+  if (flatpak_minor > minor)
+    return TRUE;
+  if (flatpak_minor < minor)
+    return FALSE;
+  if (flatpak_micro >= micro)
+    return TRUE;
+
+  return FALSE;
+}
+
+static gboolean
 do_install (BuilderContext *build_context,
             const gchar    *repodir,
             const gchar    *id,
@@ -276,7 +316,8 @@ do_install (BuilderContext *build_context,
     g_ptr_array_add (args, g_strdup ("--system"));
 
   g_ptr_array_add (args, g_strdup ("-y"));
-
+  if (flatpak_version_check (1, 2, 0))
+    g_ptr_array_add (args, g_strdup ("--noninteractive"));
   g_ptr_array_add (args, g_strdup ("--reinstall"));
 
   ref = flatpak_build_untyped_ref (id, branch,
@@ -401,6 +442,7 @@ main (int    argc,
   int i, first_non_arg, orig_argc;
   int argnr;
   char *p;
+  struct stat statbuf;
 
   setlocale (LC_ALL, "");
 
@@ -416,7 +458,6 @@ main (int    argc,
     g_setenv ("GIO_USE_VFS", old_env, TRUE);
   else
     g_unsetenv ("GIO_USE_VFS");
-
 
   /* Work around libsoup/glib race condition, as per:
      https://bugzilla.gnome.org/show_bug.cgi?id=796031 and
@@ -618,6 +659,9 @@ main (int    argc,
       g_printerr ("Can't load '%s': %s\n", manifest_rel_path, error->message);
       return 1;
     }
+
+  if (stat (flatpak_file_get_path_cached (manifest_file), &statbuf) == 0)
+    builder_context_set_source_date_epoch (build_context, (gint64)statbuf.st_mtime);
 
   manifest_sha256 = g_compute_checksum_for_string (G_CHECKSUM_SHA256, manifest_contents, -1);
 

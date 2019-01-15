@@ -112,7 +112,7 @@
     <refsect1>
         <title>Manifest</title>
 
-        <para>The manifest file is a json file whose format is described in detail in its own manual page.</para>
+        <para>The manifest file is a json or yaml file whose format is described in detail in its own manual page.</para>
     </refsect1>
 
     <refsect1>
@@ -623,7 +623,7 @@
     "runtime-version": "1.2",
     "sdk": "org.freedesktop.Sdk",
     "command": "test",
-    "clean": [ "/include", "*.la" ],
+    "cleanup": [ "/include", "*.la" ],
     "build-options" : {
         "cflags": "-O2 -g",
         "cxxflags": "-O2 -g",
