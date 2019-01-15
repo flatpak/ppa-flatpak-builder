@@ -1,4 +1,4 @@
-flatpak-builder (1.0.2-1) UNRELEASED; urgency=medium
+flatpak-builder (1.0.2-1) unstable; urgency=medium
 
   [ Jelmer Vernooĳ ]
   * Support brz as alternative to bzr.
@@ -6,7 +6,7 @@ flatpak-builder (1.0.2-1) UNRELEASED; urgency=medium
   [ Simon McVittie ]
   * New upstream release
 
- -- Jelmer Vernooĳ <jelmer@debian.org>  Sun, 28 Oct 2018 19:09:17 +0000
+ -- Simon McVittie <smcv@debian.org>  Tue, 15 Jan 2019 18:38:27 +0000
 
 flatpak-builder (1.0.1-1) unstable; urgency=medium
 
