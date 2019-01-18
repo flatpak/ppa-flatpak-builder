@@ -1,0 +1,8 @@
+---
+Name: flatpak-builder
+Repository: https://github.com/flatpak/flatpak-builder
+Repository-Browse: https://github.com/flatpak/flatpak-builder
+Bug-Database: https://github.com/flatpak/flatpak-builder/issues
+Bug-Submit: https://github.com/flatpak/flatpak-builder/issues/new
+...
+# vim:set ft=yaml:
