@@ -1,10 +1,10 @@
-flatpak-builder (1.0.3-1) UNRELEASED; urgency=medium
+flatpak-builder (1.0.3-1) unstable; urgency=medium
 
   * New upstream release
   * Standards-Version: 4.3.0 (no changes required)
   * d/upstream/metadata: Add DEP-12 metadata
 
- -- Simon McVittie <smcv@debian.org>  Thu, 24 Jan 2019 09:22:12 +0000
+ -- Simon McVittie <smcv@debian.org>  Mon, 28 Jan 2019 14:06:58 +0000
 
 flatpak-builder (1.0.2-1) unstable; urgency=medium
 
