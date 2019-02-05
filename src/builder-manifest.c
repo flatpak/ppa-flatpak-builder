@@ -1415,6 +1415,56 @@ builder_manifest_set_default_collection_id (BuilderManifest *self,
     self->collection_id = g_strdup (default_collection_id);
 }
 
+void
+builder_manifest_add_tags (BuilderManifest *self,
+                          const char      **add_tags)
+{
+  GPtrArray *new_tags = g_ptr_array_new ();
+  int i;
+
+  for (i = 0; self->tags != NULL && self->tags[i] != NULL; i++)
+    g_ptr_array_add (new_tags, self->tags[i]);
+
+  for (i = 0; add_tags[i] != NULL; i++)
+    {
+      const char *new_tag = add_tags[i];
+      if (self->tags == NULL || !g_strv_contains ((const char **)self->tags, new_tag))
+        g_ptr_array_add (new_tags, g_strdup (new_tag));
+    }
+
+  g_ptr_array_add (new_tags, NULL);
+
+  g_free (self->tags);
+  self->tags = (char **)g_ptr_array_free (new_tags, FALSE);
+
+}
+
+void
+builder_manifest_remove_tags (BuilderManifest *self,
+                             const char      **remove_tags)
+{
+  GPtrArray *new_tags = g_ptr_array_new ();
+  int i;
+
+  if (self->tags)
+    {
+      for (i = 0; self->tags[i] != NULL; i++)
+        {
+          char *old_tag = self->tags[i];
+          if (g_strv_contains (remove_tags, old_tag))
+            g_free (old_tag);
+          else
+            g_ptr_array_add (new_tags, old_tag);
+        }
+    }
+
+  g_ptr_array_add (new_tags, NULL);
+
+  g_free (self->tags);
+  self->tags = (char **)g_ptr_array_free (new_tags, FALSE);
+}
+
+
 const char *
 builder_manifest_get_extension_tag (BuilderManifest *self)
 {
@@ -3660,6 +3710,7 @@ static gboolean
 builder_manifest_install_extension_deps (BuilderManifest *self,
                                          BuilderContext  *context,
                                          const char *runtime,
+                                         const char *runtime_version,
                                          char **runtime_extensions,
                                          const char *remote,
                                          gboolean opt_user,
@@ -3667,7 +3718,7 @@ builder_manifest_install_extension_deps (BuilderManifest *self,
                                          gboolean opt_yes,
                                          GError **error)
 {
-  g_autofree char *runtime_ref = flatpak_build_runtime_ref (runtime, builder_manifest_get_runtime_version (self),
+  g_autofree char *runtime_ref = flatpak_build_runtime_ref (runtime, runtime_version,
                                                             builder_context_get_arch (context));
   g_autofree char *metadata = NULL;
   g_autoptr(GKeyFile) keyfile = g_key_file_new ();
@@ -3706,7 +3757,7 @@ builder_manifest_install_extension_deps (BuilderManifest *self,
 
       extension_version = g_key_file_get_string (keyfile, extension_group, "version", NULL);
       if (extension_version == NULL)
-        extension_version = g_strdup (builder_manifest_get_runtime_version (self));
+        extension_version = g_strdup (runtime_version);
 
       g_print ("Dependency Extension: %s %s\n", runtime_extensions[i], extension_version);
       if (!builder_manifest_install_dep (self, context, remote, opt_user, opt_installation,
@@ -3730,10 +3781,25 @@ builder_manifest_install_deps (BuilderManifest *self,
 {
   GList *l;
 
+  const char *sdk = NULL;
+  const char *sdk_branch = NULL;
+  g_auto(GStrv) sdk_parts = g_strsplit (self->sdk, "/", 3);
+
+  if (g_strv_length (sdk_parts) >= 3)
+    {
+      sdk = sdk_parts[0];
+      sdk_branch = sdk_parts[2];
+    }
+  else
+    {
+      sdk = self->sdk;
+      sdk_branch = builder_manifest_get_runtime_version (self);
+    }
+
   /* Sdk */
-  g_print ("Dependency Sdk: %s %s\n", self->sdk, builder_manifest_get_runtime_version (self));
+  g_print ("Dependency Sdk: %s %s\n", sdk, sdk_branch);
   if (!builder_manifest_install_dep (self, context, remote, opt_user, opt_installation,
-                                     self->sdk, builder_manifest_get_runtime_version (self),
+                                     sdk, sdk_branch,
                                      opt_yes,
                                      error))
     return FALSE;
@@ -3757,14 +3823,15 @@ builder_manifest_install_deps (BuilderManifest *self,
     }
 
   if (!builder_manifest_install_extension_deps (self, context,
-                                                self->sdk, self->sdk_extensions,
+                                                sdk, sdk_branch, self->sdk_extensions,
                                                 remote,opt_user, opt_installation,
                                                 opt_yes,
                                                 error))
     return FALSE;
 
   if (!builder_manifest_install_extension_deps (self, context,
-                                                self->runtime, self->platform_extensions,
+                                                self->runtime, builder_manifest_get_runtime_version (self),
+                                                self->platform_extensions,
                                                 remote, opt_user, opt_installation,
                                                 opt_yes,
                                                 error))
