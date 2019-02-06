@@ -55,12 +55,13 @@ Depends:
  ${shlibs:Depends},
 Recommends:
  binutils,
- bzr | brz,
  elfutils,
  git,
  patch,
- subversion,
  unzip,
+Suggests:
+ bzr | brz,
+ subversion,
 Replaces:
  flatpak (<< 0.9.8-1~),
 Description: Flatpak application building helper
