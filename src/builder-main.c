@@ -627,21 +627,27 @@ main (int    argc,
 
       cleanup_manifest_dir = g_object_ref (build_subdir);
 
+      int mirror_flags = FLATPAK_GIT_MIRROR_FLAGS_MIRROR_SUBMODULES;
+
+      if (opt_disable_updates)
+        {
+          mirror_flags |= FLATPAK_GIT_MIRROR_FLAGS_UPDATE;
+	}
+
       if (!builder_git_mirror_repo (opt_from_git,
                                     NULL,
-                                    opt_disable_updates?0:FLATPAK_GIT_MIRROR_FLAGS_UPDATE,
+                                    mirror_flags,
                                     git_branch, build_context, &error))
         {
           g_printerr ("Can't clone manifest repo: %s\n", error->message);
           return 1;
         }
 
-      if (!builder_git_checkout_dir (opt_from_git,
-                                     git_branch,
-                                     manifest_dirname,
-                                     build_subdir,
-                                     build_context,
-                                     &error))
+      if (!builder_git_checkout (opt_from_git,
+                                 git_branch,
+                                 build_subdir,
+                                 build_context,
+                                 &error))
         {
           g_printerr ("Can't check out manifest repo: %s\n", error->message);
           return 1;
@@ -718,7 +724,7 @@ main (int    argc,
     {
       if (!builder_manifest_show_deps (manifest, build_context, &error))
         {
-          g_printerr ("Error running %s: %s\n", argv[3], error->message);
+          g_printerr ("Error calculating deps: %s\n", error->message);
           return 1;
         }
 
@@ -730,7 +736,7 @@ main (int    argc,
       if (!builder_manifest_install_deps (manifest, build_context, opt_install_deps_from, opt_user, opt_installation,
                                           opt_yes, &error))
         {
-          g_printerr ("Error running %s: %s\n", argv[3], error->message);
+          g_printerr ("Error installing deps: %s\n", error->message);
           return 1;
         }
       if (opt_install_deps_only)
