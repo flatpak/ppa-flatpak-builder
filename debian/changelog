@@ -1,11 +1,11 @@
-flatpak-builder (1.0.5-1) UNRELEASED; urgency=medium
+flatpak-builder (1.0.5-1) unstable; urgency=medium
 
   * New upstream release
     - Fix regression in picking up default build options from SDK
       with flatpak >= 1.2
   * Downgrade bzr|brz and subversion to Suggests (Closes: #917035)
 
- -- Simon McVittie <smcv@debian.org>  Wed, 06 Feb 2019 10:28:12 +0000
+ -- Simon McVittie <smcv@debian.org>  Mon, 11 Feb 2019 08:23:12 +0000
 
 flatpak-builder (1.0.4-1) unstable; urgency=medium
 
