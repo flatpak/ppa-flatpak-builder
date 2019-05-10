@@ -1,8 +1,8 @@
-flatpak-builder (1.0.7-1) UNRELEASED; urgency=medium
+flatpak-builder (1.0.7-1) experimental; urgency=medium
 
   * New upstream release
 
- -- Simon McVittie <smcv@debian.org>  Fri, 10 May 2019 12:10:41 +0100
+ -- Simon McVittie <smcv@debian.org>  Fri, 10 May 2019 12:10:59 +0100
 
 flatpak-builder (1.0.6-1) experimental; urgency=medium
 
