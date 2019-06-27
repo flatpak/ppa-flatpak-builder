@@ -1,9 +1,9 @@
-flatpak-builder (1.0.8-1) UNRELEASED; urgency=medium
+flatpak-builder (1.0.8-1) experimental; urgency=medium
 
   * New upstream release
   * d/salsa-ci.yml: Request standard CI on salsa.debian.org
 
- -- Simon McVittie <smcv@debian.org>  Sun, 23 Jun 2019 19:29:50 +0100
+ -- Simon McVittie <smcv@debian.org>  Thu, 27 Jun 2019 19:03:29 +0100
 
 flatpak-builder (1.0.7-1) experimental; urgency=medium
 
