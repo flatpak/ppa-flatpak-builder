@@ -1,3 +1,9 @@
+flatpak-builder (1.0.8-2) UNRELEASED; urgency=medium
+
+  * Standards-Version: 4.4.0 (no changes required)
+
+ -- Simon McVittie <smcv@debian.org>  Tue, 09 Jul 2019 17:32:25 +0100
+
 flatpak-builder (1.0.8-1) experimental; urgency=medium
 
   * New upstream release
