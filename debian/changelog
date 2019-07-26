@@ -1,3 +1,14 @@
+flatpak-builder (1.0.8-3) UNRELEASED; urgency=medium
+
+  * installed-tests: Downgrade python2 from Depends to Suggests.
+    Test coverage will be a bit better if it is installed, but this
+    doesn't need to block the eventual removal of python2 from Debian.
+    The test in question relies on implementation details of Python 2,
+    so it is not straightforward to convert to Python 3.
+    (Closes: #936530)
+
+ -- Simon McVittie <smcv@debian.org>  Fri, 26 Jul 2019 08:40:40 +0100
+
 flatpak-builder (1.0.8-2) unstable; urgency=medium
 
   * Upload to unstable

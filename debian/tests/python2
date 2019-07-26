@@ -1,0 +1,17 @@
+#!/bin/sh
+
+set -e
+exec 2>&1
+
+# The tests want /sbin/ldconfig to be in PATH
+export PATH="$PATH:/usr/sbin:/sbin"
+
+# Don't pollute the home directory unless this looks like a dedicated
+# autopkgtest environment
+case "$(id -nu)" in
+	(adt|debci)
+		install -d ~/.flatpak-tests/
+		;;
+esac
+
+exec gnome-desktop-testing-runner flatpak-builder/test-builder-python.sh.test
