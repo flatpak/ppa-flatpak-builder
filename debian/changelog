@@ -1,4 +1,4 @@
-flatpak-builder (1.0.9-flatpak1~xenial) xenial; urgency=medium
+flatpak-builder (1.0.9-flatpak1.2~xenial) xenial; urgency=medium
 
   * Rebuild for xenial
 
