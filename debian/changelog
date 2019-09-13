@@ -1,3 +1,10 @@
+flatpak-builder (1.0.8-3~bionic) bionic; urgency=medium
+
+  [ Alexander Larsson ]
+  * Rebuild for bionic
+
+ -- Alexander Larsson <alexl@redhat.com>  Fri, 13 Sep 2019 16:22:39 +0200
+
 flatpak-builder (1.0.8-3) UNRELEASED; urgency=medium
 
   * installed-tests: Downgrade python2 from Depends to Suggests.
