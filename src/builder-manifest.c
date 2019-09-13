@@ -226,6 +226,9 @@ expand_modules (BuilderContext *context, GList *modules,
     {
       BuilderModule *m = l->data;
       GList *submodules = NULL;
+      g_autofree char *new_name = NULL;
+      int new_name_counter;
+      const char *orig_name;
       const char *name;
 
       if (!builder_module_is_enabled (m, context))
@@ -237,7 +240,6 @@ expand_modules (BuilderContext *context, GList *modules,
       *expanded = g_list_concat (*expanded, submodules);
 
       name = builder_module_get_name (m);
-
       if (name == NULL)
         {
           /* FIXME: We'd like to report *something* for the user
@@ -247,13 +249,22 @@ expand_modules (BuilderContext *context, GList *modules,
                        "Module has no 'name' attribute set");
           return FALSE;
         }
+      orig_name = name;
 
-      if (g_hash_table_lookup (names, name) != NULL)
+      /* Duplicated name happen sometimes, like e.g. when including snippets out of your control.
+       * It is not a huge problem for building, but we need unique names for e.g the cache, so
+       * uniquify on collision */
+      new_name_counter = 2;
+      while (g_hash_table_lookup (names, name) != NULL)
         {
-          g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-                       "Duplicate modules named '%s'", name);
-          return FALSE;
+          g_free (new_name);
+          new_name = g_strdup_printf ("%s-%d", orig_name, new_name_counter++);
+          name = new_name;
         }
+
+      if (name != orig_name)
+        builder_module_set_name (m, name);
+
       g_hash_table_insert (names, (char *)name, (char *)name);
       *expanded = g_list_append (*expanded, m);
     }
@@ -1289,7 +1300,7 @@ serializable_iface_init (JsonSerializableIface *serializable_iface)
   serializable_iface->get_property = builder_serializable_get_property;
 }
 
-static char *
+char *
 builder_manifest_serialize (BuilderManifest *self)
 {
   JsonNode *node;
@@ -1638,9 +1649,7 @@ builder_manifest_init_app_dir (BuilderManifest *self,
 {
   GFile *app_dir = builder_context_get_app_dir (context);
 
-  g_autoptr(GSubprocess) subp = NULL;
   g_autoptr(GPtrArray) args = NULL;
-  g_autofree char *commandline = NULL;
   GList *l;
   int i;
 
@@ -1723,16 +1732,8 @@ builder_manifest_init_app_dir (BuilderManifest *self,
   g_ptr_array_add (args, g_strdup (builder_manifest_get_runtime_version (self)));
   g_ptr_array_add (args, NULL);
 
-  commandline = flatpak_quote_argv ((const char **) args->pdata);
-  g_debug ("Running '%s'", commandline);
-
-  subp =
-    g_subprocess_newv ((const gchar * const *) args->pdata,
-                       G_SUBPROCESS_FLAGS_NONE,
-                       error);
-
-  if (subp == NULL ||
-      !g_subprocess_wait_check (subp, NULL, error))
+  if (!flatpak_spawnv (NULL, NULL, G_SUBPROCESS_FLAGS_NONE, error,
+                       (const gchar * const *) args->pdata))
     return FALSE;
 
   if (self->build_runtime && self->separate_locales)
@@ -2760,10 +2761,8 @@ builder_manifest_finish (BuilderManifest *self,
   g_autoptr(GFile) sources_dir = NULL;
   g_autoptr(GFile) locale_parent_dir = NULL;
   g_autofree char *json = NULL;
-  g_autofree char *commandline = NULL;
   g_autoptr(GPtrArray) args = NULL;
   g_autoptr(GPtrArray) inherit_extensions = NULL;
-  g_autoptr(GSubprocess) subp = NULL;
   int i;
   GList *l;
 
@@ -2956,16 +2955,8 @@ builder_manifest_finish (BuilderManifest *self,
       g_ptr_array_add (args, g_file_get_path (app_dir));
       g_ptr_array_add (args, NULL);
 
-      commandline = flatpak_quote_argv ((const char **) args->pdata);
-      g_debug ("Running '%s'", commandline);
-
-      subp =
-        g_subprocess_newv ((const gchar * const *) args->pdata,
-                           G_SUBPROCESS_FLAGS_NONE,
-                           error);
-
-      if (subp == NULL ||
-          !g_subprocess_wait_check (subp, NULL, error))
+      if (!flatpak_spawnv (NULL, NULL, G_SUBPROCESS_FLAGS_NONE, error,
+                           (const gchar * const *) args->pdata))
         return FALSE;
 
       json = builder_manifest_serialize (self);
@@ -3178,9 +3169,7 @@ builder_manifest_create_platform_base (BuilderManifest *self,
     {
       GFile *app_dir = NULL;
       g_autoptr(GFile) platform_dir = NULL;
-      g_autoptr(GSubprocess) subp = NULL;
       g_autoptr(GPtrArray) args = NULL;
-      g_autofree char *commandline = NULL;
       int i;
 
       g_print ("Creating platform based on %s\n", self->runtime);
@@ -3216,16 +3205,8 @@ builder_manifest_create_platform_base (BuilderManifest *self,
 
       g_ptr_array_add (args, NULL);
 
-      commandline = flatpak_quote_argv ((const char **) args->pdata);
-      g_debug ("Running '%s'", commandline);
-
-      subp =
-        g_subprocess_newv ((const gchar * const *) args->pdata,
-                           G_SUBPROCESS_FLAGS_NONE,
-                           error);
-
-      if (subp == NULL ||
-          !g_subprocess_wait_check (subp, NULL, error))
+      if (!flatpak_spawnv (NULL, NULL, G_SUBPROCESS_FLAGS_NONE, error,
+                           (const gchar * const *) args->pdata))
         return FALSE;
 
       if (self->separate_locales)
