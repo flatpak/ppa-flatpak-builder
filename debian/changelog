@@ -13,9 +13,6 @@ flatpak-builder (1.0.8-2) unstable; urgency=medium
 
   * Upload to unstable
   * Standards-Version: 4.4.0 (no changes required)
-  * Use debhelper-compat 12
-    - Do not explicitly set --libexecdir since /usr/libexec is now the
-      default
 
  -- Simon McVittie <smcv@debian.org>  Tue, 09 Jul 2019 17:35:23 +0100
 
