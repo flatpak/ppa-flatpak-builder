@@ -1,5 +1,6 @@
-flatpak-builder (1.0.8-3) UNRELEASED; urgency=medium
+flatpak-builder (1.0.9-1) UNRELEASED; urgency=medium
 
+  * New upstream release
   * installed-tests: Downgrade python2 from Depends to Suggests.
     Test coverage will be a bit better if it is installed, but this
     doesn't need to block the eventual removal of python2 from Debian.
