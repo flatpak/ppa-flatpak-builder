@@ -749,7 +749,7 @@ load_sources_from_json (const char *sources_relpath)
     }
 
   builder_manifest_set_demarshal_base_dir (sources_file_dir);
-  sources_root = json_from_string (sources_json, &error);
+  sources_root = builder_json_node_from_data (sources_path, sources_json, &error);
   if (sources_root == NULL)
     {
       g_printerr ("Error parsing %s: %s\n", sources_relpath, error->message);
@@ -934,6 +934,14 @@ const char *
 builder_module_get_name (BuilderModule *self)
 {
   return self->name;
+}
+
+void
+builder_module_set_name (BuilderModule *self,
+                         const char *name)
+{
+  g_free (self->name);
+  self->name = g_strdup (name);
 }
 
 gboolean
