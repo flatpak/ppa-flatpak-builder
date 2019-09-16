@@ -423,7 +423,8 @@ parse_yaml_node_to_json (yaml_document_t *doc, yaml_node_t *node)
                   json_node_init_int (json, num);
                   break;
                 }
-              else if (*endptr == '.')
+              // Make sure that N.N, N., and .N (where N is a digit) are picked up as numbers.
+              else if (*endptr == '.' && (endptr != scalar || endptr[1] != '\0'))
                 {
                   g_ascii_strtoll (endptr + 1, &endptr, 10);
                   if (*endptr == '\0')
@@ -509,22 +510,28 @@ parse_yaml_to_json (const gchar *contents,
 
 #endif  // FLATPAK_BUILDER_ENABLE_YAML
 
+JsonNode *
+builder_json_node_from_data (const char *relpath,
+                             const char *contents,
+                             GError    **error)
+{
+  if (g_str_has_suffix (relpath, ".yaml") || g_str_has_suffix (relpath, ".yml"))
+    return parse_yaml_to_json (contents, error);
+  else
+    return json_from_string (contents, error);
+}
+
 GObject *
 builder_gobject_from_data (GType       gtype,
                            const char *relpath,
                            const char *contents,
                            GError    **error)
 {
-  if (g_str_has_suffix (relpath, ".yaml") || g_str_has_suffix (relpath, ".yml"))
-    {
-      g_autoptr(JsonNode) json = parse_yaml_to_json (contents, error);
-      if (json != NULL)
-        return json_gobject_deserialize (gtype, json);
-      else
-        return NULL;
-    }
+  g_autoptr(JsonNode) json = builder_json_node_from_data (relpath, contents, error);
+  if (json != NULL)
+    return json_gobject_deserialize (gtype, json);
   else
-    return json_gobject_from_data (gtype, contents, -1, error);
+    return NULL;
 }
 
 /*
