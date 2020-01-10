@@ -1,5 +1,4 @@
 ---
-Name: flatpak-builder
 Repository: https://github.com/flatpak/flatpak-builder.git
 Repository-Browse: https://github.com/flatpak/flatpak-builder
 Bug-Database: https://github.com/flatpak/flatpak-builder/issues
