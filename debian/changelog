@@ -1,8 +1,14 @@
+flatpak-builder (1.0.10-flatpak1~bionic) bionic; urgency=medium
+
+  * Update to 1.0.10
+
+ -- Alexander Larsson <alexl@redhat.com>  Thu, 19 Mar 2020 16:48:07 +0100
+
 flatpak-builder (1.0.9-flatpak1~cosmic) cosmic; urgency=medium
 
   * Rebuild for cosmic
 
- -- Alexander Larsson <alexl@redhat.com>  Fri, 13 Sep 2019 16:51:06 +0200
+ -- Alexander Larsson <alexl@redhat.com>  Fri, 13 Sep 2019 16:51:06 +0200>
 
 flatpak-builder (1.0.9-flatpak1~bionic) bionic; urgency=medium
 

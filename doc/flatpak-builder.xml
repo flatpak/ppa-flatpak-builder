@@ -388,7 +388,10 @@
                 <term><option>--repo=DIR</option></term>
 
                 <listitem><para>
-                    When build is done, run export the result to this repository.
+                    After the build finishes, run <command>flatpak build-export</command> to
+                    export the result to the repository <arg choice="plain">DIR</arg>. If
+                    <arg choice="plain">DIR</arg> exists, it must be an OSTree repository;
+                    otherwise a new one will be created.
                 </para></listitem>
             </varlistentry>
 
@@ -422,6 +425,19 @@
                     If building in an existing repository, the collection ID
                     must match the existing configured collection ID for that
                     repository.
+                </para></listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><option>--token-type=VAL</option></term>
+
+                <listitem><para>
+                    Set type of token needed to install this commit.
+                    Setting this to a value greater than 0 implies that
+                    authentication will be needed to install the
+                    flatpak. A <option>token-type</option> property set
+                    in the manifest takes precedence over this option.
+                    Used when exporting the build results.
                 </para></listitem>
             </varlistentry>
 
