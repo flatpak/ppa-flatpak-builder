@@ -1,3 +1,9 @@
+flatpak-builder (1.0.10-flatpak1~bionic) bionic; urgency=medium
+
+  * Update to 1.0.10
+
+ -- Alexander Larsson <alexl@redhat.com>  Thu, 19 Mar 2020 16:48:07 +0100
+
 flatpak-builder (1.0.9-flatpak1~bionic) bionic; urgency=medium
 
   * Update to 1.0.9
