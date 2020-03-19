@@ -1,3 +1,9 @@
+flatpak-builder (1.0.10-flatpak1~xenial) xenial; urgency=medium
+
+  * Rebuild for xenial
+
+ -- Alexander Larsson <alexl@redhat.com>  Thu, 19 Mar 2020 16:57:30 +0100
+
 flatpak-builder (1.0.10-flatpak1~bionic) bionic; urgency=medium
 
   * Update to 1.0.10
