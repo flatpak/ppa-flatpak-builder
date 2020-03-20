@@ -61,6 +61,7 @@ Recommends:
  unzip,
 Suggests:
  bzr | brz,
+ p7zip-full,
  subversion,
 Replaces:
  flatpak (<< 0.9.8-1~),

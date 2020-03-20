@@ -1,6 +1,7 @@
 flatpak-builder (1.0.10-1) UNRELEASED; urgency=medium
 
   * New upstream release
+  * Add Suggests on p7zip-full, for 7z
   * Standards-Version: 4.5.0 (no changes required)
   * Use secure URI in Homepage field.
   * Set upstream metadata fields: Repository.
