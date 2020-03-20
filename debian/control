@@ -60,7 +60,7 @@ Recommends:
  patch,
  unzip,
 Suggests:
- bzr | brz,
+ brz,
  p7zip-full,
  subversion,
 Replaces:

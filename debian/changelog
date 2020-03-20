@@ -7,6 +7,7 @@ flatpak-builder (1.0.10-1) UNRELEASED; urgency=medium
   * Set upstream metadata fields: Repository.
   * Remove obsolete field Name from debian/upstream/metadata (already
     present in machine-readable debian/copyright).
+  * Remove Suggests on bzr now that it is a transitional package to brz
 
  -- Simon McVittie <smcv@debian.org>  Tue, 01 Oct 2019 09:54:43 +0100
 
