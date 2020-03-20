@@ -46,6 +46,7 @@ struct BuilderSourceArchive
   guint         strip_components;
   char         *dest_filename;
   gboolean      git_init;
+  char         *archive_type;
 };
 
 typedef struct
@@ -67,6 +68,7 @@ enum {
   PROP_DEST_FILENAME,
   PROP_MIRROR_URLS,
   PROP_GIT_INIT,
+  PROP_ARCHIVE_TYPE,
   LAST_PROP
 };
 
@@ -81,7 +83,8 @@ typedef enum {
   TAR_LZMA,
   TAR_LZOP,
   TAR_XZ,
-  ZIP
+  ZIP,
+  SEVENZ,
 } BuilderArchiveType;
 
 static gboolean
@@ -135,6 +138,7 @@ builder_source_archive_finalize (GObject *object)
   g_free (self->sha512);
   g_free (self->dest_filename);
   g_strfreev (self->mirror_urls);
+  g_free (self->archive_type);
 
   G_OBJECT_CLASS (builder_source_archive_parent_class)->finalize (object);
 }
@@ -187,6 +191,10 @@ builder_source_archive_get_property (GObject    *object,
 
     case PROP_GIT_INIT:
       g_value_set_boolean (value, self->git_init);
+      break;
+
+    case PROP_ARCHIVE_TYPE:
+      g_value_set_string (value, self->archive_type);
       break;
 
     default:
@@ -252,6 +260,11 @@ builder_source_archive_set_property (GObject      *object,
 
     case PROP_GIT_INIT:
       self->git_init = g_value_get_boolean (value);
+      break;
+
+    case PROP_ARCHIVE_TYPE:
+      g_free (self->archive_type);
+      self->archive_type = g_value_dup_string (value);
       break;
 
     default:
@@ -452,6 +465,19 @@ unzip (GFile   *dir,
 }
 
 static gboolean
+un7z (GFile       *dir,
+      const char  *sevenz_path,
+      GError     **error)
+{
+  gboolean res;
+  const gchar *argv[] = { "7z",  "x", sevenz_path, NULL };
+
+  res = flatpak_spawnv (dir, NULL, 0, error, argv);
+
+  return res;
+}
+
+static gboolean
 unrpm (GFile   *dir,
        const char *rpm_path,
        GError **error)
@@ -629,6 +655,40 @@ init_git (GFile   *dir,
   return TRUE;
 }
 
+static BuilderArchiveType
+get_type_from_prop (BuilderSourceArchive *self)
+{
+  struct {
+    const char *id;
+    BuilderArchiveType type;
+  } str_to_types[] = {
+      { "rpm", RPM },
+      { "tar", TAR },
+      { "tar-gzip", TAR_GZIP },
+      { "tar-compress", TAR_COMPRESS },
+      { "tar-bzip2", TAR_BZIP2 },
+      { "tar-lzip", TAR_LZIP },
+      { "tar-lzma", TAR_LZMA },
+      { "tar-xz", TAR_XZ },
+      { "zip", ZIP },
+      { "7z", SEVENZ },
+  };
+  guint i;
+
+  if (self->archive_type == NULL)
+    return UNKNOWN;
+
+  for (i = 0; i < G_N_ELEMENTS(str_to_types); i++)
+    {
+      if (g_strcmp0 (self->archive_type, str_to_types[i].id) == 0)
+        return str_to_types[i].type;
+    }
+
+  g_warning ("Unknown archive-type \"%s\"", self->archive_type);
+
+  return UNKNOWN;
+}
+
 static gboolean
 builder_source_archive_extract (BuilderSource  *source,
                                 GFile          *dest,
@@ -647,7 +707,9 @@ builder_source_archive_extract (BuilderSource  *source,
   if (archivefile == NULL)
     return FALSE;
 
-  type = get_type (archivefile);
+  type = get_type_from_prop (self);
+  if (type == UNKNOWN)
+    type = get_type (archivefile);
 
   archive_path = g_file_get_path (archivefile);
 
@@ -672,6 +734,23 @@ builder_source_archive_extract (BuilderSource  *source,
       if (self->strip_components > 0)
         {
           if (!strip_components_into (dest, zip_dest, self->strip_components, error))
+            return FALSE;
+        }
+    }
+  else if (type == SEVENZ)
+    {
+      g_autoptr(GFile) sevenz_dest = NULL;
+
+      sevenz_dest = create_uncompress_directory (self, dest, error);
+      if (sevenz_dest == NULL)
+        return FALSE;
+
+      if (!un7z (sevenz_dest, archive_path, error))
+        return FALSE;
+
+      if (self->strip_components > 0)
+        {
+          if (!strip_components_into (dest, sevenz_dest, self->strip_components, error))
             return FALSE;
         }
     }
@@ -866,6 +945,13 @@ builder_source_archive_class_init (BuilderSourceArchiveClass *klass)
                                                          "",
                                                          FALSE,
                                                          G_PARAM_READWRITE));
+  g_object_class_install_property (object_class,
+                                   PROP_ARCHIVE_TYPE,
+                                   g_param_spec_string ("archive-type",
+                                                        "",
+                                                        "",
+                                                        NULL,
+                                                        G_PARAM_READWRITE));
 }
 
 static void
