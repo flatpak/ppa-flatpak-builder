@@ -1,4 +1,4 @@
-flatpak-builder (1.0.10-1) UNRELEASED; urgency=medium
+flatpak-builder (1.0.10-1) unstable; urgency=medium
 
   * New upstream release
   * Add Suggests on p7zip-full, for 7z
@@ -11,7 +11,7 @@ flatpak-builder (1.0.10-1) UNRELEASED; urgency=medium
   * d/p/bzr-Run-brz-in-preference-to-bzr.patch:
     Make the bzr module type actually work with only brz installed
 
- -- Simon McVittie <smcv@debian.org>  Tue, 01 Oct 2019 09:54:43 +0100
+ -- Simon McVittie <smcv@debian.org>  Fri, 20 Mar 2020 20:37:36 +0000
 
 flatpak-builder (1.0.9-1) unstable; urgency=medium
 
