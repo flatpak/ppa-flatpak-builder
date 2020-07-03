@@ -1,3 +1,9 @@
+flatpak-builder (1.0.11-flatpak1~bionic) bionic; urgency=medium
+
+  * Update to 1.0.11
+
+ -- Alexander Larsson <alexl@redhat.com>  Fri, 03 Jul 2020 16:35:53 +0200
+
 flatpak-builder (1.0.10-flatpak1~eoan) eoan; urgency=medium
 
   * Rebuild for eoan
