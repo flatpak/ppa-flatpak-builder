@@ -1,3 +1,11 @@
+flatpak-builder (1.0.11-1) UNRELEASED; urgency=medium
+
+  * New upstream release
+    - d/p/bzr-Run-brz-in-preference-to-bzr.patch:
+      Drop patch, applied upstream
+
+ -- Simon McVittie <smcv@debian.org>  Sat, 04 Jul 2020 15:25:25 +0100
+
 flatpak-builder (1.0.10-1) unstable; urgency=medium
 
   * New upstream release
