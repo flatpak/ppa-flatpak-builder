@@ -1,3 +1,12 @@
+flatpak-builder (1.0.12-1) UNRELEASED; urgency=medium
+
+  * New upstream release
+    - Make --run work if manifest has --metadata in build-finish
+    - Don't extract git submodules if they're disabled
+    - Make debug messages more understandable
+
+ -- Simon McVittie <smcv@debian.org>  Sun, 21 Feb 2021 21:27:56 +0000
+
 flatpak-builder (1.0.11-1) unstable; urgency=medium
 
   * New upstream release
