@@ -1,12 +1,13 @@
-flatpak-builder (1.0.12-1) UNRELEASED; urgency=medium
+flatpak-builder (1.0.12-1) unstable; urgency=medium
 
   * New upstream bugfix release
     - Make --run work if manifest has --metadata in build-finish
     - Don't extract git submodules if they're disabled
     - Make debug messages more understandable
   * Standards-Version: 4.5.1 (no changes required)
+  * Drop autopkgtest that uses python2 (Closes: #936530)
 
- -- Simon McVittie <smcv@debian.org>  Sun, 21 Feb 2021 21:30:17 +0000
+ -- Simon McVittie <smcv@debian.org>  Mon, 22 Feb 2021 08:42:42 +0000
 
 flatpak-builder (1.0.11-1) unstable; urgency=medium
 
