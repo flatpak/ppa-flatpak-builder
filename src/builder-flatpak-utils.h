@@ -192,6 +192,7 @@ gboolean            flatpak_spawnv (GFile                *dir,
                                     const gchar * const  *argv);
 
 const char *flatpak_file_get_path_cached (GFile *file);
+gboolean flatpak_file_query_exists_nofollow (GFile *file);
 
 GFile *flatpak_build_file_va (GFile *base,
                               va_list args);
@@ -202,6 +203,12 @@ gboolean flatpak_file_rename (GFile *from,
                               GCancellable  *cancellable,
                               GError       **error);
 
+GFile * flatpak_canonicalize_file (GFile *file,
+                                   GError **error);
+/* NOTE: This requires both files to exist */
+gboolean flatpak_file_is_in (GFile *file,
+                             GFile *toplevel);
+
 typedef enum {
   FLATPAK_CP_FLAGS_NONE = 0,
   FLATPAK_CP_FLAGS_MERGE = 1<<0,
@@ -211,6 +218,7 @@ typedef enum {
 
 gboolean   flatpak_cp_a (GFile         *src,
                          GFile         *dest,
+                         GFile         *keep_in_toplevel,
                          FlatpakCpFlags flags,
                          GPtrArray     *skip_files,
                          GCancellable  *cancellable,

@@ -124,7 +124,16 @@ get_source_file (BuilderSourceDir *self,
 
   if (self->path != NULL && self->path[0] != 0)
     {
-      return g_file_resolve_relative_path (base_dir, self->path);
+      g_autoptr(GFile) file = NULL;
+      file = g_file_resolve_relative_path (base_dir, self->path);
+
+      if (!builder_context_ensure_file_sandboxed (context, file, error))
+        {
+          g_prefix_error (error, "Unable to get source file '%s': ", self->path);
+          return NULL;
+        }
+
+      return g_steal_pointer (&file);
     }
 
   g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED, "source dir path not specified");
@@ -191,6 +200,7 @@ builder_source_dir_get_skip (BuilderSource  *source,
 static gboolean
 builder_source_dir_extract (BuilderSource  *source,
                             GFile          *dest,
+                            GFile          *source_dir,
                             BuilderOptions *build_options,
                             BuilderContext *context,
                             GError        **error)
@@ -204,8 +214,7 @@ builder_source_dir_extract (BuilderSource  *source,
     return FALSE;
 
   skip = builder_source_dir_get_skip (source, context);
-  g_mkdir_with_parents (flatpak_file_get_path_cached (src), 0755);
-  if (!flatpak_cp_a (src, dest,
+  if (!flatpak_cp_a (src, dest, source_dir,
                      FLATPAK_CP_FLAGS_MERGE|FLATPAK_CP_FLAGS_NO_CHOWN,
                      skip, NULL, error))
     return FALSE;
@@ -241,7 +250,7 @@ builder_source_dir_bundle (BuilderSource  *source,
 
   skip = builder_source_dir_get_skip (source, context);
   g_mkdir_with_parents (flatpak_file_get_path_cached (dest), 0755);
-  if (!flatpak_cp_a (src, dest,
+  if (!flatpak_cp_a (src, dest, NULL,
                      FLATPAK_CP_FLAGS_MERGE|FLATPAK_CP_FLAGS_NO_CHOWN,
                      skip, NULL, error))
     return FALSE;

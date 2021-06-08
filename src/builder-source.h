@@ -59,6 +59,7 @@ typedef struct
                         GError        **error);
   gboolean (* extract)(BuilderSource  *self,
                        GFile          *dest,
+                       GFile          *source_dir,
                        BuilderOptions *build_options,
                        BuilderContext *context,
                        GError        **error);
@@ -74,6 +75,8 @@ typedef struct
   void (* finish)(BuilderSource  *self,
                   GPtrArray      *args,
                   BuilderContext *context);
+  gboolean (* validate)(BuilderSource  *self,
+                        GError        **error);
 } BuilderSourceClass;
 
 GType builder_source_get_type (void);
@@ -92,7 +95,7 @@ gboolean builder_source_download (BuilderSource  *self,
                                   BuilderContext *context,
                                   GError        **error);
 gboolean builder_source_extract (BuilderSource  *self,
-                                 GFile          *dest,
+                                 GFile          *source_dir,
                                  BuilderOptions *build_options,
                                  BuilderContext *context,
                                  GError        **error);
@@ -109,6 +112,8 @@ void     builder_source_checksum (BuilderSource  *self,
 void     builder_source_finish (BuilderSource  *self,
                                 GPtrArray      *args,
                                 BuilderContext *context);
+gboolean builder_source_validate (BuilderSource  *self,
+                                  GError        **error);
 
 gboolean builder_source_is_enabled (BuilderSource *self,
                                     BuilderContext *context);
