@@ -1,21 +1,8 @@
 AC_PREREQ([2.63])
 
-# Making releases:
-#   FLATPAK_MICRO_VERSION += 1;
-#   FLATPAK_INTERFACE_AGE += 1;
-#   FLATPAK_BINARY_AGE += 1;
-# if any functions have been added, set FLATPAK_INTERFACE_AGE to 0.
-# if backwards compatibility has been broken,
-# set FLATPAK_BINARY_AGE and FLATPAK_INTERFACE_AGE to 0.
-#
-# in easier to understand terms:
-#
-# on the stable branch, interface age == micro
-# on the unstable (ie master), interface age = 0
-
 m4_define([flatpak_builder_major_version], [1])
 m4_define([flatpak_builder_minor_version], [0])
-m4_define([flatpak_builder_micro_version], [12])
+m4_define([flatpak_builder_micro_version], [14])
 m4_define([flatpak_builder_version],
           [flatpak_builder_major_version.flatpak_builder_minor_version.flatpak_builder_micro_version])
 
@@ -91,9 +78,8 @@ AX_VALGRIND_CHECK
 
 PKG_PROG_PKG_CONFIG([0.24])
 
-AC_CHECK_FUNCS(fdwalk)
+# For libglnx
 AC_CHECK_HEADER([sys/xattr.h], [], [AC_MSG_ERROR([You must have sys/xattr.h from glibc])])
-AC_CHECK_HEADER([sys/capability.h], have_caps=yes, [AC_MSG_ERROR([sys/capability.h header not found])])
 
 PKG_CHECK_MODULES(BASE, [glib-2.0 >= $GLIB_REQS gio-2.0 gio-unix-2.0 libsoup-2.4 ostree-1 >= $OSTREE_REQS json-glib-1.0 libxml-2.0 >= 2.4 libcurl])
 
