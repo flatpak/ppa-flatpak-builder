@@ -28,6 +28,7 @@
 #include <sys/statfs.h>
 
 #include "builder-utils.h"
+#include "builder-flatpak-utils.h"
 #include "builder-source.h"
 #include "builder-source-archive.h"
 #include "builder-source-patch.h"
@@ -152,6 +153,7 @@ builder_source_real_download (BuilderSource  *self,
 static gboolean
 builder_source_real_extract (BuilderSource  *self,
                              GFile          *dest,
+                             GFile          *source_dir,
                              BuilderOptions *build_options,
                              BuilderContext *context,
                              GError        **error)
@@ -286,35 +288,46 @@ builder_source_from_json (JsonNode *node)
 {
   JsonObject *object = json_node_get_object (node);
   const gchar *type;
+  BuilderSource *source = NULL;
 
   type = json_object_get_string_member (object, "type");
 
   if (type == NULL)
     g_warning ("Missing source type");
   else if (strcmp (type, "archive") == 0)
-    return (BuilderSource *) json_gobject_deserialize (BUILDER_TYPE_SOURCE_ARCHIVE, node);
+    source = (BuilderSource *) json_gobject_deserialize (BUILDER_TYPE_SOURCE_ARCHIVE, node);
   else if (strcmp (type, "file") == 0)
-    return (BuilderSource *) json_gobject_deserialize (BUILDER_TYPE_SOURCE_FILE, node);
+    source = (BuilderSource *) json_gobject_deserialize (BUILDER_TYPE_SOURCE_FILE, node);
   else if (strcmp (type, "dir") == 0)
-    return (BuilderSource *) json_gobject_deserialize (BUILDER_TYPE_SOURCE_DIR, node);
+    source = (BuilderSource *) json_gobject_deserialize (BUILDER_TYPE_SOURCE_DIR, node);
   else if (strcmp (type, "script") == 0)
-    return (BuilderSource *) json_gobject_deserialize (BUILDER_TYPE_SOURCE_SCRIPT, node);
+    source = (BuilderSource *) json_gobject_deserialize (BUILDER_TYPE_SOURCE_SCRIPT, node);
   else if (strcmp (type, "shell") == 0)
-    return (BuilderSource *) json_gobject_deserialize (BUILDER_TYPE_SOURCE_SHELL, node);
+    source = (BuilderSource *) json_gobject_deserialize (BUILDER_TYPE_SOURCE_SHELL, node);
   else if (strcmp (type, "extra-data") == 0)
-    return (BuilderSource *) json_gobject_deserialize (BUILDER_TYPE_SOURCE_EXTRA_DATA, node);
+    source = (BuilderSource *) json_gobject_deserialize (BUILDER_TYPE_SOURCE_EXTRA_DATA, node);
   else if (strcmp (type, "patch") == 0)
-    return (BuilderSource *) json_gobject_deserialize (BUILDER_TYPE_SOURCE_PATCH, node);
+    source = (BuilderSource *) json_gobject_deserialize (BUILDER_TYPE_SOURCE_PATCH, node);
   else if (strcmp (type, "git") == 0)
-    return (BuilderSource *) json_gobject_deserialize (BUILDER_TYPE_SOURCE_GIT, node);
+    source = (BuilderSource *) json_gobject_deserialize (BUILDER_TYPE_SOURCE_GIT, node);
   else if (strcmp (type, "bzr") == 0)
-    return (BuilderSource *) json_gobject_deserialize (BUILDER_TYPE_SOURCE_BZR, node);
+    source = (BuilderSource *) json_gobject_deserialize (BUILDER_TYPE_SOURCE_BZR, node);
   else if (strcmp (type, "svn") == 0)
-    return (BuilderSource *) json_gobject_deserialize (BUILDER_TYPE_SOURCE_SVN, node);
+    source = (BuilderSource *) json_gobject_deserialize (BUILDER_TYPE_SOURCE_SVN, node);
   else
     g_warning ("Unknown source type %s", type);
 
-  return NULL;
+  if (source != NULL)
+    {
+      g_autoptr(GError) error = NULL;
+      if (!builder_source_validate (source, &error))
+        {
+          g_warning ("Invalid source: %s", error->message);
+          g_clear_object (&source);
+        }
+    }
+
+  return source;
 }
 
 gboolean
@@ -341,9 +354,37 @@ builder_source_download (BuilderSource  *self,
   return class->download (self, update_vcs, context, error);
 }
 
+/* Ensure the destination exists (by making directories if needed) and
+   that it is inside the build directory. It could be outside the build
+   dir either if the specified path makes it so, of if some symlink inside
+   the source tree points outside it. */
+static gboolean
+ensure_dir_inside_toplevel (GFile          *dest,
+                            GFile          *toplevel_dir,
+                            GError        **error)
+{
+  if (!g_file_query_exists (dest, NULL))
+    {
+      g_autoptr(GFile) parent = g_file_get_parent (dest);
+      if (parent == NULL)
+        return flatpak_fail (error, "No parent directory found");
+
+      if (!ensure_dir_inside_toplevel (parent, toplevel_dir, error))
+        return FALSE;
+
+      if (!g_file_make_directory (dest, NULL, error))
+        return FALSE;
+    }
+
+  if (!flatpak_file_is_in (dest, toplevel_dir))
+    return flatpak_fail (error, "dest is not pointing inside build directory");
+
+  return TRUE;
+}
+
 gboolean
 builder_source_extract (BuilderSource  *self,
-                        GFile          *dest,
+                        GFile          *source_dir,
                         BuilderOptions *build_options,
                         BuilderContext *context,
                         GError        **error)
@@ -356,19 +397,17 @@ builder_source_extract (BuilderSource  *self,
 
   if (self->dest != NULL)
     {
-      real_dest = g_file_resolve_relative_path (dest, self->dest);
+      real_dest = g_file_resolve_relative_path (source_dir, self->dest);
 
-      if (!g_file_query_exists (real_dest, NULL) &&
-          !g_file_make_directory_with_parents (real_dest, NULL, error))
+      if (!ensure_dir_inside_toplevel (real_dest, source_dir, error))
         return FALSE;
     }
   else
     {
-      real_dest = g_object_ref (dest);
+      real_dest = g_object_ref (source_dir);
     }
 
-
-  return class->extract (self, real_dest, build_options, context, error);
+  return class->extract (self, real_dest, source_dir, build_options, context, error);
 }
 
 gboolean
@@ -418,6 +457,19 @@ builder_source_finish (BuilderSource  *self,
   if (class->finish)
     class->finish (self, args, context);
 }
+
+gboolean
+builder_source_validate (BuilderSource  *self,
+                         GError        **error)
+{
+  BuilderSourceClass *class = BUILDER_SOURCE_GET_CLASS (self);
+
+  if (class->validate)
+    return class->validate (self, error);
+
+  return TRUE;
+}
+
 
 gboolean
 builder_source_is_enabled (BuilderSource *self,

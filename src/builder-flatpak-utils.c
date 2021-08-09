@@ -692,8 +692,61 @@ flatpak_file_get_path_cached (GFile *file)
 }
 
 gboolean
+flatpak_file_query_exists_nofollow (GFile *file)
+{
+  GFileInfo *info;
+
+  info = g_file_query_info (file, G_FILE_ATTRIBUTE_STANDARD_TYPE,
+                            G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS, FALSE, NULL);
+  if (info != NULL)
+    {
+      g_object_unref (info);
+      return TRUE;
+    }
+
+  return FALSE;
+}
+
+/* NOTE: This requires that file exists */
+GFile *
+flatpak_canonicalize_file (GFile *file, GError **error)
+{
+  g_autofree char *canonical_path = NULL;
+
+  canonical_path = realpath (flatpak_file_get_path_cached (file), NULL);
+  if (canonical_path == NULL)
+    {
+      glnx_set_error_from_errno (error);
+      return NULL;
+    }
+
+  return g_file_new_for_path (canonical_path);
+}
+
+/* NOTE: This requires both files to exist */
+gboolean
+flatpak_file_is_in (GFile *file,
+                    GFile *toplevel)
+{
+  g_autoptr(GFile) canonical_file = NULL;
+  g_autoptr(GFile) canonical_toplevel = NULL;
+
+  canonical_toplevel = flatpak_canonicalize_file (toplevel, NULL);
+  if (canonical_toplevel == NULL)
+    return FALSE;
+
+  canonical_file = flatpak_canonicalize_file (file, NULL);
+  if (canonical_file == NULL)
+    return FALSE;
+
+  return g_file_equal (canonical_file, canonical_toplevel) ||
+    g_file_has_prefix (canonical_file, canonical_toplevel);
+}
+
+gboolean
 flatpak_cp_a (GFile         *src,
               GFile         *dest,
+              GFile         *keep_in_toplevel,
               FlatpakCpFlags flags,
               GPtrArray     *skip_files,
               GCancellable  *cancellable,
@@ -727,11 +780,20 @@ flatpak_cp_a (GFile         *src,
   do
     r = mkdir (flatpak_file_get_path_cached (dest), 0755);
   while (G_UNLIKELY (r == -1 && errno == EINTR));
-  if (r == -1 &&
-      (!merge || errno != EEXIST))
+  if (r == -1)
     {
-      glnx_set_error_from_errno (error);
-      goto out;
+      if (!merge || errno != EEXIST)
+        {
+          glnx_set_error_from_errno (error);
+          goto out;
+        }
+
+      /* When merging, ensure the new dir is inside the toplevel instead of a symlink outside */
+      if (keep_in_toplevel != NULL && !flatpak_file_is_in (dest, keep_in_toplevel))
+        {
+          flatpak_fail (error, "Recursive copy outside destination bounds");
+          goto out;
+        }
     }
 
   if (!glnx_opendirat (AT_FDCWD, flatpak_file_get_path_cached (dest), TRUE,
@@ -788,7 +850,7 @@ flatpak_cp_a (GFile         *src,
         }
       else if (g_file_info_get_file_type (child_info) == G_FILE_TYPE_DIRECTORY)
         {
-          if (!flatpak_cp_a (src_child, dest_child, flags, skip_files,
+          if (!flatpak_cp_a (src_child, dest_child, keep_in_toplevel, flags, skip_files,
                              cancellable, error))
             goto out;
         }
