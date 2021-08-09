@@ -145,7 +145,7 @@ check_PROGRAMS = $(am__EXEEXT_2) $(am__EXEEXT_3)
 @BUILD_DOCUMENTATION_TRUE@am__append_14 = . doc
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/libglnx/libglnx.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/subprojects/libglnx/libglnx.m4 \
 	$(top_srcdir)/m4/attributes.m4 $(top_srcdir)/m4/gettext.m4 \
 	$(top_srcdir)/m4/glibtests.m4 $(top_srcdir)/m4/iconv.m4 \
 	$(top_srcdir)/m4/intlmacosx.m4 $(top_srcdir)/m4/lib-ld.m4 \
@@ -219,12 +219,16 @@ am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1)
 libglnx_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am__dirstamp = $(am__leading_dot)dirstamp
 am__objects_1 =
-am_libglnx_la_OBJECTS = libglnx/la-glnx-backports.lo \
-	libglnx/la-glnx-local-alloc.lo libglnx/la-glnx-errors.lo \
-	libglnx/la-glnx-console.lo libglnx/la-glnx-dirfd.lo \
-	libglnx/la-glnx-fdio.lo libglnx/la-glnx-lockfile.lo \
-	libglnx/la-glnx-xattrs.lo libglnx/la-glnx-shutil.lo \
-	$(am__objects_1)
+am_libglnx_la_OBJECTS =  \
+	subprojects/libglnx/libglnx_la-glnx-backports.lo \
+	subprojects/libglnx/libglnx_la-glnx-local-alloc.lo \
+	subprojects/libglnx/libglnx_la-glnx-errors.lo \
+	subprojects/libglnx/libglnx_la-glnx-console.lo \
+	subprojects/libglnx/libglnx_la-glnx-dirfd.lo \
+	subprojects/libglnx/libglnx_la-glnx-fdio.lo \
+	subprojects/libglnx/libglnx_la-glnx-lockfile.lo \
+	subprojects/libglnx/libglnx_la-glnx-xattrs.lo \
+	subprojects/libglnx/libglnx_la-glnx-shutil.lo $(am__objects_1)
 libglnx_la_OBJECTS = $(am_libglnx_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -265,36 +269,35 @@ flatpak_builder_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(flatpak_builder_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
-am_test_libglnx_errors_OBJECTS = libglnx/tests/test_libglnx_errors-test-libglnx-errors.$(OBJEXT)
+am_test_libglnx_errors_OBJECTS = subprojects/libglnx/tests/test_libglnx_errors-test-libglnx-errors.$(OBJEXT)
 test_libglnx_errors_OBJECTS = $(am_test_libglnx_errors_OBJECTS)
 test_libglnx_errors_DEPENDENCIES = $(am__DEPENDENCIES_2) libglnx.la
 test_libglnx_errors_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(test_libglnx_errors_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-am_test_libglnx_fdio_OBJECTS =  \
-	libglnx/tests/test_libglnx_fdio-test-libglnx-fdio.$(OBJEXT)
+am_test_libglnx_fdio_OBJECTS = subprojects/libglnx/tests/test_libglnx_fdio-test-libglnx-fdio.$(OBJEXT)
 test_libglnx_fdio_OBJECTS = $(am_test_libglnx_fdio_OBJECTS)
 test_libglnx_fdio_DEPENDENCIES = $(am__DEPENDENCIES_2) libglnx.la
 test_libglnx_fdio_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(test_libglnx_fdio_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
-am_test_libglnx_macros_OBJECTS = libglnx/tests/test_libglnx_macros-test-libglnx-macros.$(OBJEXT)
+am_test_libglnx_macros_OBJECTS = subprojects/libglnx/tests/test_libglnx_macros-test-libglnx-macros.$(OBJEXT)
 test_libglnx_macros_OBJECTS = $(am_test_libglnx_macros_OBJECTS)
 test_libglnx_macros_DEPENDENCIES = $(am__DEPENDENCIES_2) libglnx.la
 test_libglnx_macros_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(test_libglnx_macros_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-am_test_libglnx_shutil_OBJECTS = libglnx/tests/test_libglnx_shutil-test-libglnx-shutil.$(OBJEXT)
+am_test_libglnx_shutil_OBJECTS = subprojects/libglnx/tests/test_libglnx_shutil-test-libglnx-shutil.$(OBJEXT)
 test_libglnx_shutil_OBJECTS = $(am_test_libglnx_shutil_OBJECTS)
 test_libglnx_shutil_DEPENDENCIES = $(am__DEPENDENCIES_2) libglnx.la
 test_libglnx_shutil_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(test_libglnx_shutil_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-am_test_libglnx_xattrs_OBJECTS = libglnx/tests/test_libglnx_xattrs-test-libglnx-xattrs.$(OBJEXT)
+am_test_libglnx_xattrs_OBJECTS = subprojects/libglnx/tests/test_libglnx_xattrs-test-libglnx-xattrs.$(OBJEXT)
 test_libglnx_xattrs_OBJECTS = $(am_test_libglnx_xattrs_OBJECTS)
 test_libglnx_xattrs_DEPENDENCIES = $(am__DEPENDENCIES_2) libglnx.la
 test_libglnx_xattrs_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
@@ -317,21 +320,7 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = libglnx/$(DEPDIR)/la-glnx-backports.Plo \
-	libglnx/$(DEPDIR)/la-glnx-console.Plo \
-	libglnx/$(DEPDIR)/la-glnx-dirfd.Plo \
-	libglnx/$(DEPDIR)/la-glnx-errors.Plo \
-	libglnx/$(DEPDIR)/la-glnx-fdio.Plo \
-	libglnx/$(DEPDIR)/la-glnx-local-alloc.Plo \
-	libglnx/$(DEPDIR)/la-glnx-lockfile.Plo \
-	libglnx/$(DEPDIR)/la-glnx-shutil.Plo \
-	libglnx/$(DEPDIR)/la-glnx-xattrs.Plo \
-	libglnx/tests/$(DEPDIR)/test_libglnx_errors-test-libglnx-errors.Po \
-	libglnx/tests/$(DEPDIR)/test_libglnx_fdio-test-libglnx-fdio.Po \
-	libglnx/tests/$(DEPDIR)/test_libglnx_macros-test-libglnx-macros.Po \
-	libglnx/tests/$(DEPDIR)/test_libglnx_shutil-test-libglnx-shutil.Po \
-	libglnx/tests/$(DEPDIR)/test_libglnx_xattrs-test-libglnx-xattrs.Po \
-	src/$(DEPDIR)/flatpak_builder-builder-cache.Po \
+am__depfiles_remade = src/$(DEPDIR)/flatpak_builder-builder-cache.Po \
 	src/$(DEPDIR)/flatpak_builder-builder-context.Po \
 	src/$(DEPDIR)/flatpak_builder-builder-extension.Po \
 	src/$(DEPDIR)/flatpak_builder-builder-flatpak-utils.Po \
@@ -353,7 +342,21 @@ am__depfiles_remade = libglnx/$(DEPDIR)/la-glnx-backports.Plo \
 	src/$(DEPDIR)/flatpak_builder-builder-source-shell.Po \
 	src/$(DEPDIR)/flatpak_builder-builder-source-svn.Po \
 	src/$(DEPDIR)/flatpak_builder-builder-source.Po \
-	src/$(DEPDIR)/flatpak_builder-builder-utils.Po
+	src/$(DEPDIR)/flatpak_builder-builder-utils.Po \
+	subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-backports.Plo \
+	subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-console.Plo \
+	subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-dirfd.Plo \
+	subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-errors.Plo \
+	subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-fdio.Plo \
+	subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-local-alloc.Plo \
+	subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-lockfile.Plo \
+	subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-shutil.Plo \
+	subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-xattrs.Plo \
+	subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_errors-test-libglnx-errors.Po \
+	subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_fdio-test-libglnx-fdio.Po \
+	subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_macros-test-libglnx-macros.Po \
+	subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_shutil-test-libglnx-shutil.Po \
+	subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_xattrs-test-libglnx-xattrs.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -612,8 +615,9 @@ TEST_LOG_COMPILE = $(TEST_LOG_COMPILER) $(AM_TEST_LOG_FLAGS) \
 	$(TEST_LOG_FLAGS)
 DIST_SUBDIRS = . doc
 am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/config.h.in \
-	$(srcdir)/libglnx/Makefile-libglnx.am.inc \
-	$(srcdir)/src/Makefile.am.inc $(srcdir)/tests/Makefile.am.inc \
+	$(srcdir)/src/Makefile.am.inc \
+	$(srcdir)/subprojects/libglnx/Makefile-libglnx.am.inc \
+	$(srcdir)/tests/Makefile.am.inc \
 	$(top_srcdir)/buildutil/glib-tap.mk ABOUT-NLS COPYING INSTALL \
 	NEWS compile config.guess config.rpath config.sub depcomp \
 	install-sh ltmain.sh missing test-driver
@@ -806,6 +810,7 @@ pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
+runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
@@ -826,8 +831,9 @@ DISTCLEANFILES = $(NULL) $(NULL)
 BUILT_SOURCES = $(NULL)
 EXTRA_DIST = buildutil/tap-driver.sh buildutil/tap-test \
 	$(all_dist_test_scripts) $(all_dist_test_data) \
-	libglnx/README.md libglnx/COPYING libglnx/libglnx.m4 $(NULL) \
-	tests/flatpak.supp tests/glib.supp README.md
+	subprojects/libglnx/README.md subprojects/libglnx/COPYING \
+	subprojects/libglnx/libglnx.m4 $(NULL) tests/flatpak.supp \
+	tests/glib.supp README.md
 TESTS_ENVIRONMENT = \
 	G_TEST_SRCDIR="$(abs_srcdir)/tests"	\
 	G_TEST_BUILDDIR="$(abs_builddir)/tests"	\
@@ -873,18 +879,19 @@ all_test_ltlibs = $(test_ltlibraries) $(uninstalled_test_ltlibraries) $(installe
 @ENABLE_INSTALLED_TESTS_TRUE@installed_test_meta_DATA = $(installed_testcases:=.test)
 SUBDIRS = $(am__append_14)
 FLATPAK_BINDIR = $(bindir)
-ACLOCAL_AMFLAGS = -I m4 -I libglnx ${ACLOCAL_FLAGS}
+ACLOCAL_AMFLAGS = -I m4 -I subprojects/libglnx ${ACLOCAL_FLAGS}
 AM_CPPFLAGS = \
 	-DFLATPAK_BINDIR=\"$(FLATPAK_BINDIR)\"			\
 	-DFLATPAK_BASEDIR=\"$(pkgdatadir)\"			\
 	-DG_LOG_DOMAIN=\"flatpak-builder\"			\
-	-I$(srcdir)/libglnx					\
+	-I$(srcdir)/subprojects					\
+	-I$(srcdir)/subprojects/libglnx				\
 	-include "config.h"					\
 	$(NULL)
 
 AM_CFLAGS = $(WARN_CFLAGS)
 lib_LTLIBRARIES = 
-libglnx_srcpath := $(srcdir)/libglnx
+libglnx_srcpath := $(srcdir)/subprojects/libglnx
 libglnx_cflags := \
 	$(BASE_CFLAGS) \
 	"-I$(libglnx_srcpath)" \
@@ -894,50 +901,50 @@ libglnx_cflags := \
 
 libglnx_libs := $(BASE_LIBS)
 libglnx_la_SOURCES = \
-	libglnx/glnx-macros.h \
-	libglnx/glnx-backport-autocleanups.h \
-	libglnx/glnx-backport-autoptr.h \
-	libglnx/glnx-backports.h \
-	libglnx/glnx-backports.c \
-	libglnx/glnx-local-alloc.h \
-	libglnx/glnx-local-alloc.c \
-	libglnx/glnx-errors.h \
-	libglnx/glnx-errors.c \
-	libglnx/glnx-console.h \
-	libglnx/glnx-console.c \
-	libglnx/glnx-dirfd.h \
-	libglnx/glnx-dirfd.c \
-	libglnx/glnx-fdio.h \
-	libglnx/glnx-fdio.c \
-	libglnx/glnx-lockfile.h \
-	libglnx/glnx-lockfile.c \
-	libglnx/glnx-missing-syscall.h \
-	libglnx/glnx-missing.h \
-	libglnx/glnx-xattrs.h \
-	libglnx/glnx-xattrs.c \
-	libglnx/glnx-shutil.h \
-	libglnx/glnx-shutil.c \
-	libglnx/libglnx.h \
-	libglnx/tests/libglnx-testlib.h \
+	subprojects/libglnx/glnx-macros.h \
+	subprojects/libglnx/glnx-backport-autocleanups.h \
+	subprojects/libglnx/glnx-backport-autoptr.h \
+	subprojects/libglnx/glnx-backports.h \
+	subprojects/libglnx/glnx-backports.c \
+	subprojects/libglnx/glnx-local-alloc.h \
+	subprojects/libglnx/glnx-local-alloc.c \
+	subprojects/libglnx/glnx-errors.h \
+	subprojects/libglnx/glnx-errors.c \
+	subprojects/libglnx/glnx-console.h \
+	subprojects/libglnx/glnx-console.c \
+	subprojects/libglnx/glnx-dirfd.h \
+	subprojects/libglnx/glnx-dirfd.c \
+	subprojects/libglnx/glnx-fdio.h \
+	subprojects/libglnx/glnx-fdio.c \
+	subprojects/libglnx/glnx-lockfile.h \
+	subprojects/libglnx/glnx-lockfile.c \
+	subprojects/libglnx/glnx-missing-syscall.h \
+	subprojects/libglnx/glnx-missing.h \
+	subprojects/libglnx/glnx-xattrs.h \
+	subprojects/libglnx/glnx-xattrs.c \
+	subprojects/libglnx/glnx-shutil.h \
+	subprojects/libglnx/glnx-shutil.c \
+	subprojects/libglnx/libglnx.h \
+	subprojects/libglnx/tests/libglnx-testlib.h \
 	$(NULL)
 
 libglnx_la_CFLAGS = $(AM_CFLAGS) $(libglnx_cflags)
 libglnx_la_LDFLAGS = -avoid-version -Bsymbolic-functions -export-symbols-regex "^glnx_" -no-undefined -export-dynamic 
 libglnx_la_LIBADD = $(libglnx_libs)
 libglnx_tests = test-libglnx-xattrs test-libglnx-fdio test-libglnx-errors test-libglnx-macros test-libglnx-shutil
-test_libglnx_xattrs_SOURCES = libglnx/tests/test-libglnx-xattrs.c
+test_libglnx_xattrs_SOURCES = subprojects/libglnx/tests/test-libglnx-xattrs.c
 test_libglnx_xattrs_CFLAGS = $(AM_CFLAGS) $(libglnx_cflags)
 test_libglnx_xattrs_LDADD = $(libglnx_libs) libglnx.la
-test_libglnx_fdio_SOURCES = libglnx/tests/test-libglnx-fdio.c
+test_libglnx_fdio_SOURCES = subprojects/libglnx/tests/test-libglnx-fdio.c
 test_libglnx_fdio_CFLAGS = $(AM_CFLAGS) $(libglnx_cflags)
 test_libglnx_fdio_LDADD = $(libglnx_libs) libglnx.la
-test_libglnx_errors_SOURCES = libglnx/tests/test-libglnx-errors.c
+test_libglnx_errors_SOURCES = subprojects/libglnx/tests/test-libglnx-errors.c
 test_libglnx_errors_CFLAGS = $(AM_CFLAGS) $(libglnx_cflags)
 test_libglnx_errors_LDADD = $(libglnx_libs) libglnx.la
-test_libglnx_macros_SOURCES = libglnx/tests/test-libglnx-macros.c
+test_libglnx_macros_SOURCES = subprojects/libglnx/tests/test-libglnx-macros.c
 test_libglnx_macros_CFLAGS = $(AM_CFLAGS) $(libglnx_cflags)
 test_libglnx_macros_LDADD = $(libglnx_libs) libglnx.la
-test_libglnx_shutil_SOURCES = libglnx/tests/test-libglnx-shutil.c
+test_libglnx_shutil_SOURCES = subprojects/libglnx/tests/test-libglnx-shutil.c
 test_libglnx_shutil_CFLAGS = $(AM_CFLAGS) $(libglnx_cflags)
 test_libglnx_shutil_LDADD = $(libglnx_libs) libglnx.la
 flatpak_builder_SOURCES = \
@@ -1050,7 +1057,7 @@ all: $(BUILT_SOURCES) config.h
 .SUFFIXES: .c .lo .log .o .obj .test .test$(EXEEXT) .trs
 am--refresh: Makefile
 	@:
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/buildutil/glib-tap.mk $(srcdir)/libglnx/Makefile-libglnx.am.inc $(srcdir)/src/Makefile.am.inc $(srcdir)/tests/Makefile.am.inc $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/buildutil/glib-tap.mk $(srcdir)/subprojects/libglnx/Makefile-libglnx.am.inc $(srcdir)/src/Makefile.am.inc $(srcdir)/tests/Makefile.am.inc $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -1072,7 +1079,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__maybe_remake_depfiles)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__maybe_remake_depfiles);; \
 	esac;
-$(top_srcdir)/buildutil/glib-tap.mk $(srcdir)/libglnx/Makefile-libglnx.am.inc $(srcdir)/src/Makefile.am.inc $(srcdir)/tests/Makefile.am.inc $(am__empty):
+$(top_srcdir)/buildutil/glib-tap.mk $(srcdir)/subprojects/libglnx/Makefile-libglnx.am.inc $(srcdir)/src/Makefile.am.inc $(srcdir)/tests/Makefile.am.inc $(am__empty):
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck
@@ -1354,30 +1361,39 @@ clean-noinstLTLIBRARIES:
 	  echo rm -f $${locs}; \
 	  rm -f $${locs}; \
 	}
-libglnx/$(am__dirstamp):
-	@$(MKDIR_P) libglnx
-	@: > libglnx/$(am__dirstamp)
-libglnx/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) libglnx/$(DEPDIR)
-	@: > libglnx/$(DEPDIR)/$(am__dirstamp)
-libglnx/la-glnx-backports.lo: libglnx/$(am__dirstamp) \
-	libglnx/$(DEPDIR)/$(am__dirstamp)
-libglnx/la-glnx-local-alloc.lo: libglnx/$(am__dirstamp) \
-	libglnx/$(DEPDIR)/$(am__dirstamp)
-libglnx/la-glnx-errors.lo: libglnx/$(am__dirstamp) \
-	libglnx/$(DEPDIR)/$(am__dirstamp)
-libglnx/la-glnx-console.lo: libglnx/$(am__dirstamp) \
-	libglnx/$(DEPDIR)/$(am__dirstamp)
-libglnx/la-glnx-dirfd.lo: libglnx/$(am__dirstamp) \
-	libglnx/$(DEPDIR)/$(am__dirstamp)
-libglnx/la-glnx-fdio.lo: libglnx/$(am__dirstamp) \
-	libglnx/$(DEPDIR)/$(am__dirstamp)
-libglnx/la-glnx-lockfile.lo: libglnx/$(am__dirstamp) \
-	libglnx/$(DEPDIR)/$(am__dirstamp)
-libglnx/la-glnx-xattrs.lo: libglnx/$(am__dirstamp) \
-	libglnx/$(DEPDIR)/$(am__dirstamp)
-libglnx/la-glnx-shutil.lo: libglnx/$(am__dirstamp) \
-	libglnx/$(DEPDIR)/$(am__dirstamp)
+subprojects/libglnx/$(am__dirstamp):
+	@$(MKDIR_P) subprojects/libglnx
+	@: > subprojects/libglnx/$(am__dirstamp)
+subprojects/libglnx/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) subprojects/libglnx/$(DEPDIR)
+	@: > subprojects/libglnx/$(DEPDIR)/$(am__dirstamp)
+subprojects/libglnx/libglnx_la-glnx-backports.lo:  \
+	subprojects/libglnx/$(am__dirstamp) \
+	subprojects/libglnx/$(DEPDIR)/$(am__dirstamp)
+subprojects/libglnx/libglnx_la-glnx-local-alloc.lo:  \
+	subprojects/libglnx/$(am__dirstamp) \
+	subprojects/libglnx/$(DEPDIR)/$(am__dirstamp)
+subprojects/libglnx/libglnx_la-glnx-errors.lo:  \
+	subprojects/libglnx/$(am__dirstamp) \
+	subprojects/libglnx/$(DEPDIR)/$(am__dirstamp)
+subprojects/libglnx/libglnx_la-glnx-console.lo:  \
+	subprojects/libglnx/$(am__dirstamp) \
+	subprojects/libglnx/$(DEPDIR)/$(am__dirstamp)
+subprojects/libglnx/libglnx_la-glnx-dirfd.lo:  \
+	subprojects/libglnx/$(am__dirstamp) \
+	subprojects/libglnx/$(DEPDIR)/$(am__dirstamp)
+subprojects/libglnx/libglnx_la-glnx-fdio.lo:  \
+	subprojects/libglnx/$(am__dirstamp) \
+	subprojects/libglnx/$(DEPDIR)/$(am__dirstamp)
+subprojects/libglnx/libglnx_la-glnx-lockfile.lo:  \
+	subprojects/libglnx/$(am__dirstamp) \
+	subprojects/libglnx/$(DEPDIR)/$(am__dirstamp)
+subprojects/libglnx/libglnx_la-glnx-xattrs.lo:  \
+	subprojects/libglnx/$(am__dirstamp) \
+	subprojects/libglnx/$(DEPDIR)/$(am__dirstamp)
+subprojects/libglnx/libglnx_la-glnx-shutil.lo:  \
+	subprojects/libglnx/$(am__dirstamp) \
+	subprojects/libglnx/$(DEPDIR)/$(am__dirstamp)
 
 libglnx.la: $(libglnx_la_OBJECTS) $(libglnx_la_DEPENDENCIES) $(EXTRA_libglnx_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(libglnx_la_LINK)  $(libglnx_la_OBJECTS) $(libglnx_la_LIBADD) $(LIBS)
@@ -1437,43 +1453,43 @@ src/flatpak_builder-builder-sdk-config.$(OBJEXT): src/$(am__dirstamp) \
 flatpak-builder$(EXEEXT): $(flatpak_builder_OBJECTS) $(flatpak_builder_DEPENDENCIES) $(EXTRA_flatpak_builder_DEPENDENCIES) 
 	@rm -f flatpak-builder$(EXEEXT)
 	$(AM_V_CCLD)$(flatpak_builder_LINK) $(flatpak_builder_OBJECTS) $(flatpak_builder_LDADD) $(LIBS)
-libglnx/tests/$(am__dirstamp):
-	@$(MKDIR_P) libglnx/tests
-	@: > libglnx/tests/$(am__dirstamp)
-libglnx/tests/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) libglnx/tests/$(DEPDIR)
-	@: > libglnx/tests/$(DEPDIR)/$(am__dirstamp)
-libglnx/tests/test_libglnx_errors-test-libglnx-errors.$(OBJEXT):  \
-	libglnx/tests/$(am__dirstamp) \
-	libglnx/tests/$(DEPDIR)/$(am__dirstamp)
+subprojects/libglnx/tests/$(am__dirstamp):
+	@$(MKDIR_P) subprojects/libglnx/tests
+	@: > subprojects/libglnx/tests/$(am__dirstamp)
+subprojects/libglnx/tests/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) subprojects/libglnx/tests/$(DEPDIR)
+	@: > subprojects/libglnx/tests/$(DEPDIR)/$(am__dirstamp)
+subprojects/libglnx/tests/test_libglnx_errors-test-libglnx-errors.$(OBJEXT):  \
+	subprojects/libglnx/tests/$(am__dirstamp) \
+	subprojects/libglnx/tests/$(DEPDIR)/$(am__dirstamp)
 
 test-libglnx-errors$(EXEEXT): $(test_libglnx_errors_OBJECTS) $(test_libglnx_errors_DEPENDENCIES) $(EXTRA_test_libglnx_errors_DEPENDENCIES) 
 	@rm -f test-libglnx-errors$(EXEEXT)
 	$(AM_V_CCLD)$(test_libglnx_errors_LINK) $(test_libglnx_errors_OBJECTS) $(test_libglnx_errors_LDADD) $(LIBS)
-libglnx/tests/test_libglnx_fdio-test-libglnx-fdio.$(OBJEXT):  \
-	libglnx/tests/$(am__dirstamp) \
-	libglnx/tests/$(DEPDIR)/$(am__dirstamp)
+subprojects/libglnx/tests/test_libglnx_fdio-test-libglnx-fdio.$(OBJEXT):  \
+	subprojects/libglnx/tests/$(am__dirstamp) \
+	subprojects/libglnx/tests/$(DEPDIR)/$(am__dirstamp)
 
 test-libglnx-fdio$(EXEEXT): $(test_libglnx_fdio_OBJECTS) $(test_libglnx_fdio_DEPENDENCIES) $(EXTRA_test_libglnx_fdio_DEPENDENCIES) 
 	@rm -f test-libglnx-fdio$(EXEEXT)
 	$(AM_V_CCLD)$(test_libglnx_fdio_LINK) $(test_libglnx_fdio_OBJECTS) $(test_libglnx_fdio_LDADD) $(LIBS)
-libglnx/tests/test_libglnx_macros-test-libglnx-macros.$(OBJEXT):  \
-	libglnx/tests/$(am__dirstamp) \
-	libglnx/tests/$(DEPDIR)/$(am__dirstamp)
+subprojects/libglnx/tests/test_libglnx_macros-test-libglnx-macros.$(OBJEXT):  \
+	subprojects/libglnx/tests/$(am__dirstamp) \
+	subprojects/libglnx/tests/$(DEPDIR)/$(am__dirstamp)
 
 test-libglnx-macros$(EXEEXT): $(test_libglnx_macros_OBJECTS) $(test_libglnx_macros_DEPENDENCIES) $(EXTRA_test_libglnx_macros_DEPENDENCIES) 
 	@rm -f test-libglnx-macros$(EXEEXT)
 	$(AM_V_CCLD)$(test_libglnx_macros_LINK) $(test_libglnx_macros_OBJECTS) $(test_libglnx_macros_LDADD) $(LIBS)
-libglnx/tests/test_libglnx_shutil-test-libglnx-shutil.$(OBJEXT):  \
-	libglnx/tests/$(am__dirstamp) \
-	libglnx/tests/$(DEPDIR)/$(am__dirstamp)
+subprojects/libglnx/tests/test_libglnx_shutil-test-libglnx-shutil.$(OBJEXT):  \
+	subprojects/libglnx/tests/$(am__dirstamp) \
+	subprojects/libglnx/tests/$(DEPDIR)/$(am__dirstamp)
 
 test-libglnx-shutil$(EXEEXT): $(test_libglnx_shutil_OBJECTS) $(test_libglnx_shutil_DEPENDENCIES) $(EXTRA_test_libglnx_shutil_DEPENDENCIES) 
 	@rm -f test-libglnx-shutil$(EXEEXT)
 	$(AM_V_CCLD)$(test_libglnx_shutil_LINK) $(test_libglnx_shutil_OBJECTS) $(test_libglnx_shutil_LDADD) $(LIBS)
-libglnx/tests/test_libglnx_xattrs-test-libglnx-xattrs.$(OBJEXT):  \
-	libglnx/tests/$(am__dirstamp) \
-	libglnx/tests/$(DEPDIR)/$(am__dirstamp)
+subprojects/libglnx/tests/test_libglnx_xattrs-test-libglnx-xattrs.$(OBJEXT):  \
+	subprojects/libglnx/tests/$(am__dirstamp) \
+	subprojects/libglnx/tests/$(DEPDIR)/$(am__dirstamp)
 
 test-libglnx-xattrs$(EXEEXT): $(test_libglnx_xattrs_OBJECTS) $(test_libglnx_xattrs_DEPENDENCIES) $(EXTRA_test_libglnx_xattrs_DEPENDENCIES) 
 	@rm -f test-libglnx-xattrs$(EXEEXT)
@@ -1516,28 +1532,14 @@ uninstall-installed_testSCRIPTS:
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
-	-rm -f libglnx/*.$(OBJEXT)
-	-rm -f libglnx/*.lo
-	-rm -f libglnx/tests/*.$(OBJEXT)
 	-rm -f src/*.$(OBJEXT)
+	-rm -f subprojects/libglnx/*.$(OBJEXT)
+	-rm -f subprojects/libglnx/*.lo
+	-rm -f subprojects/libglnx/tests/*.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@libglnx/$(DEPDIR)/la-glnx-backports.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@libglnx/$(DEPDIR)/la-glnx-console.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@libglnx/$(DEPDIR)/la-glnx-dirfd.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@libglnx/$(DEPDIR)/la-glnx-errors.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@libglnx/$(DEPDIR)/la-glnx-fdio.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@libglnx/$(DEPDIR)/la-glnx-local-alloc.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@libglnx/$(DEPDIR)/la-glnx-lockfile.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@libglnx/$(DEPDIR)/la-glnx-shutil.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@libglnx/$(DEPDIR)/la-glnx-xattrs.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@libglnx/tests/$(DEPDIR)/test_libglnx_errors-test-libglnx-errors.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@libglnx/tests/$(DEPDIR)/test_libglnx_fdio-test-libglnx-fdio.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@libglnx/tests/$(DEPDIR)/test_libglnx_macros-test-libglnx-macros.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@libglnx/tests/$(DEPDIR)/test_libglnx_shutil-test-libglnx-shutil.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@libglnx/tests/$(DEPDIR)/test_libglnx_xattrs-test-libglnx-xattrs.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/flatpak_builder-builder-cache.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/flatpak_builder-builder-context.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/flatpak_builder-builder-extension.Po@am__quote@ # am--include-marker
@@ -1561,6 +1563,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/flatpak_builder-builder-source-svn.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/flatpak_builder-builder-source.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/flatpak_builder-builder-utils.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-backports.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-console.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-dirfd.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-errors.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-fdio.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-local-alloc.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-lockfile.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-shutil.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-xattrs.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_errors-test-libglnx-errors.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_fdio-test-libglnx-fdio.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_macros-test-libglnx-macros.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_shutil-test-libglnx-shutil.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_xattrs-test-libglnx-xattrs.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -1592,68 +1608,68 @@ am--depfiles: $(am__depfiles_remade)
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
 
-libglnx/la-glnx-backports.lo: libglnx/glnx-backports.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -MT libglnx/la-glnx-backports.lo -MD -MP -MF libglnx/$(DEPDIR)/la-glnx-backports.Tpo -c -o libglnx/la-glnx-backports.lo `test -f 'libglnx/glnx-backports.c' || echo '$(srcdir)/'`libglnx/glnx-backports.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) libglnx/$(DEPDIR)/la-glnx-backports.Tpo libglnx/$(DEPDIR)/la-glnx-backports.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='libglnx/glnx-backports.c' object='libglnx/la-glnx-backports.lo' libtool=yes @AMDEPBACKSLASH@
+subprojects/libglnx/libglnx_la-glnx-backports.lo: subprojects/libglnx/glnx-backports.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -MT subprojects/libglnx/libglnx_la-glnx-backports.lo -MD -MP -MF subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-backports.Tpo -c -o subprojects/libglnx/libglnx_la-glnx-backports.lo `test -f 'subprojects/libglnx/glnx-backports.c' || echo '$(srcdir)/'`subprojects/libglnx/glnx-backports.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-backports.Tpo subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-backports.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='subprojects/libglnx/glnx-backports.c' object='subprojects/libglnx/libglnx_la-glnx-backports.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -c -o libglnx/la-glnx-backports.lo `test -f 'libglnx/glnx-backports.c' || echo '$(srcdir)/'`libglnx/glnx-backports.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -c -o subprojects/libglnx/libglnx_la-glnx-backports.lo `test -f 'subprojects/libglnx/glnx-backports.c' || echo '$(srcdir)/'`subprojects/libglnx/glnx-backports.c
 
-libglnx/la-glnx-local-alloc.lo: libglnx/glnx-local-alloc.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -MT libglnx/la-glnx-local-alloc.lo -MD -MP -MF libglnx/$(DEPDIR)/la-glnx-local-alloc.Tpo -c -o libglnx/la-glnx-local-alloc.lo `test -f 'libglnx/glnx-local-alloc.c' || echo '$(srcdir)/'`libglnx/glnx-local-alloc.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) libglnx/$(DEPDIR)/la-glnx-local-alloc.Tpo libglnx/$(DEPDIR)/la-glnx-local-alloc.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='libglnx/glnx-local-alloc.c' object='libglnx/la-glnx-local-alloc.lo' libtool=yes @AMDEPBACKSLASH@
+subprojects/libglnx/libglnx_la-glnx-local-alloc.lo: subprojects/libglnx/glnx-local-alloc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -MT subprojects/libglnx/libglnx_la-glnx-local-alloc.lo -MD -MP -MF subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-local-alloc.Tpo -c -o subprojects/libglnx/libglnx_la-glnx-local-alloc.lo `test -f 'subprojects/libglnx/glnx-local-alloc.c' || echo '$(srcdir)/'`subprojects/libglnx/glnx-local-alloc.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-local-alloc.Tpo subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-local-alloc.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='subprojects/libglnx/glnx-local-alloc.c' object='subprojects/libglnx/libglnx_la-glnx-local-alloc.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -c -o libglnx/la-glnx-local-alloc.lo `test -f 'libglnx/glnx-local-alloc.c' || echo '$(srcdir)/'`libglnx/glnx-local-alloc.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -c -o subprojects/libglnx/libglnx_la-glnx-local-alloc.lo `test -f 'subprojects/libglnx/glnx-local-alloc.c' || echo '$(srcdir)/'`subprojects/libglnx/glnx-local-alloc.c
 
-libglnx/la-glnx-errors.lo: libglnx/glnx-errors.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -MT libglnx/la-glnx-errors.lo -MD -MP -MF libglnx/$(DEPDIR)/la-glnx-errors.Tpo -c -o libglnx/la-glnx-errors.lo `test -f 'libglnx/glnx-errors.c' || echo '$(srcdir)/'`libglnx/glnx-errors.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) libglnx/$(DEPDIR)/la-glnx-errors.Tpo libglnx/$(DEPDIR)/la-glnx-errors.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='libglnx/glnx-errors.c' object='libglnx/la-glnx-errors.lo' libtool=yes @AMDEPBACKSLASH@
+subprojects/libglnx/libglnx_la-glnx-errors.lo: subprojects/libglnx/glnx-errors.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -MT subprojects/libglnx/libglnx_la-glnx-errors.lo -MD -MP -MF subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-errors.Tpo -c -o subprojects/libglnx/libglnx_la-glnx-errors.lo `test -f 'subprojects/libglnx/glnx-errors.c' || echo '$(srcdir)/'`subprojects/libglnx/glnx-errors.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-errors.Tpo subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-errors.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='subprojects/libglnx/glnx-errors.c' object='subprojects/libglnx/libglnx_la-glnx-errors.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -c -o libglnx/la-glnx-errors.lo `test -f 'libglnx/glnx-errors.c' || echo '$(srcdir)/'`libglnx/glnx-errors.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -c -o subprojects/libglnx/libglnx_la-glnx-errors.lo `test -f 'subprojects/libglnx/glnx-errors.c' || echo '$(srcdir)/'`subprojects/libglnx/glnx-errors.c
 
-libglnx/la-glnx-console.lo: libglnx/glnx-console.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -MT libglnx/la-glnx-console.lo -MD -MP -MF libglnx/$(DEPDIR)/la-glnx-console.Tpo -c -o libglnx/la-glnx-console.lo `test -f 'libglnx/glnx-console.c' || echo '$(srcdir)/'`libglnx/glnx-console.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) libglnx/$(DEPDIR)/la-glnx-console.Tpo libglnx/$(DEPDIR)/la-glnx-console.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='libglnx/glnx-console.c' object='libglnx/la-glnx-console.lo' libtool=yes @AMDEPBACKSLASH@
+subprojects/libglnx/libglnx_la-glnx-console.lo: subprojects/libglnx/glnx-console.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -MT subprojects/libglnx/libglnx_la-glnx-console.lo -MD -MP -MF subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-console.Tpo -c -o subprojects/libglnx/libglnx_la-glnx-console.lo `test -f 'subprojects/libglnx/glnx-console.c' || echo '$(srcdir)/'`subprojects/libglnx/glnx-console.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-console.Tpo subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-console.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='subprojects/libglnx/glnx-console.c' object='subprojects/libglnx/libglnx_la-glnx-console.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -c -o libglnx/la-glnx-console.lo `test -f 'libglnx/glnx-console.c' || echo '$(srcdir)/'`libglnx/glnx-console.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -c -o subprojects/libglnx/libglnx_la-glnx-console.lo `test -f 'subprojects/libglnx/glnx-console.c' || echo '$(srcdir)/'`subprojects/libglnx/glnx-console.c
 
-libglnx/la-glnx-dirfd.lo: libglnx/glnx-dirfd.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -MT libglnx/la-glnx-dirfd.lo -MD -MP -MF libglnx/$(DEPDIR)/la-glnx-dirfd.Tpo -c -o libglnx/la-glnx-dirfd.lo `test -f 'libglnx/glnx-dirfd.c' || echo '$(srcdir)/'`libglnx/glnx-dirfd.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) libglnx/$(DEPDIR)/la-glnx-dirfd.Tpo libglnx/$(DEPDIR)/la-glnx-dirfd.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='libglnx/glnx-dirfd.c' object='libglnx/la-glnx-dirfd.lo' libtool=yes @AMDEPBACKSLASH@
+subprojects/libglnx/libglnx_la-glnx-dirfd.lo: subprojects/libglnx/glnx-dirfd.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -MT subprojects/libglnx/libglnx_la-glnx-dirfd.lo -MD -MP -MF subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-dirfd.Tpo -c -o subprojects/libglnx/libglnx_la-glnx-dirfd.lo `test -f 'subprojects/libglnx/glnx-dirfd.c' || echo '$(srcdir)/'`subprojects/libglnx/glnx-dirfd.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-dirfd.Tpo subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-dirfd.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='subprojects/libglnx/glnx-dirfd.c' object='subprojects/libglnx/libglnx_la-glnx-dirfd.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -c -o libglnx/la-glnx-dirfd.lo `test -f 'libglnx/glnx-dirfd.c' || echo '$(srcdir)/'`libglnx/glnx-dirfd.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -c -o subprojects/libglnx/libglnx_la-glnx-dirfd.lo `test -f 'subprojects/libglnx/glnx-dirfd.c' || echo '$(srcdir)/'`subprojects/libglnx/glnx-dirfd.c
 
-libglnx/la-glnx-fdio.lo: libglnx/glnx-fdio.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -MT libglnx/la-glnx-fdio.lo -MD -MP -MF libglnx/$(DEPDIR)/la-glnx-fdio.Tpo -c -o libglnx/la-glnx-fdio.lo `test -f 'libglnx/glnx-fdio.c' || echo '$(srcdir)/'`libglnx/glnx-fdio.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) libglnx/$(DEPDIR)/la-glnx-fdio.Tpo libglnx/$(DEPDIR)/la-glnx-fdio.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='libglnx/glnx-fdio.c' object='libglnx/la-glnx-fdio.lo' libtool=yes @AMDEPBACKSLASH@
+subprojects/libglnx/libglnx_la-glnx-fdio.lo: subprojects/libglnx/glnx-fdio.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -MT subprojects/libglnx/libglnx_la-glnx-fdio.lo -MD -MP -MF subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-fdio.Tpo -c -o subprojects/libglnx/libglnx_la-glnx-fdio.lo `test -f 'subprojects/libglnx/glnx-fdio.c' || echo '$(srcdir)/'`subprojects/libglnx/glnx-fdio.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-fdio.Tpo subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-fdio.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='subprojects/libglnx/glnx-fdio.c' object='subprojects/libglnx/libglnx_la-glnx-fdio.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -c -o libglnx/la-glnx-fdio.lo `test -f 'libglnx/glnx-fdio.c' || echo '$(srcdir)/'`libglnx/glnx-fdio.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -c -o subprojects/libglnx/libglnx_la-glnx-fdio.lo `test -f 'subprojects/libglnx/glnx-fdio.c' || echo '$(srcdir)/'`subprojects/libglnx/glnx-fdio.c
 
-libglnx/la-glnx-lockfile.lo: libglnx/glnx-lockfile.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -MT libglnx/la-glnx-lockfile.lo -MD -MP -MF libglnx/$(DEPDIR)/la-glnx-lockfile.Tpo -c -o libglnx/la-glnx-lockfile.lo `test -f 'libglnx/glnx-lockfile.c' || echo '$(srcdir)/'`libglnx/glnx-lockfile.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) libglnx/$(DEPDIR)/la-glnx-lockfile.Tpo libglnx/$(DEPDIR)/la-glnx-lockfile.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='libglnx/glnx-lockfile.c' object='libglnx/la-glnx-lockfile.lo' libtool=yes @AMDEPBACKSLASH@
+subprojects/libglnx/libglnx_la-glnx-lockfile.lo: subprojects/libglnx/glnx-lockfile.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -MT subprojects/libglnx/libglnx_la-glnx-lockfile.lo -MD -MP -MF subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-lockfile.Tpo -c -o subprojects/libglnx/libglnx_la-glnx-lockfile.lo `test -f 'subprojects/libglnx/glnx-lockfile.c' || echo '$(srcdir)/'`subprojects/libglnx/glnx-lockfile.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-lockfile.Tpo subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-lockfile.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='subprojects/libglnx/glnx-lockfile.c' object='subprojects/libglnx/libglnx_la-glnx-lockfile.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -c -o libglnx/la-glnx-lockfile.lo `test -f 'libglnx/glnx-lockfile.c' || echo '$(srcdir)/'`libglnx/glnx-lockfile.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -c -o subprojects/libglnx/libglnx_la-glnx-lockfile.lo `test -f 'subprojects/libglnx/glnx-lockfile.c' || echo '$(srcdir)/'`subprojects/libglnx/glnx-lockfile.c
 
-libglnx/la-glnx-xattrs.lo: libglnx/glnx-xattrs.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -MT libglnx/la-glnx-xattrs.lo -MD -MP -MF libglnx/$(DEPDIR)/la-glnx-xattrs.Tpo -c -o libglnx/la-glnx-xattrs.lo `test -f 'libglnx/glnx-xattrs.c' || echo '$(srcdir)/'`libglnx/glnx-xattrs.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) libglnx/$(DEPDIR)/la-glnx-xattrs.Tpo libglnx/$(DEPDIR)/la-glnx-xattrs.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='libglnx/glnx-xattrs.c' object='libglnx/la-glnx-xattrs.lo' libtool=yes @AMDEPBACKSLASH@
+subprojects/libglnx/libglnx_la-glnx-xattrs.lo: subprojects/libglnx/glnx-xattrs.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -MT subprojects/libglnx/libglnx_la-glnx-xattrs.lo -MD -MP -MF subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-xattrs.Tpo -c -o subprojects/libglnx/libglnx_la-glnx-xattrs.lo `test -f 'subprojects/libglnx/glnx-xattrs.c' || echo '$(srcdir)/'`subprojects/libglnx/glnx-xattrs.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-xattrs.Tpo subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-xattrs.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='subprojects/libglnx/glnx-xattrs.c' object='subprojects/libglnx/libglnx_la-glnx-xattrs.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -c -o libglnx/la-glnx-xattrs.lo `test -f 'libglnx/glnx-xattrs.c' || echo '$(srcdir)/'`libglnx/glnx-xattrs.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -c -o subprojects/libglnx/libglnx_la-glnx-xattrs.lo `test -f 'subprojects/libglnx/glnx-xattrs.c' || echo '$(srcdir)/'`subprojects/libglnx/glnx-xattrs.c
 
-libglnx/la-glnx-shutil.lo: libglnx/glnx-shutil.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -MT libglnx/la-glnx-shutil.lo -MD -MP -MF libglnx/$(DEPDIR)/la-glnx-shutil.Tpo -c -o libglnx/la-glnx-shutil.lo `test -f 'libglnx/glnx-shutil.c' || echo '$(srcdir)/'`libglnx/glnx-shutil.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) libglnx/$(DEPDIR)/la-glnx-shutil.Tpo libglnx/$(DEPDIR)/la-glnx-shutil.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='libglnx/glnx-shutil.c' object='libglnx/la-glnx-shutil.lo' libtool=yes @AMDEPBACKSLASH@
+subprojects/libglnx/libglnx_la-glnx-shutil.lo: subprojects/libglnx/glnx-shutil.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -MT subprojects/libglnx/libglnx_la-glnx-shutil.lo -MD -MP -MF subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-shutil.Tpo -c -o subprojects/libglnx/libglnx_la-glnx-shutil.lo `test -f 'subprojects/libglnx/glnx-shutil.c' || echo '$(srcdir)/'`subprojects/libglnx/glnx-shutil.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-shutil.Tpo subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-shutil.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='subprojects/libglnx/glnx-shutil.c' object='subprojects/libglnx/libglnx_la-glnx-shutil.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -c -o libglnx/la-glnx-shutil.lo `test -f 'libglnx/glnx-shutil.c' || echo '$(srcdir)/'`libglnx/glnx-shutil.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libglnx_la_CFLAGS) $(CFLAGS) -c -o subprojects/libglnx/libglnx_la-glnx-shutil.lo `test -f 'subprojects/libglnx/glnx-shutil.c' || echo '$(srcdir)/'`subprojects/libglnx/glnx-shutil.c
 
 src/flatpak_builder-builder-main.o: src/builder-main.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(flatpak_builder_CFLAGS) $(CFLAGS) -MT src/flatpak_builder-builder-main.o -MD -MP -MF src/$(DEPDIR)/flatpak_builder-builder-main.Tpo -c -o src/flatpak_builder-builder-main.o `test -f 'src/builder-main.c' || echo '$(srcdir)/'`src/builder-main.c
@@ -1977,82 +1993,82 @@ src/flatpak_builder-builder-sdk-config.obj: src/builder-sdk-config.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(flatpak_builder_CFLAGS) $(CFLAGS) -c -o src/flatpak_builder-builder-sdk-config.obj `if test -f 'src/builder-sdk-config.c'; then $(CYGPATH_W) 'src/builder-sdk-config.c'; else $(CYGPATH_W) '$(srcdir)/src/builder-sdk-config.c'; fi`
 
-libglnx/tests/test_libglnx_errors-test-libglnx-errors.o: libglnx/tests/test-libglnx-errors.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_errors_CFLAGS) $(CFLAGS) -MT libglnx/tests/test_libglnx_errors-test-libglnx-errors.o -MD -MP -MF libglnx/tests/$(DEPDIR)/test_libglnx_errors-test-libglnx-errors.Tpo -c -o libglnx/tests/test_libglnx_errors-test-libglnx-errors.o `test -f 'libglnx/tests/test-libglnx-errors.c' || echo '$(srcdir)/'`libglnx/tests/test-libglnx-errors.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) libglnx/tests/$(DEPDIR)/test_libglnx_errors-test-libglnx-errors.Tpo libglnx/tests/$(DEPDIR)/test_libglnx_errors-test-libglnx-errors.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='libglnx/tests/test-libglnx-errors.c' object='libglnx/tests/test_libglnx_errors-test-libglnx-errors.o' libtool=no @AMDEPBACKSLASH@
+subprojects/libglnx/tests/test_libglnx_errors-test-libglnx-errors.o: subprojects/libglnx/tests/test-libglnx-errors.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_errors_CFLAGS) $(CFLAGS) -MT subprojects/libglnx/tests/test_libglnx_errors-test-libglnx-errors.o -MD -MP -MF subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_errors-test-libglnx-errors.Tpo -c -o subprojects/libglnx/tests/test_libglnx_errors-test-libglnx-errors.o `test -f 'subprojects/libglnx/tests/test-libglnx-errors.c' || echo '$(srcdir)/'`subprojects/libglnx/tests/test-libglnx-errors.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_errors-test-libglnx-errors.Tpo subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_errors-test-libglnx-errors.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='subprojects/libglnx/tests/test-libglnx-errors.c' object='subprojects/libglnx/tests/test_libglnx_errors-test-libglnx-errors.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_errors_CFLAGS) $(CFLAGS) -c -o libglnx/tests/test_libglnx_errors-test-libglnx-errors.o `test -f 'libglnx/tests/test-libglnx-errors.c' || echo '$(srcdir)/'`libglnx/tests/test-libglnx-errors.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_errors_CFLAGS) $(CFLAGS) -c -o subprojects/libglnx/tests/test_libglnx_errors-test-libglnx-errors.o `test -f 'subprojects/libglnx/tests/test-libglnx-errors.c' || echo '$(srcdir)/'`subprojects/libglnx/tests/test-libglnx-errors.c
 
-libglnx/tests/test_libglnx_errors-test-libglnx-errors.obj: libglnx/tests/test-libglnx-errors.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_errors_CFLAGS) $(CFLAGS) -MT libglnx/tests/test_libglnx_errors-test-libglnx-errors.obj -MD -MP -MF libglnx/tests/$(DEPDIR)/test_libglnx_errors-test-libglnx-errors.Tpo -c -o libglnx/tests/test_libglnx_errors-test-libglnx-errors.obj `if test -f 'libglnx/tests/test-libglnx-errors.c'; then $(CYGPATH_W) 'libglnx/tests/test-libglnx-errors.c'; else $(CYGPATH_W) '$(srcdir)/libglnx/tests/test-libglnx-errors.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) libglnx/tests/$(DEPDIR)/test_libglnx_errors-test-libglnx-errors.Tpo libglnx/tests/$(DEPDIR)/test_libglnx_errors-test-libglnx-errors.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='libglnx/tests/test-libglnx-errors.c' object='libglnx/tests/test_libglnx_errors-test-libglnx-errors.obj' libtool=no @AMDEPBACKSLASH@
+subprojects/libglnx/tests/test_libglnx_errors-test-libglnx-errors.obj: subprojects/libglnx/tests/test-libglnx-errors.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_errors_CFLAGS) $(CFLAGS) -MT subprojects/libglnx/tests/test_libglnx_errors-test-libglnx-errors.obj -MD -MP -MF subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_errors-test-libglnx-errors.Tpo -c -o subprojects/libglnx/tests/test_libglnx_errors-test-libglnx-errors.obj `if test -f 'subprojects/libglnx/tests/test-libglnx-errors.c'; then $(CYGPATH_W) 'subprojects/libglnx/tests/test-libglnx-errors.c'; else $(CYGPATH_W) '$(srcdir)/subprojects/libglnx/tests/test-libglnx-errors.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_errors-test-libglnx-errors.Tpo subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_errors-test-libglnx-errors.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='subprojects/libglnx/tests/test-libglnx-errors.c' object='subprojects/libglnx/tests/test_libglnx_errors-test-libglnx-errors.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_errors_CFLAGS) $(CFLAGS) -c -o libglnx/tests/test_libglnx_errors-test-libglnx-errors.obj `if test -f 'libglnx/tests/test-libglnx-errors.c'; then $(CYGPATH_W) 'libglnx/tests/test-libglnx-errors.c'; else $(CYGPATH_W) '$(srcdir)/libglnx/tests/test-libglnx-errors.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_errors_CFLAGS) $(CFLAGS) -c -o subprojects/libglnx/tests/test_libglnx_errors-test-libglnx-errors.obj `if test -f 'subprojects/libglnx/tests/test-libglnx-errors.c'; then $(CYGPATH_W) 'subprojects/libglnx/tests/test-libglnx-errors.c'; else $(CYGPATH_W) '$(srcdir)/subprojects/libglnx/tests/test-libglnx-errors.c'; fi`
 
-libglnx/tests/test_libglnx_fdio-test-libglnx-fdio.o: libglnx/tests/test-libglnx-fdio.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_fdio_CFLAGS) $(CFLAGS) -MT libglnx/tests/test_libglnx_fdio-test-libglnx-fdio.o -MD -MP -MF libglnx/tests/$(DEPDIR)/test_libglnx_fdio-test-libglnx-fdio.Tpo -c -o libglnx/tests/test_libglnx_fdio-test-libglnx-fdio.o `test -f 'libglnx/tests/test-libglnx-fdio.c' || echo '$(srcdir)/'`libglnx/tests/test-libglnx-fdio.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) libglnx/tests/$(DEPDIR)/test_libglnx_fdio-test-libglnx-fdio.Tpo libglnx/tests/$(DEPDIR)/test_libglnx_fdio-test-libglnx-fdio.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='libglnx/tests/test-libglnx-fdio.c' object='libglnx/tests/test_libglnx_fdio-test-libglnx-fdio.o' libtool=no @AMDEPBACKSLASH@
+subprojects/libglnx/tests/test_libglnx_fdio-test-libglnx-fdio.o: subprojects/libglnx/tests/test-libglnx-fdio.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_fdio_CFLAGS) $(CFLAGS) -MT subprojects/libglnx/tests/test_libglnx_fdio-test-libglnx-fdio.o -MD -MP -MF subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_fdio-test-libglnx-fdio.Tpo -c -o subprojects/libglnx/tests/test_libglnx_fdio-test-libglnx-fdio.o `test -f 'subprojects/libglnx/tests/test-libglnx-fdio.c' || echo '$(srcdir)/'`subprojects/libglnx/tests/test-libglnx-fdio.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_fdio-test-libglnx-fdio.Tpo subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_fdio-test-libglnx-fdio.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='subprojects/libglnx/tests/test-libglnx-fdio.c' object='subprojects/libglnx/tests/test_libglnx_fdio-test-libglnx-fdio.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_fdio_CFLAGS) $(CFLAGS) -c -o libglnx/tests/test_libglnx_fdio-test-libglnx-fdio.o `test -f 'libglnx/tests/test-libglnx-fdio.c' || echo '$(srcdir)/'`libglnx/tests/test-libglnx-fdio.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_fdio_CFLAGS) $(CFLAGS) -c -o subprojects/libglnx/tests/test_libglnx_fdio-test-libglnx-fdio.o `test -f 'subprojects/libglnx/tests/test-libglnx-fdio.c' || echo '$(srcdir)/'`subprojects/libglnx/tests/test-libglnx-fdio.c
 
-libglnx/tests/test_libglnx_fdio-test-libglnx-fdio.obj: libglnx/tests/test-libglnx-fdio.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_fdio_CFLAGS) $(CFLAGS) -MT libglnx/tests/test_libglnx_fdio-test-libglnx-fdio.obj -MD -MP -MF libglnx/tests/$(DEPDIR)/test_libglnx_fdio-test-libglnx-fdio.Tpo -c -o libglnx/tests/test_libglnx_fdio-test-libglnx-fdio.obj `if test -f 'libglnx/tests/test-libglnx-fdio.c'; then $(CYGPATH_W) 'libglnx/tests/test-libglnx-fdio.c'; else $(CYGPATH_W) '$(srcdir)/libglnx/tests/test-libglnx-fdio.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) libglnx/tests/$(DEPDIR)/test_libglnx_fdio-test-libglnx-fdio.Tpo libglnx/tests/$(DEPDIR)/test_libglnx_fdio-test-libglnx-fdio.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='libglnx/tests/test-libglnx-fdio.c' object='libglnx/tests/test_libglnx_fdio-test-libglnx-fdio.obj' libtool=no @AMDEPBACKSLASH@
+subprojects/libglnx/tests/test_libglnx_fdio-test-libglnx-fdio.obj: subprojects/libglnx/tests/test-libglnx-fdio.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_fdio_CFLAGS) $(CFLAGS) -MT subprojects/libglnx/tests/test_libglnx_fdio-test-libglnx-fdio.obj -MD -MP -MF subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_fdio-test-libglnx-fdio.Tpo -c -o subprojects/libglnx/tests/test_libglnx_fdio-test-libglnx-fdio.obj `if test -f 'subprojects/libglnx/tests/test-libglnx-fdio.c'; then $(CYGPATH_W) 'subprojects/libglnx/tests/test-libglnx-fdio.c'; else $(CYGPATH_W) '$(srcdir)/subprojects/libglnx/tests/test-libglnx-fdio.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_fdio-test-libglnx-fdio.Tpo subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_fdio-test-libglnx-fdio.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='subprojects/libglnx/tests/test-libglnx-fdio.c' object='subprojects/libglnx/tests/test_libglnx_fdio-test-libglnx-fdio.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_fdio_CFLAGS) $(CFLAGS) -c -o libglnx/tests/test_libglnx_fdio-test-libglnx-fdio.obj `if test -f 'libglnx/tests/test-libglnx-fdio.c'; then $(CYGPATH_W) 'libglnx/tests/test-libglnx-fdio.c'; else $(CYGPATH_W) '$(srcdir)/libglnx/tests/test-libglnx-fdio.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_fdio_CFLAGS) $(CFLAGS) -c -o subprojects/libglnx/tests/test_libglnx_fdio-test-libglnx-fdio.obj `if test -f 'subprojects/libglnx/tests/test-libglnx-fdio.c'; then $(CYGPATH_W) 'subprojects/libglnx/tests/test-libglnx-fdio.c'; else $(CYGPATH_W) '$(srcdir)/subprojects/libglnx/tests/test-libglnx-fdio.c'; fi`
 
-libglnx/tests/test_libglnx_macros-test-libglnx-macros.o: libglnx/tests/test-libglnx-macros.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_macros_CFLAGS) $(CFLAGS) -MT libglnx/tests/test_libglnx_macros-test-libglnx-macros.o -MD -MP -MF libglnx/tests/$(DEPDIR)/test_libglnx_macros-test-libglnx-macros.Tpo -c -o libglnx/tests/test_libglnx_macros-test-libglnx-macros.o `test -f 'libglnx/tests/test-libglnx-macros.c' || echo '$(srcdir)/'`libglnx/tests/test-libglnx-macros.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) libglnx/tests/$(DEPDIR)/test_libglnx_macros-test-libglnx-macros.Tpo libglnx/tests/$(DEPDIR)/test_libglnx_macros-test-libglnx-macros.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='libglnx/tests/test-libglnx-macros.c' object='libglnx/tests/test_libglnx_macros-test-libglnx-macros.o' libtool=no @AMDEPBACKSLASH@
+subprojects/libglnx/tests/test_libglnx_macros-test-libglnx-macros.o: subprojects/libglnx/tests/test-libglnx-macros.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_macros_CFLAGS) $(CFLAGS) -MT subprojects/libglnx/tests/test_libglnx_macros-test-libglnx-macros.o -MD -MP -MF subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_macros-test-libglnx-macros.Tpo -c -o subprojects/libglnx/tests/test_libglnx_macros-test-libglnx-macros.o `test -f 'subprojects/libglnx/tests/test-libglnx-macros.c' || echo '$(srcdir)/'`subprojects/libglnx/tests/test-libglnx-macros.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_macros-test-libglnx-macros.Tpo subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_macros-test-libglnx-macros.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='subprojects/libglnx/tests/test-libglnx-macros.c' object='subprojects/libglnx/tests/test_libglnx_macros-test-libglnx-macros.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_macros_CFLAGS) $(CFLAGS) -c -o libglnx/tests/test_libglnx_macros-test-libglnx-macros.o `test -f 'libglnx/tests/test-libglnx-macros.c' || echo '$(srcdir)/'`libglnx/tests/test-libglnx-macros.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_macros_CFLAGS) $(CFLAGS) -c -o subprojects/libglnx/tests/test_libglnx_macros-test-libglnx-macros.o `test -f 'subprojects/libglnx/tests/test-libglnx-macros.c' || echo '$(srcdir)/'`subprojects/libglnx/tests/test-libglnx-macros.c
 
-libglnx/tests/test_libglnx_macros-test-libglnx-macros.obj: libglnx/tests/test-libglnx-macros.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_macros_CFLAGS) $(CFLAGS) -MT libglnx/tests/test_libglnx_macros-test-libglnx-macros.obj -MD -MP -MF libglnx/tests/$(DEPDIR)/test_libglnx_macros-test-libglnx-macros.Tpo -c -o libglnx/tests/test_libglnx_macros-test-libglnx-macros.obj `if test -f 'libglnx/tests/test-libglnx-macros.c'; then $(CYGPATH_W) 'libglnx/tests/test-libglnx-macros.c'; else $(CYGPATH_W) '$(srcdir)/libglnx/tests/test-libglnx-macros.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) libglnx/tests/$(DEPDIR)/test_libglnx_macros-test-libglnx-macros.Tpo libglnx/tests/$(DEPDIR)/test_libglnx_macros-test-libglnx-macros.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='libglnx/tests/test-libglnx-macros.c' object='libglnx/tests/test_libglnx_macros-test-libglnx-macros.obj' libtool=no @AMDEPBACKSLASH@
+subprojects/libglnx/tests/test_libglnx_macros-test-libglnx-macros.obj: subprojects/libglnx/tests/test-libglnx-macros.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_macros_CFLAGS) $(CFLAGS) -MT subprojects/libglnx/tests/test_libglnx_macros-test-libglnx-macros.obj -MD -MP -MF subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_macros-test-libglnx-macros.Tpo -c -o subprojects/libglnx/tests/test_libglnx_macros-test-libglnx-macros.obj `if test -f 'subprojects/libglnx/tests/test-libglnx-macros.c'; then $(CYGPATH_W) 'subprojects/libglnx/tests/test-libglnx-macros.c'; else $(CYGPATH_W) '$(srcdir)/subprojects/libglnx/tests/test-libglnx-macros.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_macros-test-libglnx-macros.Tpo subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_macros-test-libglnx-macros.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='subprojects/libglnx/tests/test-libglnx-macros.c' object='subprojects/libglnx/tests/test_libglnx_macros-test-libglnx-macros.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_macros_CFLAGS) $(CFLAGS) -c -o libglnx/tests/test_libglnx_macros-test-libglnx-macros.obj `if test -f 'libglnx/tests/test-libglnx-macros.c'; then $(CYGPATH_W) 'libglnx/tests/test-libglnx-macros.c'; else $(CYGPATH_W) '$(srcdir)/libglnx/tests/test-libglnx-macros.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_macros_CFLAGS) $(CFLAGS) -c -o subprojects/libglnx/tests/test_libglnx_macros-test-libglnx-macros.obj `if test -f 'subprojects/libglnx/tests/test-libglnx-macros.c'; then $(CYGPATH_W) 'subprojects/libglnx/tests/test-libglnx-macros.c'; else $(CYGPATH_W) '$(srcdir)/subprojects/libglnx/tests/test-libglnx-macros.c'; fi`
 
-libglnx/tests/test_libglnx_shutil-test-libglnx-shutil.o: libglnx/tests/test-libglnx-shutil.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_shutil_CFLAGS) $(CFLAGS) -MT libglnx/tests/test_libglnx_shutil-test-libglnx-shutil.o -MD -MP -MF libglnx/tests/$(DEPDIR)/test_libglnx_shutil-test-libglnx-shutil.Tpo -c -o libglnx/tests/test_libglnx_shutil-test-libglnx-shutil.o `test -f 'libglnx/tests/test-libglnx-shutil.c' || echo '$(srcdir)/'`libglnx/tests/test-libglnx-shutil.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) libglnx/tests/$(DEPDIR)/test_libglnx_shutil-test-libglnx-shutil.Tpo libglnx/tests/$(DEPDIR)/test_libglnx_shutil-test-libglnx-shutil.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='libglnx/tests/test-libglnx-shutil.c' object='libglnx/tests/test_libglnx_shutil-test-libglnx-shutil.o' libtool=no @AMDEPBACKSLASH@
+subprojects/libglnx/tests/test_libglnx_shutil-test-libglnx-shutil.o: subprojects/libglnx/tests/test-libglnx-shutil.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_shutil_CFLAGS) $(CFLAGS) -MT subprojects/libglnx/tests/test_libglnx_shutil-test-libglnx-shutil.o -MD -MP -MF subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_shutil-test-libglnx-shutil.Tpo -c -o subprojects/libglnx/tests/test_libglnx_shutil-test-libglnx-shutil.o `test -f 'subprojects/libglnx/tests/test-libglnx-shutil.c' || echo '$(srcdir)/'`subprojects/libglnx/tests/test-libglnx-shutil.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_shutil-test-libglnx-shutil.Tpo subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_shutil-test-libglnx-shutil.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='subprojects/libglnx/tests/test-libglnx-shutil.c' object='subprojects/libglnx/tests/test_libglnx_shutil-test-libglnx-shutil.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_shutil_CFLAGS) $(CFLAGS) -c -o libglnx/tests/test_libglnx_shutil-test-libglnx-shutil.o `test -f 'libglnx/tests/test-libglnx-shutil.c' || echo '$(srcdir)/'`libglnx/tests/test-libglnx-shutil.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_shutil_CFLAGS) $(CFLAGS) -c -o subprojects/libglnx/tests/test_libglnx_shutil-test-libglnx-shutil.o `test -f 'subprojects/libglnx/tests/test-libglnx-shutil.c' || echo '$(srcdir)/'`subprojects/libglnx/tests/test-libglnx-shutil.c
 
-libglnx/tests/test_libglnx_shutil-test-libglnx-shutil.obj: libglnx/tests/test-libglnx-shutil.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_shutil_CFLAGS) $(CFLAGS) -MT libglnx/tests/test_libglnx_shutil-test-libglnx-shutil.obj -MD -MP -MF libglnx/tests/$(DEPDIR)/test_libglnx_shutil-test-libglnx-shutil.Tpo -c -o libglnx/tests/test_libglnx_shutil-test-libglnx-shutil.obj `if test -f 'libglnx/tests/test-libglnx-shutil.c'; then $(CYGPATH_W) 'libglnx/tests/test-libglnx-shutil.c'; else $(CYGPATH_W) '$(srcdir)/libglnx/tests/test-libglnx-shutil.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) libglnx/tests/$(DEPDIR)/test_libglnx_shutil-test-libglnx-shutil.Tpo libglnx/tests/$(DEPDIR)/test_libglnx_shutil-test-libglnx-shutil.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='libglnx/tests/test-libglnx-shutil.c' object='libglnx/tests/test_libglnx_shutil-test-libglnx-shutil.obj' libtool=no @AMDEPBACKSLASH@
+subprojects/libglnx/tests/test_libglnx_shutil-test-libglnx-shutil.obj: subprojects/libglnx/tests/test-libglnx-shutil.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_shutil_CFLAGS) $(CFLAGS) -MT subprojects/libglnx/tests/test_libglnx_shutil-test-libglnx-shutil.obj -MD -MP -MF subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_shutil-test-libglnx-shutil.Tpo -c -o subprojects/libglnx/tests/test_libglnx_shutil-test-libglnx-shutil.obj `if test -f 'subprojects/libglnx/tests/test-libglnx-shutil.c'; then $(CYGPATH_W) 'subprojects/libglnx/tests/test-libglnx-shutil.c'; else $(CYGPATH_W) '$(srcdir)/subprojects/libglnx/tests/test-libglnx-shutil.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_shutil-test-libglnx-shutil.Tpo subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_shutil-test-libglnx-shutil.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='subprojects/libglnx/tests/test-libglnx-shutil.c' object='subprojects/libglnx/tests/test_libglnx_shutil-test-libglnx-shutil.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_shutil_CFLAGS) $(CFLAGS) -c -o libglnx/tests/test_libglnx_shutil-test-libglnx-shutil.obj `if test -f 'libglnx/tests/test-libglnx-shutil.c'; then $(CYGPATH_W) 'libglnx/tests/test-libglnx-shutil.c'; else $(CYGPATH_W) '$(srcdir)/libglnx/tests/test-libglnx-shutil.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_shutil_CFLAGS) $(CFLAGS) -c -o subprojects/libglnx/tests/test_libglnx_shutil-test-libglnx-shutil.obj `if test -f 'subprojects/libglnx/tests/test-libglnx-shutil.c'; then $(CYGPATH_W) 'subprojects/libglnx/tests/test-libglnx-shutil.c'; else $(CYGPATH_W) '$(srcdir)/subprojects/libglnx/tests/test-libglnx-shutil.c'; fi`
 
-libglnx/tests/test_libglnx_xattrs-test-libglnx-xattrs.o: libglnx/tests/test-libglnx-xattrs.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_xattrs_CFLAGS) $(CFLAGS) -MT libglnx/tests/test_libglnx_xattrs-test-libglnx-xattrs.o -MD -MP -MF libglnx/tests/$(DEPDIR)/test_libglnx_xattrs-test-libglnx-xattrs.Tpo -c -o libglnx/tests/test_libglnx_xattrs-test-libglnx-xattrs.o `test -f 'libglnx/tests/test-libglnx-xattrs.c' || echo '$(srcdir)/'`libglnx/tests/test-libglnx-xattrs.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) libglnx/tests/$(DEPDIR)/test_libglnx_xattrs-test-libglnx-xattrs.Tpo libglnx/tests/$(DEPDIR)/test_libglnx_xattrs-test-libglnx-xattrs.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='libglnx/tests/test-libglnx-xattrs.c' object='libglnx/tests/test_libglnx_xattrs-test-libglnx-xattrs.o' libtool=no @AMDEPBACKSLASH@
+subprojects/libglnx/tests/test_libglnx_xattrs-test-libglnx-xattrs.o: subprojects/libglnx/tests/test-libglnx-xattrs.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_xattrs_CFLAGS) $(CFLAGS) -MT subprojects/libglnx/tests/test_libglnx_xattrs-test-libglnx-xattrs.o -MD -MP -MF subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_xattrs-test-libglnx-xattrs.Tpo -c -o subprojects/libglnx/tests/test_libglnx_xattrs-test-libglnx-xattrs.o `test -f 'subprojects/libglnx/tests/test-libglnx-xattrs.c' || echo '$(srcdir)/'`subprojects/libglnx/tests/test-libglnx-xattrs.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_xattrs-test-libglnx-xattrs.Tpo subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_xattrs-test-libglnx-xattrs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='subprojects/libglnx/tests/test-libglnx-xattrs.c' object='subprojects/libglnx/tests/test_libglnx_xattrs-test-libglnx-xattrs.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_xattrs_CFLAGS) $(CFLAGS) -c -o libglnx/tests/test_libglnx_xattrs-test-libglnx-xattrs.o `test -f 'libglnx/tests/test-libglnx-xattrs.c' || echo '$(srcdir)/'`libglnx/tests/test-libglnx-xattrs.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_xattrs_CFLAGS) $(CFLAGS) -c -o subprojects/libglnx/tests/test_libglnx_xattrs-test-libglnx-xattrs.o `test -f 'subprojects/libglnx/tests/test-libglnx-xattrs.c' || echo '$(srcdir)/'`subprojects/libglnx/tests/test-libglnx-xattrs.c
 
-libglnx/tests/test_libglnx_xattrs-test-libglnx-xattrs.obj: libglnx/tests/test-libglnx-xattrs.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_xattrs_CFLAGS) $(CFLAGS) -MT libglnx/tests/test_libglnx_xattrs-test-libglnx-xattrs.obj -MD -MP -MF libglnx/tests/$(DEPDIR)/test_libglnx_xattrs-test-libglnx-xattrs.Tpo -c -o libglnx/tests/test_libglnx_xattrs-test-libglnx-xattrs.obj `if test -f 'libglnx/tests/test-libglnx-xattrs.c'; then $(CYGPATH_W) 'libglnx/tests/test-libglnx-xattrs.c'; else $(CYGPATH_W) '$(srcdir)/libglnx/tests/test-libglnx-xattrs.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) libglnx/tests/$(DEPDIR)/test_libglnx_xattrs-test-libglnx-xattrs.Tpo libglnx/tests/$(DEPDIR)/test_libglnx_xattrs-test-libglnx-xattrs.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='libglnx/tests/test-libglnx-xattrs.c' object='libglnx/tests/test_libglnx_xattrs-test-libglnx-xattrs.obj' libtool=no @AMDEPBACKSLASH@
+subprojects/libglnx/tests/test_libglnx_xattrs-test-libglnx-xattrs.obj: subprojects/libglnx/tests/test-libglnx-xattrs.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_xattrs_CFLAGS) $(CFLAGS) -MT subprojects/libglnx/tests/test_libglnx_xattrs-test-libglnx-xattrs.obj -MD -MP -MF subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_xattrs-test-libglnx-xattrs.Tpo -c -o subprojects/libglnx/tests/test_libglnx_xattrs-test-libglnx-xattrs.obj `if test -f 'subprojects/libglnx/tests/test-libglnx-xattrs.c'; then $(CYGPATH_W) 'subprojects/libglnx/tests/test-libglnx-xattrs.c'; else $(CYGPATH_W) '$(srcdir)/subprojects/libglnx/tests/test-libglnx-xattrs.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_xattrs-test-libglnx-xattrs.Tpo subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_xattrs-test-libglnx-xattrs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='subprojects/libglnx/tests/test-libglnx-xattrs.c' object='subprojects/libglnx/tests/test_libglnx_xattrs-test-libglnx-xattrs.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_xattrs_CFLAGS) $(CFLAGS) -c -o libglnx/tests/test_libglnx_xattrs-test-libglnx-xattrs.obj `if test -f 'libglnx/tests/test-libglnx-xattrs.c'; then $(CYGPATH_W) 'libglnx/tests/test-libglnx-xattrs.c'; else $(CYGPATH_W) '$(srcdir)/libglnx/tests/test-libglnx-xattrs.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_xattrs_CFLAGS) $(CFLAGS) -c -o subprojects/libglnx/tests/test_libglnx_xattrs-test-libglnx-xattrs.obj `if test -f 'subprojects/libglnx/tests/test-libglnx-xattrs.c'; then $(CYGPATH_W) 'subprojects/libglnx/tests/test-libglnx-xattrs.c'; else $(CYGPATH_W) '$(srcdir)/subprojects/libglnx/tests/test-libglnx-xattrs.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
 
 clean-libtool:
 	-rm -rf .libs _libs
-	-rm -rf libglnx/.libs libglnx/_libs
+	-rm -rf subprojects/libglnx/.libs subprojects/libglnx/_libs
 
 distclean-libtool:
 	-rm -f libtool config.lt
@@ -2718,12 +2734,12 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
-	-rm -f libglnx/$(DEPDIR)/$(am__dirstamp)
-	-rm -f libglnx/$(am__dirstamp)
-	-rm -f libglnx/tests/$(DEPDIR)/$(am__dirstamp)
-	-rm -f libglnx/tests/$(am__dirstamp)
 	-rm -f src/$(DEPDIR)/$(am__dirstamp)
 	-rm -f src/$(am__dirstamp)
+	-rm -f subprojects/libglnx/$(DEPDIR)/$(am__dirstamp)
+	-rm -f subprojects/libglnx/$(am__dirstamp)
+	-rm -f subprojects/libglnx/tests/$(DEPDIR)/$(am__dirstamp)
+	-rm -f subprojects/libglnx/tests/$(am__dirstamp)
 	-test -z "$(DISTCLEANFILES)" || rm -f $(DISTCLEANFILES)
 
 maintainer-clean-generic:
@@ -2741,21 +2757,7 @@ clean-am: clean-binPROGRAMS clean-checkLTLIBRARIES clean-checkPROGRAMS \
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-		-rm -f libglnx/$(DEPDIR)/la-glnx-backports.Plo
-	-rm -f libglnx/$(DEPDIR)/la-glnx-console.Plo
-	-rm -f libglnx/$(DEPDIR)/la-glnx-dirfd.Plo
-	-rm -f libglnx/$(DEPDIR)/la-glnx-errors.Plo
-	-rm -f libglnx/$(DEPDIR)/la-glnx-fdio.Plo
-	-rm -f libglnx/$(DEPDIR)/la-glnx-local-alloc.Plo
-	-rm -f libglnx/$(DEPDIR)/la-glnx-lockfile.Plo
-	-rm -f libglnx/$(DEPDIR)/la-glnx-shutil.Plo
-	-rm -f libglnx/$(DEPDIR)/la-glnx-xattrs.Plo
-	-rm -f libglnx/tests/$(DEPDIR)/test_libglnx_errors-test-libglnx-errors.Po
-	-rm -f libglnx/tests/$(DEPDIR)/test_libglnx_fdio-test-libglnx-fdio.Po
-	-rm -f libglnx/tests/$(DEPDIR)/test_libglnx_macros-test-libglnx-macros.Po
-	-rm -f libglnx/tests/$(DEPDIR)/test_libglnx_shutil-test-libglnx-shutil.Po
-	-rm -f libglnx/tests/$(DEPDIR)/test_libglnx_xattrs-test-libglnx-xattrs.Po
-	-rm -f src/$(DEPDIR)/flatpak_builder-builder-cache.Po
+		-rm -f src/$(DEPDIR)/flatpak_builder-builder-cache.Po
 	-rm -f src/$(DEPDIR)/flatpak_builder-builder-context.Po
 	-rm -f src/$(DEPDIR)/flatpak_builder-builder-extension.Po
 	-rm -f src/$(DEPDIR)/flatpak_builder-builder-flatpak-utils.Po
@@ -2778,6 +2780,20 @@ distclean: distclean-recursive
 	-rm -f src/$(DEPDIR)/flatpak_builder-builder-source-svn.Po
 	-rm -f src/$(DEPDIR)/flatpak_builder-builder-source.Po
 	-rm -f src/$(DEPDIR)/flatpak_builder-builder-utils.Po
+	-rm -f subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-backports.Plo
+	-rm -f subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-console.Plo
+	-rm -f subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-dirfd.Plo
+	-rm -f subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-errors.Plo
+	-rm -f subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-fdio.Plo
+	-rm -f subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-local-alloc.Plo
+	-rm -f subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-lockfile.Plo
+	-rm -f subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-shutil.Plo
+	-rm -f subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-xattrs.Plo
+	-rm -f subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_errors-test-libglnx-errors.Po
+	-rm -f subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_fdio-test-libglnx-fdio.Po
+	-rm -f subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_macros-test-libglnx-macros.Po
+	-rm -f subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_shutil-test-libglnx-shutil.Po
+	-rm -f subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_xattrs-test-libglnx-xattrs.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-libtool distclean-tags
@@ -2831,21 +2847,7 @@ installcheck-am:
 maintainer-clean: maintainer-clean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-		-rm -f libglnx/$(DEPDIR)/la-glnx-backports.Plo
-	-rm -f libglnx/$(DEPDIR)/la-glnx-console.Plo
-	-rm -f libglnx/$(DEPDIR)/la-glnx-dirfd.Plo
-	-rm -f libglnx/$(DEPDIR)/la-glnx-errors.Plo
-	-rm -f libglnx/$(DEPDIR)/la-glnx-fdio.Plo
-	-rm -f libglnx/$(DEPDIR)/la-glnx-local-alloc.Plo
-	-rm -f libglnx/$(DEPDIR)/la-glnx-lockfile.Plo
-	-rm -f libglnx/$(DEPDIR)/la-glnx-shutil.Plo
-	-rm -f libglnx/$(DEPDIR)/la-glnx-xattrs.Plo
-	-rm -f libglnx/tests/$(DEPDIR)/test_libglnx_errors-test-libglnx-errors.Po
-	-rm -f libglnx/tests/$(DEPDIR)/test_libglnx_fdio-test-libglnx-fdio.Po
-	-rm -f libglnx/tests/$(DEPDIR)/test_libglnx_macros-test-libglnx-macros.Po
-	-rm -f libglnx/tests/$(DEPDIR)/test_libglnx_shutil-test-libglnx-shutil.Po
-	-rm -f libglnx/tests/$(DEPDIR)/test_libglnx_xattrs-test-libglnx-xattrs.Po
-	-rm -f src/$(DEPDIR)/flatpak_builder-builder-cache.Po
+		-rm -f src/$(DEPDIR)/flatpak_builder-builder-cache.Po
 	-rm -f src/$(DEPDIR)/flatpak_builder-builder-context.Po
 	-rm -f src/$(DEPDIR)/flatpak_builder-builder-extension.Po
 	-rm -f src/$(DEPDIR)/flatpak_builder-builder-flatpak-utils.Po
@@ -2868,6 +2870,20 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f src/$(DEPDIR)/flatpak_builder-builder-source-svn.Po
 	-rm -f src/$(DEPDIR)/flatpak_builder-builder-source.Po
 	-rm -f src/$(DEPDIR)/flatpak_builder-builder-utils.Po
+	-rm -f subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-backports.Plo
+	-rm -f subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-console.Plo
+	-rm -f subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-dirfd.Plo
+	-rm -f subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-errors.Plo
+	-rm -f subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-fdio.Plo
+	-rm -f subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-local-alloc.Plo
+	-rm -f subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-lockfile.Plo
+	-rm -f subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-shutil.Plo
+	-rm -f subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-xattrs.Plo
+	-rm -f subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_errors-test-libglnx-errors.Po
+	-rm -f subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_fdio-test-libglnx-fdio.Po
+	-rm -f subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_macros-test-libglnx-macros.Po
+	-rm -f subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_shutil-test-libglnx-shutil.Po
+	-rm -f subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_xattrs-test-libglnx-xattrs.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

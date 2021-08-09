@@ -187,6 +187,20 @@ builder_source_file_set_property (GObject      *object,
     }
 }
 
+static gboolean
+builder_source_file_validate (BuilderSource  *source,
+                              GError        **error)
+{
+  BuilderSourceFile *self = BUILDER_SOURCE_FILE (source);
+
+  if (self->dest_filename != NULL &&
+      strchr (self->dest_filename, '/') != NULL)
+    return flatpak_fail (error, "No slashes allowed in dest-filename");
+
+  return TRUE;
+}
+
+
 static SoupURI *
 get_uri (BuilderSourceFile *self,
          GError           **error)
@@ -280,9 +294,18 @@ get_source_file (BuilderSourceFile *self,
 
   if (self->path != NULL && self->path[0] != 0)
     {
+      g_autoptr(GFile) file = NULL;
       *is_local = TRUE;
       *is_inline = FALSE;
-      return g_file_resolve_relative_path (base_dir, self->path);
+      file = g_file_resolve_relative_path (base_dir, self->path);
+
+      if (!builder_context_ensure_parent_dir_sandboxed (context, file, error))
+        {
+          g_prefix_error (error, "Unable to get source file '%s': ", self->path);
+          return NULL;
+        }
+
+      return g_steal_pointer (&file);
     }
 
   g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED, "source file path or url not specified");
@@ -397,6 +420,7 @@ builder_source_file_download (BuilderSource  *source,
 static gboolean
 builder_source_file_extract (BuilderSource  *source,
                              GFile          *dest,
+                             GFile          *source_dir,
                              BuilderOptions *build_options,
                              BuilderContext *context,
                              GError        **error)
@@ -432,7 +456,8 @@ builder_source_file_extract (BuilderSource  *source,
   /* If the destination file exists, just delete it. We can encounter errors when
    * trying to overwrite files that are not writable.
    */
-  if (g_file_query_exists (dest_file, NULL) && !g_file_delete (dest_file, NULL, error))
+  if (flatpak_file_query_exists_nofollow (dest_file) &&
+      !g_file_delete (dest_file, NULL, error))
     return FALSE;
 
   if (is_inline)
@@ -588,6 +613,7 @@ builder_source_file_class_init (BuilderSourceFileClass *klass)
   source_class->bundle = builder_source_file_bundle;
   source_class->update = builder_source_file_update;
   source_class->checksum = builder_source_file_checksum;
+  source_class->validate = builder_source_file_validate;
 
   g_object_class_install_property (object_class,
                                    PROP_PATH,
