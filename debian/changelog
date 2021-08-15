@@ -1,3 +1,9 @@
+flatpak-builder (1.0.14-2) unstable; urgency=medium
+
+  * Upload to unstable
+
+ -- Simon McVittie <smcv@debian.org>  Sun, 15 Aug 2021 10:46:41 +0100
+
 flatpak-builder (1.0.14-1) experimental; urgency=medium
 
   * New upstream release
