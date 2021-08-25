@@ -3,10 +3,3 @@ Restrictions: isolation-machine
 Depends:
  flatpak-builder-tests,
  gnome-desktop-testing,
-
-Tests: python2
-Restrictions: isolation-machine skip-not-installable
-Depends:
- flatpak-builder-tests,
- gnome-desktop-testing,
- python2,

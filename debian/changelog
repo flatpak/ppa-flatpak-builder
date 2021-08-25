@@ -1,3 +1,14 @@
+flatpak-builder (1.1.1-1) experimental; urgency=medium
+
+  * Branch for experimental
+  * New upstream development release
+  * Build with the bundled debugedit for now (ITP: #985814)
+  * d/rules: Avoid debhelper 13.4+ making installed-tests data executable
+  * Use debhelper compat level 13
+    - Drop dh_missing --fail-missing override, it is now the default
+
+ -- Simon McVittie <smcv@debian.org>  Wed, 25 Aug 2021 17:52:01 +0100
+
 flatpak-builder (1.0.12-flatpak1~focal) focal; urgency=medium
 
   * Rebuild for focal
@@ -41,8 +52,55 @@ flatpak-builder (1.0.8-3~bionic) bionic; urgency=medium
 
  -- Alexander Larsson <alexl@redhat.com>  Fri, 13 Sep 2019 16:22:39 +0200
 
-flatpak-builder (1.0.8-3) UNRELEASED; urgency=medium
+flatpak-builder (1.0.14-2) unstable; urgency=medium
 
+  * Upload to unstable
+
+ -- Simon McVittie <smcv@debian.org>  Sun, 15 Aug 2021 10:46:41 +0100
+
+flatpak-builder (1.0.14-1) experimental; urgency=medium
+
+  * New upstream release
+
+ -- Simon McVittie <smcv@debian.org>  Mon, 09 Aug 2021 13:15:58 +0100
+
+flatpak-builder (1.0.12-1) unstable; urgency=medium
+
+  * New upstream bugfix release
+    - Make --run work if manifest has --metadata in build-finish
+    - Don't extract git submodules if they're disabled
+    - Make debug messages more understandable
+  * Standards-Version: 4.5.1 (no changes required)
+  * Drop autopkgtest that uses python2 (Closes: #936530)
+
+ -- Simon McVittie <smcv@debian.org>  Mon, 22 Feb 2021 08:42:42 +0000
+
+flatpak-builder (1.0.11-1) unstable; urgency=medium
+
+  * New upstream release
+    - d/p/bzr-Run-brz-in-preference-to-bzr.patch:
+      Drop patch, applied upstream
+
+ -- Simon McVittie <smcv@debian.org>  Sat, 04 Jul 2020 15:26:09 +0100
+
+flatpak-builder (1.0.10-1) unstable; urgency=medium
+
+  * New upstream release
+  * Add Suggests on p7zip-full, for 7z
+  * Standards-Version: 4.5.0 (no changes required)
+  * Use secure URI in Homepage field.
+  * Set upstream metadata fields: Repository.
+  * Remove obsolete field Name from debian/upstream/metadata (already
+    present in machine-readable debian/copyright).
+  * Remove Suggests on bzr now that it is a transitional package to brz
+  * d/p/bzr-Run-brz-in-preference-to-bzr.patch:
+    Make the bzr module type actually work with only brz installed
+
+ -- Simon McVittie <smcv@debian.org>  Fri, 20 Mar 2020 20:37:36 +0000
+
+flatpak-builder (1.0.9-1) unstable; urgency=medium
+
+  * New upstream release
   * installed-tests: Downgrade python2 from Depends to Suggests.
     Test coverage will be a bit better if it is installed, but this
     doesn't need to block the eventual removal of python2 from Debian.
@@ -50,7 +108,7 @@ flatpak-builder (1.0.8-3) UNRELEASED; urgency=medium
     so it is not straightforward to convert to Python 3.
     (Closes: #936530)
 
- -- Simon McVittie <smcv@debian.org>  Fri, 26 Jul 2019 08:40:40 +0100
+ -- Simon McVittie <smcv@debian.org>  Mon, 16 Sep 2019 09:47:06 +0100
 
 flatpak-builder (1.0.8-2) unstable; urgency=medium
 

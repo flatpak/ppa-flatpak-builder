@@ -1,6 +1,7 @@
 #!/usr/bin/dh-exec
 
 usr/bin/flatpak-builder
+usr/libexec/flatpak-builder-debugedit
 <!nodoc> usr/share/doc/flatpak-builder
 <!nodoc> usr/share/man/man1
 <!nodoc> usr/share/man/man5

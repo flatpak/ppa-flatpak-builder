@@ -3,6 +3,8 @@
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
 
+
+binaries := $(shell dh_listpackages)
 %:
 	dh $@
 
@@ -19,12 +21,17 @@ endif
 override_dh_auto_configure:
 	dh_auto_configure -- \
 		--enable-installed-tests \
-		--libexecdir=/usr/libexec \
 		--with-yaml \
+		--without-system-debugedit \
 		$(configure_options)
 
-override_dh_missing:
-	dh_missing --fail-missing
+# debhelper >= 13.4 makes all of /usr/libexec executable, which is not
+# quite right for installed-tests
+override_dh_fixperms:
+	dh_fixperms -Xusr/libexec/installed-tests
+ifneq ($(filter %-tests,$(binaries)),)
+	chmod --recursive --changes a+rX,u+w,og-w debian/*-tests/usr/libexec/installed-tests
+endif
 
 override_dh_auto_test:
 ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
