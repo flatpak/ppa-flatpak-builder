@@ -24,7 +24,7 @@ Build-Depends:
  libattr1-dev,
  libcap-dev,
  libcurl4-gnutls-dev,
- libdw-dev,
+ libdw-dev (>= 0.172),
  libelf-dev,
  libflatpak-dev (>= 0.99.1),
  libglib2.0-dev (>= 2.44),
