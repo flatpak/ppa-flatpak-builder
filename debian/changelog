@@ -1,3 +1,14 @@
+flatpak-builder (1.1.1-1flatpak1~20.04) focal; urgency=medium
+
+  * Resync packaging with 1.1.1-1 in Debian
+  * Changes relative to Debian:
+    - Backport to Ubuntu 20.04 'focal'
+      - Roll back to debhelper 12
+    - Set changelog merge driver for debian/changelog
+    - d/README.source: Add
+
+ -- Simon McVittie <smcv@debian.org>  Wed, 25 Aug 2021 19:12:36 +0100
+
 flatpak-builder (1.1.1-1) experimental; urgency=medium
 
   * Branch for experimental
