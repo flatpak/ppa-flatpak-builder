@@ -25,6 +25,9 @@ override_dh_auto_configure:
 		--without-system-debugedit \
 		$(configure_options)
 
+override_dh_missing:
+	dh_missing --fail-missing
+
 # debhelper >= 13.4 makes all of /usr/libexec executable, which is not
 # quite right for installed-tests
 override_dh_fixperms:
