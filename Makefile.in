@@ -112,9 +112,9 @@ build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = $(am__EXEEXT_1) flatpak-builder$(EXEEXT) \
 	$(am__EXEEXT_1)
-noinst_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_4)
-libexec_PROGRAMS = $(am__EXEEXT_1)
-TESTS = $(am__EXEEXT_5) $(am__EXEEXT_3)
+noinst_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_5)
+libexec_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_4)
+TESTS = $(am__EXEEXT_6) $(am__EXEEXT_3)
 installed_test_PROGRAMS = $(am__EXEEXT_1)
 check_PROGRAMS = $(am__EXEEXT_2) $(am__EXEEXT_3)
 @ENABLE_ALWAYS_BUILD_TESTS_TRUE@am__append_1 = $(all_test_ltlibs)
@@ -143,6 +143,10 @@ check_PROGRAMS = $(am__EXEEXT_2) $(am__EXEEXT_3)
 @ENABLE_INSTALLED_TESTS_TRUE@am__append_12 = $(test_ltlibraries) $(installed_test_ltlibraries)
 @ENABLE_INSTALLED_TESTS_TRUE@am__append_13 = $(installed_test_meta_DATA)
 @BUILD_DOCUMENTATION_TRUE@am__append_14 = . doc
+@WITH_SYSTEM_DEBUGEDIT_TRUE@am__append_15 = -DDEBUGEDIT=\"$(DEBUGEDIT)\"
+@WITH_SYSTEM_DEBUGEDIT_FALSE@am__append_16 = -DDEBUGEDIT=\"$(libexecdir)/flatpak-builder-debugedit\"
+@WITH_SYSTEM_DEBUGEDIT_FALSE@am__append_17 = FLATPAK_BUILDER_DEBUGEDIT=$$(cd $(top_builddir) && pwd)/flatpak-builder-debugedit
+@WITH_SYSTEM_DEBUGEDIT_FALSE@am__append_18 = flatpak-builder-debugedit
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/subprojects/libglnx/libglnx.m4 \
@@ -182,7 +186,8 @@ am__installdirs = "$(DESTDIR)$(bindir)" \
 am__EXEEXT_3 = test-libglnx-xattrs$(EXEEXT) test-libglnx-fdio$(EXEEXT) \
 	test-libglnx-errors$(EXEEXT) test-libglnx-macros$(EXEEXT) \
 	test-libglnx-shutil$(EXEEXT)
-@ENABLE_ALWAYS_BUILD_TESTS_TRUE@am__EXEEXT_4 = $(am__EXEEXT_1)
+@WITH_SYSTEM_DEBUGEDIT_FALSE@am__EXEEXT_4 = flatpak-builder-debugedit$(EXEEXT)
+@ENABLE_ALWAYS_BUILD_TESTS_TRUE@am__EXEEXT_5 = $(am__EXEEXT_1)
 PROGRAMS = $(bin_PROGRAMS) $(installed_test_PROGRAMS) \
 	$(libexec_PROGRAMS) $(noinst_PROGRAMS)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
@@ -269,6 +274,31 @@ flatpak_builder_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(flatpak_builder_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
+am__flatpak_builder_debugedit_SOURCES_DIST =  \
+	subprojects/debugedit/tools/debugedit.c \
+	subprojects/debugedit/tools/hashtab.c \
+	subprojects/debugedit/tools/hashtab.h \
+	subprojects/debugedit/tools/md5.c \
+	subprojects/debugedit/tools/md5.h \
+	subprojects/debugedit/tools/sha1.c \
+	subprojects/debugedit/tools/sha1.h \
+	subprojects/debugedit/tools/ansidecl.h
+@WITH_SYSTEM_DEBUGEDIT_FALSE@am_flatpak_builder_debugedit_OBJECTS = subprojects/debugedit/tools/flatpak_builder_debugedit-debugedit.$(OBJEXT) \
+@WITH_SYSTEM_DEBUGEDIT_FALSE@	subprojects/debugedit/tools/flatpak_builder_debugedit-hashtab.$(OBJEXT) \
+@WITH_SYSTEM_DEBUGEDIT_FALSE@	subprojects/debugedit/tools/flatpak_builder_debugedit-md5.$(OBJEXT) \
+@WITH_SYSTEM_DEBUGEDIT_FALSE@	subprojects/debugedit/tools/flatpak_builder_debugedit-sha1.$(OBJEXT) \
+@WITH_SYSTEM_DEBUGEDIT_FALSE@	$(am__objects_1)
+flatpak_builder_debugedit_OBJECTS =  \
+	$(am_flatpak_builder_debugedit_OBJECTS)
+@WITH_SYSTEM_DEBUGEDIT_FALSE@flatpak_builder_debugedit_DEPENDENCIES =  \
+@WITH_SYSTEM_DEBUGEDIT_FALSE@	$(am__DEPENDENCIES_1) \
+@WITH_SYSTEM_DEBUGEDIT_FALSE@	$(am__DEPENDENCIES_1) \
+@WITH_SYSTEM_DEBUGEDIT_FALSE@	$(am__DEPENDENCIES_1) \
+@WITH_SYSTEM_DEBUGEDIT_FALSE@	$(am__DEPENDENCIES_1)
+flatpak_builder_debugedit_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
+	$(flatpak_builder_debugedit_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
 am_test_libglnx_errors_OBJECTS = subprojects/libglnx/tests/test_libglnx_errors-test-libglnx-errors.$(OBJEXT)
 test_libglnx_errors_OBJECTS = $(am_test_libglnx_errors_OBJECTS)
 test_libglnx_errors_DEPENDENCIES = $(am__DEPENDENCIES_2) libglnx.la
@@ -343,6 +373,10 @@ am__depfiles_remade = src/$(DEPDIR)/flatpak_builder-builder-cache.Po \
 	src/$(DEPDIR)/flatpak_builder-builder-source-svn.Po \
 	src/$(DEPDIR)/flatpak_builder-builder-source.Po \
 	src/$(DEPDIR)/flatpak_builder-builder-utils.Po \
+	subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-debugedit.Po \
+	subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-hashtab.Po \
+	subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-md5.Po \
+	subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-sha1.Po \
 	subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-backports.Plo \
 	subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-console.Plo \
 	subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-dirfd.Plo \
@@ -377,10 +411,12 @@ am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(libglnx_la_SOURCES) $(flatpak_builder_SOURCES) \
+	$(flatpak_builder_debugedit_SOURCES) \
 	$(test_libglnx_errors_SOURCES) $(test_libglnx_fdio_SOURCES) \
 	$(test_libglnx_macros_SOURCES) $(test_libglnx_shutil_SOURCES) \
 	$(test_libglnx_xattrs_SOURCES)
 DIST_SOURCES = $(libglnx_la_SOURCES) $(flatpak_builder_SOURCES) \
+	$(am__flatpak_builder_debugedit_SOURCES_DIST) \
 	$(test_libglnx_errors_SOURCES) $(test_libglnx_fdio_SOURCES) \
 	$(test_libglnx_macros_SOURCES) $(test_libglnx_shutil_SOURCES) \
 	$(test_libglnx_xattrs_SOURCES)
@@ -592,7 +628,7 @@ am__set_TESTS_bases = \
   bases=`for i in $$bases; do echo $$i; done | sed 's/\.log$$//'`; \
   bases=`echo $$bases`
 RECHECK_LOGS = $(TEST_LOGS)
-am__EXEEXT_5 = tests/test-builder.sh tests/test-builder-python.sh \
+am__EXEEXT_6 = tests/test-builder.sh tests/test-builder-python.sh \
 	$(am__EXEEXT_1)
 TEST_SUITE_LOG = test-suite.log
 TEST_EXTENSIONS = @EXEEXT@ .test
@@ -679,6 +715,7 @@ CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CYGPATH_W = @CYGPATH_W@
+DEBUGEDIT = @DEBUGEDIT@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
 DLLTOOL = @DLLTOOL@
@@ -705,6 +742,8 @@ INTLLIBS = @INTLLIBS@
 INTL_MACOSX_LIBS = @INTL_MACOSX_LIBS@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
+LIBDW_CFLAGS = @LIBDW_CFLAGS@
+LIBDW_LIBS = @LIBDW_LIBS@
 LIBELF_CFLAGS = @LIBELF_CFLAGS@
 LIBELF_LIBS = @LIBELF_LIBS@
 LIBICONV = @LIBICONV@
@@ -880,15 +919,12 @@ all_test_ltlibs = $(test_ltlibraries) $(uninstalled_test_ltlibraries) $(installe
 SUBDIRS = $(am__append_14)
 FLATPAK_BINDIR = $(bindir)
 ACLOCAL_AMFLAGS = -I m4 -I subprojects/libglnx ${ACLOCAL_FLAGS}
-AM_CPPFLAGS = \
-	-DFLATPAK_BINDIR=\"$(FLATPAK_BINDIR)\"			\
-	-DFLATPAK_BASEDIR=\"$(pkgdatadir)\"			\
-	-DG_LOG_DOMAIN=\"flatpak-builder\"			\
-	-I$(srcdir)/subprojects					\
-	-I$(srcdir)/subprojects/libglnx				\
-	-include "config.h"					\
-	$(NULL)
-
+AM_CPPFLAGS = -DFLATPAK_BINDIR=\"$(FLATPAK_BINDIR)\" \
+	-DFLATPAK_BASEDIR=\"$(pkgdatadir)\" \
+	-DG_LOG_DOMAIN=\"flatpak-builder\" -I$(srcdir)/subprojects \
+	-I$(srcdir)/subprojects/libglnx \
+	-I$(srcdir)/subprojects/debugedit -include "config.h" $(NULL) \
+	$(am__append_15) $(am__append_16)
 AM_CFLAGS = $(WARN_CFLAGS)
 lib_LTLIBRARIES = 
 libglnx_srcpath := $(srcdir)/subprojects/libglnx
@@ -997,15 +1033,16 @@ flatpak_builder_SOURCES = \
 
 flatpak_builder_LDADD = $(AM_LDADD) $(BASE_LIBS) $(LIBELF_LIBS) $(YAML_LIBS) libglnx.la
 flatpak_builder_CFLAGS = $(AM_CFLAGS) $(BASE_CFLAGS) $(YAML_CFLAGS)
-AM_TESTS_ENVIRONMENT = FLATPAK_TESTS_DEBUG=1 \
-	GI_TYPELIB_PATH=$$(cd $(top_builddir) && pwd)$${GI_TYPELIB_PATH:+:$$GI_TYPELIB_PATH} \
-	LD_LIBRARY_PATH=$$(cd $(top_builddir)/.libs && pwd)$${LD_LIBRARY_PATH:+:$$LD_LIBRARY_PATH} \
-	PATH=$$(cd $(top_builddir) && pwd):$${PATH} \
-	$(NULL)
-
+AM_TESTS_ENVIRONMENT = FLATPAK_TESTS_DEBUG=1 GI_TYPELIB_PATH=$$(cd \
+	$(top_builddir) && pwd)$${GI_TYPELIB_PATH:+:$$GI_TYPELIB_PATH} \
+	LD_LIBRARY_PATH=$$(cd $(top_builddir)/.libs && \
+	pwd)$${LD_LIBRARY_PATH:+:$$LD_LIBRARY_PATH} PATH=$$(cd \
+	$(top_builddir) && pwd):$${PATH} $(NULL) $(am__append_17)
 dist_installed_test_data = \
 	tests/libtest.sh \
 	tests/org.test.Hello.png \
+	tests/source1.json \
+	tests/source2.json \
 	tests/test.json \
 	tests/test.yaml \
 	tests/test-runtime.json \
@@ -1045,6 +1082,29 @@ dist_test_scripts = \
 	$(NULL)
 
 VALGRIND_SUPPRESSIONS_FILES = tests/flatpak.supp tests/glib.supp
+@WITH_SYSTEM_DEBUGEDIT_FALSE@flatpak_builder_debugedit_SOURCES = \
+@WITH_SYSTEM_DEBUGEDIT_FALSE@	subprojects/debugedit/tools/debugedit.c \
+@WITH_SYSTEM_DEBUGEDIT_FALSE@	subprojects/debugedit/tools/hashtab.c	\
+@WITH_SYSTEM_DEBUGEDIT_FALSE@	subprojects/debugedit/tools/hashtab.h	\
+@WITH_SYSTEM_DEBUGEDIT_FALSE@	subprojects/debugedit/tools/md5.c		\
+@WITH_SYSTEM_DEBUGEDIT_FALSE@	subprojects/debugedit/tools/md5.h		\
+@WITH_SYSTEM_DEBUGEDIT_FALSE@	subprojects/debugedit/tools/sha1.c		\
+@WITH_SYSTEM_DEBUGEDIT_FALSE@	subprojects/debugedit/tools/sha1.h		\
+@WITH_SYSTEM_DEBUGEDIT_FALSE@	subprojects/debugedit/tools/ansidecl.h		\
+@WITH_SYSTEM_DEBUGEDIT_FALSE@	$(NULL)
+
+@WITH_SYSTEM_DEBUGEDIT_FALSE@flatpak_builder_debugedit_LDADD = \
+@WITH_SYSTEM_DEBUGEDIT_FALSE@	$(AM_LDADD) $(BASE_LIBS)		\
+@WITH_SYSTEM_DEBUGEDIT_FALSE@	$(LIBELF_LIBS) $(LIBDW_LIBS)	\
+@WITH_SYSTEM_DEBUGEDIT_FALSE@	$(NULL)
+
+@WITH_SYSTEM_DEBUGEDIT_FALSE@flatpak_builder_debugedit_CFLAGS = \
+@WITH_SYSTEM_DEBUGEDIT_FALSE@	$(AM_CFLAGS) $(BASE_CFLAGS)			\
+@WITH_SYSTEM_DEBUGEDIT_FALSE@	-Isubprojects/debugedit				\
+@WITH_SYSTEM_DEBUGEDIT_FALSE@	-DVERSION="\"@PACKAGE_VERSION@\""	\
+@WITH_SYSTEM_DEBUGEDIT_FALSE@	-Wno-format-nonliteral				\
+@WITH_SYSTEM_DEBUGEDIT_FALSE@	$(NULL)
+
 AM_DISTCHECK_CONFIGURE_FLAGS = \
 	--enable-documentation		\
 	--disable-maintainer-mode	\
@@ -1453,6 +1513,28 @@ src/flatpak_builder-builder-sdk-config.$(OBJEXT): src/$(am__dirstamp) \
 flatpak-builder$(EXEEXT): $(flatpak_builder_OBJECTS) $(flatpak_builder_DEPENDENCIES) $(EXTRA_flatpak_builder_DEPENDENCIES) 
 	@rm -f flatpak-builder$(EXEEXT)
 	$(AM_V_CCLD)$(flatpak_builder_LINK) $(flatpak_builder_OBJECTS) $(flatpak_builder_LDADD) $(LIBS)
+subprojects/debugedit/tools/$(am__dirstamp):
+	@$(MKDIR_P) subprojects/debugedit/tools
+	@: > subprojects/debugedit/tools/$(am__dirstamp)
+subprojects/debugedit/tools/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) subprojects/debugedit/tools/$(DEPDIR)
+	@: > subprojects/debugedit/tools/$(DEPDIR)/$(am__dirstamp)
+subprojects/debugedit/tools/flatpak_builder_debugedit-debugedit.$(OBJEXT):  \
+	subprojects/debugedit/tools/$(am__dirstamp) \
+	subprojects/debugedit/tools/$(DEPDIR)/$(am__dirstamp)
+subprojects/debugedit/tools/flatpak_builder_debugedit-hashtab.$(OBJEXT):  \
+	subprojects/debugedit/tools/$(am__dirstamp) \
+	subprojects/debugedit/tools/$(DEPDIR)/$(am__dirstamp)
+subprojects/debugedit/tools/flatpak_builder_debugedit-md5.$(OBJEXT):  \
+	subprojects/debugedit/tools/$(am__dirstamp) \
+	subprojects/debugedit/tools/$(DEPDIR)/$(am__dirstamp)
+subprojects/debugedit/tools/flatpak_builder_debugedit-sha1.$(OBJEXT):  \
+	subprojects/debugedit/tools/$(am__dirstamp) \
+	subprojects/debugedit/tools/$(DEPDIR)/$(am__dirstamp)
+
+flatpak-builder-debugedit$(EXEEXT): $(flatpak_builder_debugedit_OBJECTS) $(flatpak_builder_debugedit_DEPENDENCIES) $(EXTRA_flatpak_builder_debugedit_DEPENDENCIES) 
+	@rm -f flatpak-builder-debugedit$(EXEEXT)
+	$(AM_V_CCLD)$(flatpak_builder_debugedit_LINK) $(flatpak_builder_debugedit_OBJECTS) $(flatpak_builder_debugedit_LDADD) $(LIBS)
 subprojects/libglnx/tests/$(am__dirstamp):
 	@$(MKDIR_P) subprojects/libglnx/tests
 	@: > subprojects/libglnx/tests/$(am__dirstamp)
@@ -1533,6 +1615,7 @@ uninstall-installed_testSCRIPTS:
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 	-rm -f src/*.$(OBJEXT)
+	-rm -f subprojects/debugedit/tools/*.$(OBJEXT)
 	-rm -f subprojects/libglnx/*.$(OBJEXT)
 	-rm -f subprojects/libglnx/*.lo
 	-rm -f subprojects/libglnx/tests/*.$(OBJEXT)
@@ -1563,6 +1646,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/flatpak_builder-builder-source-svn.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/flatpak_builder-builder-source.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/flatpak_builder-builder-utils.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-debugedit.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-hashtab.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-md5.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-sha1.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-backports.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-console.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-dirfd.Plo@am__quote@ # am--include-marker
@@ -1992,6 +2079,62 @@ src/flatpak_builder-builder-sdk-config.obj: src/builder-sdk-config.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/builder-sdk-config.c' object='src/flatpak_builder-builder-sdk-config.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(flatpak_builder_CFLAGS) $(CFLAGS) -c -o src/flatpak_builder-builder-sdk-config.obj `if test -f 'src/builder-sdk-config.c'; then $(CYGPATH_W) 'src/builder-sdk-config.c'; else $(CYGPATH_W) '$(srcdir)/src/builder-sdk-config.c'; fi`
+
+subprojects/debugedit/tools/flatpak_builder_debugedit-debugedit.o: subprojects/debugedit/tools/debugedit.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(flatpak_builder_debugedit_CFLAGS) $(CFLAGS) -MT subprojects/debugedit/tools/flatpak_builder_debugedit-debugedit.o -MD -MP -MF subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-debugedit.Tpo -c -o subprojects/debugedit/tools/flatpak_builder_debugedit-debugedit.o `test -f 'subprojects/debugedit/tools/debugedit.c' || echo '$(srcdir)/'`subprojects/debugedit/tools/debugedit.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-debugedit.Tpo subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-debugedit.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='subprojects/debugedit/tools/debugedit.c' object='subprojects/debugedit/tools/flatpak_builder_debugedit-debugedit.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(flatpak_builder_debugedit_CFLAGS) $(CFLAGS) -c -o subprojects/debugedit/tools/flatpak_builder_debugedit-debugedit.o `test -f 'subprojects/debugedit/tools/debugedit.c' || echo '$(srcdir)/'`subprojects/debugedit/tools/debugedit.c
+
+subprojects/debugedit/tools/flatpak_builder_debugedit-debugedit.obj: subprojects/debugedit/tools/debugedit.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(flatpak_builder_debugedit_CFLAGS) $(CFLAGS) -MT subprojects/debugedit/tools/flatpak_builder_debugedit-debugedit.obj -MD -MP -MF subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-debugedit.Tpo -c -o subprojects/debugedit/tools/flatpak_builder_debugedit-debugedit.obj `if test -f 'subprojects/debugedit/tools/debugedit.c'; then $(CYGPATH_W) 'subprojects/debugedit/tools/debugedit.c'; else $(CYGPATH_W) '$(srcdir)/subprojects/debugedit/tools/debugedit.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-debugedit.Tpo subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-debugedit.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='subprojects/debugedit/tools/debugedit.c' object='subprojects/debugedit/tools/flatpak_builder_debugedit-debugedit.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(flatpak_builder_debugedit_CFLAGS) $(CFLAGS) -c -o subprojects/debugedit/tools/flatpak_builder_debugedit-debugedit.obj `if test -f 'subprojects/debugedit/tools/debugedit.c'; then $(CYGPATH_W) 'subprojects/debugedit/tools/debugedit.c'; else $(CYGPATH_W) '$(srcdir)/subprojects/debugedit/tools/debugedit.c'; fi`
+
+subprojects/debugedit/tools/flatpak_builder_debugedit-hashtab.o: subprojects/debugedit/tools/hashtab.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(flatpak_builder_debugedit_CFLAGS) $(CFLAGS) -MT subprojects/debugedit/tools/flatpak_builder_debugedit-hashtab.o -MD -MP -MF subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-hashtab.Tpo -c -o subprojects/debugedit/tools/flatpak_builder_debugedit-hashtab.o `test -f 'subprojects/debugedit/tools/hashtab.c' || echo '$(srcdir)/'`subprojects/debugedit/tools/hashtab.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-hashtab.Tpo subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-hashtab.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='subprojects/debugedit/tools/hashtab.c' object='subprojects/debugedit/tools/flatpak_builder_debugedit-hashtab.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(flatpak_builder_debugedit_CFLAGS) $(CFLAGS) -c -o subprojects/debugedit/tools/flatpak_builder_debugedit-hashtab.o `test -f 'subprojects/debugedit/tools/hashtab.c' || echo '$(srcdir)/'`subprojects/debugedit/tools/hashtab.c
+
+subprojects/debugedit/tools/flatpak_builder_debugedit-hashtab.obj: subprojects/debugedit/tools/hashtab.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(flatpak_builder_debugedit_CFLAGS) $(CFLAGS) -MT subprojects/debugedit/tools/flatpak_builder_debugedit-hashtab.obj -MD -MP -MF subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-hashtab.Tpo -c -o subprojects/debugedit/tools/flatpak_builder_debugedit-hashtab.obj `if test -f 'subprojects/debugedit/tools/hashtab.c'; then $(CYGPATH_W) 'subprojects/debugedit/tools/hashtab.c'; else $(CYGPATH_W) '$(srcdir)/subprojects/debugedit/tools/hashtab.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-hashtab.Tpo subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-hashtab.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='subprojects/debugedit/tools/hashtab.c' object='subprojects/debugedit/tools/flatpak_builder_debugedit-hashtab.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(flatpak_builder_debugedit_CFLAGS) $(CFLAGS) -c -o subprojects/debugedit/tools/flatpak_builder_debugedit-hashtab.obj `if test -f 'subprojects/debugedit/tools/hashtab.c'; then $(CYGPATH_W) 'subprojects/debugedit/tools/hashtab.c'; else $(CYGPATH_W) '$(srcdir)/subprojects/debugedit/tools/hashtab.c'; fi`
+
+subprojects/debugedit/tools/flatpak_builder_debugedit-md5.o: subprojects/debugedit/tools/md5.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(flatpak_builder_debugedit_CFLAGS) $(CFLAGS) -MT subprojects/debugedit/tools/flatpak_builder_debugedit-md5.o -MD -MP -MF subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-md5.Tpo -c -o subprojects/debugedit/tools/flatpak_builder_debugedit-md5.o `test -f 'subprojects/debugedit/tools/md5.c' || echo '$(srcdir)/'`subprojects/debugedit/tools/md5.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-md5.Tpo subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-md5.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='subprojects/debugedit/tools/md5.c' object='subprojects/debugedit/tools/flatpak_builder_debugedit-md5.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(flatpak_builder_debugedit_CFLAGS) $(CFLAGS) -c -o subprojects/debugedit/tools/flatpak_builder_debugedit-md5.o `test -f 'subprojects/debugedit/tools/md5.c' || echo '$(srcdir)/'`subprojects/debugedit/tools/md5.c
+
+subprojects/debugedit/tools/flatpak_builder_debugedit-md5.obj: subprojects/debugedit/tools/md5.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(flatpak_builder_debugedit_CFLAGS) $(CFLAGS) -MT subprojects/debugedit/tools/flatpak_builder_debugedit-md5.obj -MD -MP -MF subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-md5.Tpo -c -o subprojects/debugedit/tools/flatpak_builder_debugedit-md5.obj `if test -f 'subprojects/debugedit/tools/md5.c'; then $(CYGPATH_W) 'subprojects/debugedit/tools/md5.c'; else $(CYGPATH_W) '$(srcdir)/subprojects/debugedit/tools/md5.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-md5.Tpo subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-md5.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='subprojects/debugedit/tools/md5.c' object='subprojects/debugedit/tools/flatpak_builder_debugedit-md5.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(flatpak_builder_debugedit_CFLAGS) $(CFLAGS) -c -o subprojects/debugedit/tools/flatpak_builder_debugedit-md5.obj `if test -f 'subprojects/debugedit/tools/md5.c'; then $(CYGPATH_W) 'subprojects/debugedit/tools/md5.c'; else $(CYGPATH_W) '$(srcdir)/subprojects/debugedit/tools/md5.c'; fi`
+
+subprojects/debugedit/tools/flatpak_builder_debugedit-sha1.o: subprojects/debugedit/tools/sha1.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(flatpak_builder_debugedit_CFLAGS) $(CFLAGS) -MT subprojects/debugedit/tools/flatpak_builder_debugedit-sha1.o -MD -MP -MF subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-sha1.Tpo -c -o subprojects/debugedit/tools/flatpak_builder_debugedit-sha1.o `test -f 'subprojects/debugedit/tools/sha1.c' || echo '$(srcdir)/'`subprojects/debugedit/tools/sha1.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-sha1.Tpo subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-sha1.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='subprojects/debugedit/tools/sha1.c' object='subprojects/debugedit/tools/flatpak_builder_debugedit-sha1.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(flatpak_builder_debugedit_CFLAGS) $(CFLAGS) -c -o subprojects/debugedit/tools/flatpak_builder_debugedit-sha1.o `test -f 'subprojects/debugedit/tools/sha1.c' || echo '$(srcdir)/'`subprojects/debugedit/tools/sha1.c
+
+subprojects/debugedit/tools/flatpak_builder_debugedit-sha1.obj: subprojects/debugedit/tools/sha1.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(flatpak_builder_debugedit_CFLAGS) $(CFLAGS) -MT subprojects/debugedit/tools/flatpak_builder_debugedit-sha1.obj -MD -MP -MF subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-sha1.Tpo -c -o subprojects/debugedit/tools/flatpak_builder_debugedit-sha1.obj `if test -f 'subprojects/debugedit/tools/sha1.c'; then $(CYGPATH_W) 'subprojects/debugedit/tools/sha1.c'; else $(CYGPATH_W) '$(srcdir)/subprojects/debugedit/tools/sha1.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-sha1.Tpo subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-sha1.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='subprojects/debugedit/tools/sha1.c' object='subprojects/debugedit/tools/flatpak_builder_debugedit-sha1.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(flatpak_builder_debugedit_CFLAGS) $(CFLAGS) -c -o subprojects/debugedit/tools/flatpak_builder_debugedit-sha1.obj `if test -f 'subprojects/debugedit/tools/sha1.c'; then $(CYGPATH_W) 'subprojects/debugedit/tools/sha1.c'; else $(CYGPATH_W) '$(srcdir)/subprojects/debugedit/tools/sha1.c'; fi`
 
 subprojects/libglnx/tests/test_libglnx_errors-test-libglnx-errors.o: subprojects/libglnx/tests/test-libglnx-errors.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_libglnx_errors_CFLAGS) $(CFLAGS) -MT subprojects/libglnx/tests/test_libglnx_errors-test-libglnx-errors.o -MD -MP -MF subprojects/libglnx/tests/$(DEPDIR)/test_libglnx_errors-test-libglnx-errors.Tpo -c -o subprojects/libglnx/tests/test_libglnx_errors-test-libglnx-errors.o `test -f 'subprojects/libglnx/tests/test-libglnx-errors.c' || echo '$(srcdir)/'`subprojects/libglnx/tests/test-libglnx-errors.c
@@ -2736,6 +2879,8 @@ distclean-generic:
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
 	-rm -f src/$(DEPDIR)/$(am__dirstamp)
 	-rm -f src/$(am__dirstamp)
+	-rm -f subprojects/debugedit/tools/$(DEPDIR)/$(am__dirstamp)
+	-rm -f subprojects/debugedit/tools/$(am__dirstamp)
 	-rm -f subprojects/libglnx/$(DEPDIR)/$(am__dirstamp)
 	-rm -f subprojects/libglnx/$(am__dirstamp)
 	-rm -f subprojects/libglnx/tests/$(DEPDIR)/$(am__dirstamp)
@@ -2780,6 +2925,10 @@ distclean: distclean-recursive
 	-rm -f src/$(DEPDIR)/flatpak_builder-builder-source-svn.Po
 	-rm -f src/$(DEPDIR)/flatpak_builder-builder-source.Po
 	-rm -f src/$(DEPDIR)/flatpak_builder-builder-utils.Po
+	-rm -f subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-debugedit.Po
+	-rm -f subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-hashtab.Po
+	-rm -f subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-md5.Po
+	-rm -f subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-sha1.Po
 	-rm -f subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-backports.Plo
 	-rm -f subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-console.Plo
 	-rm -f subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-dirfd.Plo
@@ -2870,6 +3019,10 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f src/$(DEPDIR)/flatpak_builder-builder-source-svn.Po
 	-rm -f src/$(DEPDIR)/flatpak_builder-builder-source.Po
 	-rm -f src/$(DEPDIR)/flatpak_builder-builder-utils.Po
+	-rm -f subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-debugedit.Po
+	-rm -f subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-hashtab.Po
+	-rm -f subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-md5.Po
+	-rm -f subprojects/debugedit/tools/$(DEPDIR)/flatpak_builder_debugedit-sha1.Po
 	-rm -f subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-backports.Plo
 	-rm -f subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-console.Plo
 	-rm -f subprojects/libglnx/$(DEPDIR)/libglnx_la-glnx-dirfd.Plo
