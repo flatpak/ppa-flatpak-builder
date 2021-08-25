@@ -1,9 +1,13 @@
-flatpak-builder (1.1.1-1) UNRELEASED; urgency=medium
+flatpak-builder (1.1.1-1) experimental; urgency=medium
 
-  * New upstream release
+  * Branch for experimental
+  * New upstream development release
   * Build with the bundled debugedit for now (ITP: #985814)
+  * d/rules: Avoid debhelper 13.4+ making installed-tests data executable
+  * Use debhelper compat level 13
+    - Drop dh_missing --fail-missing override, it is now the default
 
- -- Simon McVittie <smcv@debian.org>  Wed, 25 Aug 2021 16:39:21 +0100
+ -- Simon McVittie <smcv@debian.org>  Wed, 25 Aug 2021 17:52:01 +0100
 
 flatpak-builder (1.0.14-2) unstable; urgency=medium
 
