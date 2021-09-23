@@ -256,6 +256,7 @@ am_flatpak_builder_OBJECTS =  \
 	src/flatpak_builder-builder-source-svn.$(OBJEXT) \
 	src/flatpak_builder-builder-source-file.$(OBJEXT) \
 	src/flatpak_builder-builder-source-script.$(OBJEXT) \
+	src/flatpak_builder-builder-source-inline.$(OBJEXT) \
 	src/flatpak_builder-builder-source-shell.$(OBJEXT) \
 	src/flatpak_builder-builder-source-extra-data.$(OBJEXT) \
 	src/flatpak_builder-builder-source-patch.$(OBJEXT) \
@@ -367,6 +368,7 @@ am__depfiles_remade = src/$(DEPDIR)/flatpak_builder-builder-cache.Po \
 	src/$(DEPDIR)/flatpak_builder-builder-source-extra-data.Po \
 	src/$(DEPDIR)/flatpak_builder-builder-source-file.Po \
 	src/$(DEPDIR)/flatpak_builder-builder-source-git.Po \
+	src/$(DEPDIR)/flatpak_builder-builder-source-inline.Po \
 	src/$(DEPDIR)/flatpak_builder-builder-source-patch.Po \
 	src/$(DEPDIR)/flatpak_builder-builder-source-script.Po \
 	src/$(DEPDIR)/flatpak_builder-builder-source-shell.Po \
@@ -1009,6 +1011,8 @@ flatpak_builder_SOURCES = \
 	src/builder-source-file.h \
 	src/builder-source-script.c \
 	src/builder-source-script.h \
+	src/builder-source-inline.c \
+	src/builder-source-inline.h \
 	src/builder-source-shell.c \
 	src/builder-source-shell.h \
 	src/builder-source-extra-data.c \
@@ -1489,6 +1493,8 @@ src/flatpak_builder-builder-source-file.$(OBJEXT):  \
 	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/flatpak_builder-builder-source-script.$(OBJEXT):  \
 	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/flatpak_builder-builder-source-inline.$(OBJEXT):  \
+	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/flatpak_builder-builder-source-shell.$(OBJEXT):  \
 	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/flatpak_builder-builder-source-extra-data.$(OBJEXT):  \
@@ -1640,6 +1646,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/flatpak_builder-builder-source-extra-data.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/flatpak_builder-builder-source-file.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/flatpak_builder-builder-source-git.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/flatpak_builder-builder-source-inline.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/flatpak_builder-builder-source-patch.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/flatpak_builder-builder-source-script.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/flatpak_builder-builder-source-shell.Po@am__quote@ # am--include-marker
@@ -1939,6 +1946,20 @@ src/flatpak_builder-builder-source-script.obj: src/builder-source-script.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/builder-source-script.c' object='src/flatpak_builder-builder-source-script.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(flatpak_builder_CFLAGS) $(CFLAGS) -c -o src/flatpak_builder-builder-source-script.obj `if test -f 'src/builder-source-script.c'; then $(CYGPATH_W) 'src/builder-source-script.c'; else $(CYGPATH_W) '$(srcdir)/src/builder-source-script.c'; fi`
+
+src/flatpak_builder-builder-source-inline.o: src/builder-source-inline.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(flatpak_builder_CFLAGS) $(CFLAGS) -MT src/flatpak_builder-builder-source-inline.o -MD -MP -MF src/$(DEPDIR)/flatpak_builder-builder-source-inline.Tpo -c -o src/flatpak_builder-builder-source-inline.o `test -f 'src/builder-source-inline.c' || echo '$(srcdir)/'`src/builder-source-inline.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/flatpak_builder-builder-source-inline.Tpo src/$(DEPDIR)/flatpak_builder-builder-source-inline.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/builder-source-inline.c' object='src/flatpak_builder-builder-source-inline.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(flatpak_builder_CFLAGS) $(CFLAGS) -c -o src/flatpak_builder-builder-source-inline.o `test -f 'src/builder-source-inline.c' || echo '$(srcdir)/'`src/builder-source-inline.c
+
+src/flatpak_builder-builder-source-inline.obj: src/builder-source-inline.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(flatpak_builder_CFLAGS) $(CFLAGS) -MT src/flatpak_builder-builder-source-inline.obj -MD -MP -MF src/$(DEPDIR)/flatpak_builder-builder-source-inline.Tpo -c -o src/flatpak_builder-builder-source-inline.obj `if test -f 'src/builder-source-inline.c'; then $(CYGPATH_W) 'src/builder-source-inline.c'; else $(CYGPATH_W) '$(srcdir)/src/builder-source-inline.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/flatpak_builder-builder-source-inline.Tpo src/$(DEPDIR)/flatpak_builder-builder-source-inline.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/builder-source-inline.c' object='src/flatpak_builder-builder-source-inline.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(flatpak_builder_CFLAGS) $(CFLAGS) -c -o src/flatpak_builder-builder-source-inline.obj `if test -f 'src/builder-source-inline.c'; then $(CYGPATH_W) 'src/builder-source-inline.c'; else $(CYGPATH_W) '$(srcdir)/src/builder-source-inline.c'; fi`
 
 src/flatpak_builder-builder-source-shell.o: src/builder-source-shell.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(flatpak_builder_CFLAGS) $(CFLAGS) -MT src/flatpak_builder-builder-source-shell.o -MD -MP -MF src/$(DEPDIR)/flatpak_builder-builder-source-shell.Tpo -c -o src/flatpak_builder-builder-source-shell.o `test -f 'src/builder-source-shell.c' || echo '$(srcdir)/'`src/builder-source-shell.c
@@ -2919,6 +2940,7 @@ distclean: distclean-recursive
 	-rm -f src/$(DEPDIR)/flatpak_builder-builder-source-extra-data.Po
 	-rm -f src/$(DEPDIR)/flatpak_builder-builder-source-file.Po
 	-rm -f src/$(DEPDIR)/flatpak_builder-builder-source-git.Po
+	-rm -f src/$(DEPDIR)/flatpak_builder-builder-source-inline.Po
 	-rm -f src/$(DEPDIR)/flatpak_builder-builder-source-patch.Po
 	-rm -f src/$(DEPDIR)/flatpak_builder-builder-source-script.Po
 	-rm -f src/$(DEPDIR)/flatpak_builder-builder-source-shell.Po
@@ -3013,6 +3035,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f src/$(DEPDIR)/flatpak_builder-builder-source-extra-data.Po
 	-rm -f src/$(DEPDIR)/flatpak_builder-builder-source-file.Po
 	-rm -f src/$(DEPDIR)/flatpak_builder-builder-source-git.Po
+	-rm -f src/$(DEPDIR)/flatpak_builder-builder-source-inline.Po
 	-rm -f src/$(DEPDIR)/flatpak_builder-builder-source-patch.Po
 	-rm -f src/$(DEPDIR)/flatpak_builder-builder-source-script.Po
 	-rm -f src/$(DEPDIR)/flatpak_builder-builder-source-shell.Po
