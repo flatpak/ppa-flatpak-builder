@@ -1,8 +1,9 @@
-flatpak-builder (1.1.2-1) UNRELEASED; urgency=medium
+flatpak-builder (1.1.2-1) experimental; urgency=medium
 
   * New upstream development release
+  * Standards-Version: 4.6.0 (no changes required)
 
- -- Simon McVittie <smcv@debian.org>  Thu, 23 Sep 2021 11:19:42 +0100
+ -- Simon McVittie <smcv@debian.org>  Thu, 23 Sep 2021 11:20:22 +0100
 
 flatpak-builder (1.1.1-1) experimental; urgency=medium
 
