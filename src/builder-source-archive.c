@@ -280,7 +280,7 @@ builder_source_archive_validate (BuilderSource  *source,
 
   if (self->dest_filename != NULL &&
       strchr (self->dest_filename, '/') != NULL)
-    return flatpak_fail (error, "No slashes allowed in dest-filename");
+    return flatpak_fail (error, "No slashes allowed in dest-filename, use dest property for directory");
 
   return TRUE;
 }
@@ -485,7 +485,7 @@ un7z (GFile       *dir,
   gboolean res;
   const gchar *argv[] = { "7z",  "x", sevenz_path, NULL };
 
-  res = flatpak_spawnv (dir, NULL, 0, error, argv);
+  res = flatpak_spawnv (dir, NULL, 0, error, argv, NULL);
 
   return res;
 }
@@ -501,7 +501,7 @@ unrpm (GFile   *dir,
       rpm_path, /* shell's $1 */
       NULL };
 
-  res = flatpak_spawnv (dir, NULL, 0, error, argv);
+  res = flatpak_spawnv (dir, NULL, 0, error, argv, NULL);
 
   return res;
 }

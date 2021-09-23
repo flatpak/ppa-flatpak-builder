@@ -376,6 +376,10 @@
                     <listitem><para>This is a dictionary defining environment variables to be set during the build. Elements in this override the properties that set the environment, like cflags and ldflags. Keys with a null value unset the corresponding variable. </para></listitem>
                 </varlistentry>
                 <varlistentry>
+                    <term><option>secret-env</option> (array of strings)</term>
+                    <listitem><para>This is a array defining which host environment variables is transfered to build-commands or post-install environment.</para></listitem>
+                </varlistentry>
+                <varlistentry>
                     <term><option>build-args</option> (array of strings)</term>
                     <listitem><para>This is an array containing extra options to pass to flatpak build.</para></listitem>
                 </varlistentry>
@@ -386,6 +390,12 @@
                 <varlistentry>
                     <term><option>config-opts</option> (array of strings)</term>
                     <listitem><para>This is an array containing extra options to pass to configure.</para></listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><option>secret-opts</option> (array of strings)</term>
+                    <listitem><para>This is an array of options that will be passed to
+                    configure, meant to be used to pass secrets through host environment variables. Put
+                    the option with an environment variables and will be resolved beforehand. '-DSECRET_ID=$CI_SECRET'</para></listitem>
                 </varlistentry>
                 <varlistentry>
                     <term><option>make-args</option> (array of strings)</term>
@@ -486,8 +496,18 @@
                     sources.  See below for details.</para></listitem>
                 </varlistentry>
                 <varlistentry>
+                    <term><option>secret-env</option> (array of strings)</term>
+                    <listitem><para>An array defining which host environment variables is transfered to build-commands or post-install environment.</para></listitem>
+                </varlistentry>
+                <varlistentry>
                     <term><option>config-opts</option> (array of strings)</term>
                     <listitem><para>An array of options that will be passed to configure</para></listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><option>secret-opts</option> (array of strings)</term>
+                    <listitem><para>An array of options that will be passed to configure,
+                    meant to be used to pass secrets through host environment variables. Put the option
+                    with an environment variables and will be resolved beforehand. '-DSECRET_ID=$CI_SECRET'</para></listitem>
                 </varlistentry>
                 <varlistentry>
                     <term><option>make-args</option> (array of strings)</term>
@@ -843,6 +863,30 @@
                     <varlistentry>
                         <term><option>dest-filename</option> (string)</term>
                         <listitem><para>Filename to use inside the source dir, default to autogen.sh.</para></listitem>
+                    </varlistentry>
+                </variablelist>
+            </refsect3>
+            <refsect3>
+                <title>Inline data sources</title>
+                <para>
+                    This is a way to create a file with given contents.
+                </para>
+                <variablelist>
+                    <varlistentry>
+                        <term><option>type</option></term>
+                        <listitem><para>"inline"</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><option>dest-filename</option> (string)</term>
+                        <listitem><para>Filename to use inside the source dir.</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><option>contents</option> (string)</term>
+                        <listitem><para>Text data that will be put in the file.</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><option>base64</option> (boolean)</term>
+                        <listitem><para>Whether content is base64-encoded.</para></listitem>
                     </varlistentry>
                 </variablelist>
             </refsect3>
