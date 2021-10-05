@@ -1,3 +1,13 @@
+flatpak-builder (1.1.2-1flatpak1~20.04) focal; urgency=medium
+
+  * Merge development version from Debian experimental
+  * Changes relative to Debian:
+    - Roll back to debhelper 12
+    - Set changelog merge driver for debian/changelog
+    - d/README.source: Add
+
+ -- Simon McVittie <smcv@debian.org>  Tue, 05 Oct 2021 20:58:14 +0100
+
 flatpak-builder (1.1.2-1) experimental; urgency=medium
 
   * New upstream development release
