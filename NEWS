@@ -1,3 +1,27 @@
+Changes in 1.2.0
+================
+ * Documentation updates
+ * Add missing newlines in some output
+ * Fix missing error check in the new inline data support
+
+Changes in 1.1.2
+================
+
+ * New secret-opts feature lets you pass e.g. CI secrets into the build.
+ * Support content-encoding when downloading.
+ * New inline data source allowing easy creation of files from embedded content from
+   the manifest.
+
+Changes in 1.1.1
+================
+
+This is the first unstable relase in preparation for 1.2.0
+
+ * We now use the external debugedit project instead of using an internal copy.
+   The system version can be used, or if not an internal version is used
+   built using git submodules.
+   Note, this needs libdw 0.172, which may not be available on older distributions.
+
 Changes in 1.0.14
 =================
 
