@@ -23,17 +23,11 @@ Copyright:
 License: Autoconf-permissive
 
 Files:
- src/builder-utils.c
+ subprojects/debugedit/*
 Copyright:
- © 2001-2016 Red Hat, Inc
-License: GPL-2+
-Comment:
- This is a conservative interpretation of this message in the middle of
- the file:
- .
-  This code is based on debugedit.c from rpm
- .
- followed by a GPL-2+ license grant.
+ 1991-2021 Free Software Foundation, Inc.
+ 2001-2017 Red Hat, Inc.
+License: LGPL-2+ and GPL-2+
 
 Files:
  m4/attributes.m4
@@ -108,6 +102,20 @@ Comment:
  On Debian systems, the full text of the GNU General Public
  License version 2 can be found in the file
  '/usr/share/common-licenses/GPL-2'.
+
+License: LGPL-2+
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Library General Public
+ License as published by the Free Software Foundation; either
+ version 2 of the License, or (at your option) any later version.
+ .
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Library General Public License for more details.
+Comment:
+ On Debian systems, the full text of the GNU Library General Public License
+ version 2 can be found in the file '/usr/share/common-licenses/LGPL-2'.
 
 License: LGPL-2.1+
  This library is free software; you can redistribute it and/or
