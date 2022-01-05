@@ -59,6 +59,7 @@ Recommends:
  git,
  patch,
  unzip,
+ xz-utils,
 Suggests:
  brz,
  p7zip-full,
