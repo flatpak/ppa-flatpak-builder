@@ -1,4 +1,4 @@
-flatpak-builder (1.2.1-1) UNRELEASED; urgency=medium
+flatpak-builder (1.2.1-1) unstable; urgency=medium
 
   [ Hans-Christoph Steiner ]
   * Add Recommends on xz-utils, required for .tar.xz source archives
@@ -6,8 +6,12 @@ flatpak-builder (1.2.1-1) UNRELEASED; urgency=medium
   [ Simon McVittie ]
   * New upstream release
   * Add Recommends on zstd, required for .tar.zst source archives
+    (newly supported in 1.2.1)
+  * Depend on external debugedit instead of using the vendored copy
+  * d/rules: Avoid explicitly specifying -Wl,--as-needed linker flag.
+    This is the default for Debian 11 toolchains.
 
- -- Simon McVittie <smcv@debian.org>  Mon, 10 Jan 2022 11:05:18 +0000
+ -- Simon McVittie <smcv@debian.org>  Mon, 10 Jan 2022 11:20:56 +0000
 
 flatpak-builder (1.2.0-1) unstable; urgency=medium
 
