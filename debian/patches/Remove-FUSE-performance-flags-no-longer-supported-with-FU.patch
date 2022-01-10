@@ -1,0 +1,25 @@
+From: Simon McVittie <smcv@debian.org>
+Date: Mon, 10 Jan 2022 12:04:40 +0000
+Subject: Remove FUSE performance flags no longer supported with FUSE 3
+
+With FUSE 3, most optional features are on by default and these options
+no longer exist.
+
+Signed-off-by: Simon McVittie <smcv@debian.org>
+---
+ src/builder-context.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/builder-context.c b/src/builder-context.c
+index 5fbfac3..80ae6d6 100644
+--- a/src/builder-context.c
++++ b/src/builder-context.c
+@@ -828,7 +828,7 @@ builder_context_enable_rofiles (BuilderContext *self,
+   g_autofree char *tmpdir_name = NULL;
+   char *argv[] = { "rofiles-fuse",
+                    "-o",
+-                   "kernel_cache,entry_timeout=60,attr_timeout=60,splice_write,splice_move",
++                   "kernel_cache,entry_timeout=60,attr_timeout=60",
+                    (char *)flatpak_file_get_path_cached (self->app_dir),
+                    NULL,
+                    NULL };
