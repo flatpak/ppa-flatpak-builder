@@ -1,3 +1,10 @@
+flatpak-builder (1.2.1-2) experimental; urgency=medium
+
+  * Branch for experimental
+  * Add patch to be compatible with ostree versions compiled against FUSE 3
+
+ -- Simon McVittie <smcv@debian.org>  Mon, 10 Jan 2022 12:05:31 +0000
+
 flatpak-builder (1.2.1-1) unstable; urgency=medium
 
   [ Hans-Christoph Steiner ]
