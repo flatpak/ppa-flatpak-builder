@@ -1,12 +1,13 @@
 flatpak-builder (1.2.1-1) UNRELEASED; urgency=medium
 
   [ Hans-Christoph Steiner ]
-  * Recommends: xz-utils. Many source tarballs are xz now.
+  * Add Recommends on xz-utils, required for .tar.xz source archives
 
   [ Simon McVittie ]
   * New upstream release
+  * Add Recommends on zstd, required for .tar.zst source archives
 
- -- Simon McVittie <smcv@debian.org>  Mon, 10 Jan 2022 10:49:47 +0000
+ -- Simon McVittie <smcv@debian.org>  Mon, 10 Jan 2022 11:05:18 +0000
 
 flatpak-builder (1.2.0-1) unstable; urgency=medium
 

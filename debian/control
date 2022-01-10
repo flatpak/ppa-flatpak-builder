@@ -60,6 +60,7 @@ Recommends:
  patch,
  unzip,
  xz-utils,
+ zstd,
 Suggests:
  brz,
  p7zip-full,
