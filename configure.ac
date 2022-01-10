@@ -2,7 +2,7 @@ AC_PREREQ([2.63])
 
 m4_define([flatpak_builder_major_version], [1])
 m4_define([flatpak_builder_minor_version], [2])
-m4_define([flatpak_builder_micro_version], [0])
+m4_define([flatpak_builder_micro_version], [1])
 m4_define([flatpak_builder_version],
           [flatpak_builder_major_version.flatpak_builder_minor_version.flatpak_builder_micro_version])
 
@@ -153,8 +153,8 @@ if test x$enable_documentation = xyes; then
    fi
 
   dnl check for DocBook DTD in the local catalog
-  JH_CHECK_XML_CATALOG([-//OASIS//DTD DocBook XML V4.1.2//EN],
-     [DocBook XML DTD V4.1.2], [have_docbook_dtd=yes], [have_docbook_dtd=no])
+  JH_CHECK_XML_CATALOG([-//OASIS//DTD DocBook XML V4.3//EN],
+     [DocBook XML DTD V4.3], [have_docbook_dtd=yes], [have_docbook_dtd=no])
   if test "$have_docbook_dtd" != yes; then
     AC_MSG_ERROR([DocBook DTD is required for --enable-documentation])
   fi
@@ -204,6 +204,7 @@ AC_SUBST(FLATPAK_BUILDER_VERSION)
 
 AC_CONFIG_FILES([
 Makefile
+data/Makefile
 doc/Makefile
 doc/flatpak-builder-docs.xml
 ])
