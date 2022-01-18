@@ -2,7 +2,7 @@ AC_PREREQ([2.63])
 
 m4_define([flatpak_builder_major_version], [1])
 m4_define([flatpak_builder_minor_version], [2])
-m4_define([flatpak_builder_micro_version], [0])
+m4_define([flatpak_builder_micro_version], [2])
 m4_define([flatpak_builder_version],
           [flatpak_builder_major_version.flatpak_builder_minor_version.flatpak_builder_micro_version])
 
@@ -153,8 +153,8 @@ if test x$enable_documentation = xyes; then
    fi
 
   dnl check for DocBook DTD in the local catalog
-  JH_CHECK_XML_CATALOG([-//OASIS//DTD DocBook XML V4.1.2//EN],
-     [DocBook XML DTD V4.1.2], [have_docbook_dtd=yes], [have_docbook_dtd=no])
+  JH_CHECK_XML_CATALOG([-//OASIS//DTD DocBook XML V4.3//EN],
+     [DocBook XML DTD V4.3], [have_docbook_dtd=yes], [have_docbook_dtd=no])
   if test "$have_docbook_dtd" != yes; then
     AC_MSG_ERROR([DocBook DTD is required for --enable-documentation])
   fi
@@ -197,6 +197,15 @@ AM_CONDITIONAL(DOCBOOK_DOCS_ENABLED, test x$enable_docbook_docs = xyes)
 AC_ARG_VAR([XMLTO],[Define/override the 'xmlto' location.])
 AC_ARG_VAR([XMLTO_FLAGS],[Define/override 'xmlto' options, like '--skip-validation'.])
 
+AC_ARG_WITH([fuse],
+            [AS_HELP_STRING([--with-fuse={2,3}],
+                            [Only support this major version of FUSE])],
+            [fuse_major="$withval"],
+            [fuse_major=maximize-compatibility])
+AS_IF([test $fuse_major = 2],
+      [AC_DEFINE([ASSUME_FUSE_2], [],
+                 [Define to speed up FUSE 2 at the cost of FUSE 3 compatibility])])
+
 GLIB_TESTS
 
 FLATPAK_BUILDER_VERSION=flatpak_builder_version
@@ -204,6 +213,7 @@ AC_SUBST(FLATPAK_BUILDER_VERSION)
 
 AC_CONFIG_FILES([
 Makefile
+data/Makefile
 doc/Makefile
 doc/flatpak-builder-docs.xml
 ])

@@ -1,3 +1,32 @@
+flatpak-builder (1.2.2-1) unstable; urgency=high
+
+  * New upstream stable release
+  * Security fixes:
+    - Prevent a malicious build creating directories outside the build
+      directory, when used in conjunction with flatpak (>= 1.12.2)
+      (CVE-2022-21682, GHSA-8ch7-5j3h-g4fx)
+  * Other bug fixes:
+    - Improve JSON schema
+  * d/control: Bump Flatpak dependency to 1.12.2
+  * Set urgency to high for CVE-2022-21682
+
+ -- Simon McVittie <smcv@debian.org>  Tue, 18 Jan 2022 18:06:42 +0000
+
+flatpak-builder (1.2.1-1) unstable; urgency=medium
+
+  [ Hans-Christoph Steiner ]
+  * Add Recommends on xz-utils, required for .tar.xz source archives
+
+  [ Simon McVittie ]
+  * New upstream release
+  * Add Recommends on zstd, required for .tar.zst source archives
+    (newly supported in 1.2.1)
+  * Depend on external debugedit instead of using the vendored copy
+  * d/rules: Avoid explicitly specifying -Wl,--as-needed linker flag.
+    This is the default for Debian 11 toolchains.
+
+ -- Simon McVittie <smcv@debian.org>  Mon, 10 Jan 2022 11:20:56 +0000
+
 flatpak-builder (1.2.0-1flatpak1~20.04) focal; urgency=medium
 
   * Merge from Debian
