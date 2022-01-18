@@ -2,6 +2,14 @@
   "$schema": "http://json-schema.org/draft-07/schema",
   "$comment": "https://docs.flatpak.org/en/latest/flatpak-builder-command-reference.html#flatpak-manifest",
   "$defs": {
+    "ignored-prop": {
+      "custom": {
+        "description": "Custom property (ignored by flatpak-builder)"
+      },
+      "comment": {
+        "description": "Comment property (ignored by flatpak-builder)"
+      }
+    },
     "build-options": {
       "description": "Object specifying the build environment.",
       "type": "object",
@@ -72,7 +80,14 @@
         },
         "env": {
           "description": "This is a dictionary defining environment variables to be set during the build. Elements in this override the properties that set the environment, like cflags and ldflags. Keys with a null value unset the corresponding variable.",
-          "type": "object"
+          "type": "object",
+          "patternProperties": {
+            "^[^=]+$": {
+              "description": "An environment variable.",
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
         },
         "build-args": {
           "description": "This is an array containing extra options to pass to flatpak build.",
@@ -260,7 +275,7 @@
           "items": {
             "oneOf": [
               {
-                "$ref": "#/$defs/sources"
+                "$ref": "#/$defs/source"
               },
               {
                 "type": "string",
@@ -430,7 +445,7 @@
       },
       "additionalProperties": false
     },
-    "sources": {
+    "source": {
       "description": " These contain a pointer to the source that will be extracted into the source directory before the build starts. They can be of several types, distinguished by the type property. Additionally, the sources list can contain a plain string, which is interpreted as the name of a separate json or yaml file that is read and inserted at this point. The file can contain a single source, or an array of sources.",
       "type": "object",
       "allOf": [
@@ -484,7 +499,7 @@
             }
           },
           "then": {
-            "$ref": "#/$defs/archive-sources"
+            "$ref": "#/$defs/source-archive"
           }
         },
         {
@@ -496,7 +511,7 @@
             }
           },
           "then": {
-            "$ref": "#/$defs/git-sources"
+            "$ref": "#/$defs/source-git"
           }
         },
         {
@@ -508,7 +523,7 @@
             }
           },
           "then": {
-            "$ref": "#/$defs/bzr-sources"
+            "$ref": "#/$defs/source-bzr"
           }
         },
         {
@@ -520,7 +535,7 @@
             }
           },
           "then": {
-            "$ref": "#/$defs/svn-sources"
+            "$ref": "#/$defs/source-svn"
           }
         },
         {
@@ -532,7 +547,7 @@
             }
           },
           "then": {
-            "$ref": "#/$defs/dir-sources"
+            "$ref": "#/$defs/source-dir"
           }
         },
         {
@@ -544,7 +559,7 @@
             }
           },
           "then": {
-            "$ref": "#/$defs/file-sources"
+            "$ref": "#/$defs/source-file"
           }
         },
         {
@@ -556,7 +571,7 @@
             }
           },
           "then": {
-            "$ref": "#/$defs/script-sources"
+            "$ref": "#/$defs/source-script"
           }
         },
         {
@@ -568,7 +583,7 @@
             }
           },
           "then": {
-            "$ref": "#/$defs/inline-sources"
+            "$ref": "#/$defs/source-inline"
           }
         },
         {
@@ -580,7 +595,7 @@
             }
           },
           "then": {
-            "$ref": "#/$defs/shell-sources"
+            "$ref": "#/$defs/source-shell"
           }
         },
         {
@@ -592,7 +607,7 @@
             }
           },
           "then": {
-            "$ref": "#/$defs/patch-sources"
+            "$ref": "#/$defs/source-patch"
           }
         },
         {
@@ -604,14 +619,26 @@
             }
           },
           "then": {
-            "$ref": "#/$defs/extra-data-sources"
+            "$ref": "#/$defs/source-extra-data"
           }
         }
       ]
     },
-    "archive-sources": {
+    "source-archive": {
       "type": "object",
       "properties": {
+        "type": {
+          "$ref": "#/$defs/source/allOf/0/properties/type"
+        },
+        "only-arches": {
+          "$ref": "#/$defs/source/allOf/0/properties/only-arches"
+        },
+        "skip-arches": {
+          "$ref": "#/$defs/source/allOf/0/properties/skip-arches"
+        },
+        "dest": {
+          "$ref": "#/$defs/source/allOf/0/properties/dest"
+        },
         "path": {
           "description": "The path of the archive.",
           "type": "string"
@@ -627,6 +654,24 @@
             "description": "Alternative url that is used if the main url fails.",
             "type": "string"
           }
+        },
+        "archive-type": {
+          "description": "The type of archive if it cannot be guessed from the path.",
+          "type": "string",
+          "enum": [
+            "rpm",
+            "tar",
+            "tar-gzip",
+            "tar-compress",
+            "tar-bzip2",
+            "tar-lzip",
+            "tar-lzma",
+            "tar-lzop",
+            "tar-xz",
+            "tar-zst",
+            "zip",
+            "7z"
+          ]
         },
         "git-init": {
           "description": "Whether to initialise the repository as a git repository.",
@@ -656,11 +701,28 @@
           "description": "Filename to for the downloaded file, defaults to the basename of url.",
           "type": "string"
         }
-      }
+      },
+      "patternProperties": {
+        "^x-.*": { "$ref": "#/$defs/ignored-prop/custom" },
+        "^//.*": { "$ref": "#/$defs/ignored-prop/comment" }
+      },
+      "additionalProperties": false
     },
-    "git-sources": {
+    "source-git": {
       "type": "object",
       "properties": {
+        "type": {
+          "$ref": "#/$defs/source/allOf/0/properties/type"
+        },
+        "only-arches": {
+          "$ref": "#/$defs/source/allOf/0/properties/only-arches"
+        },
+        "skip-arches": {
+          "$ref": "#/$defs/source/allOf/0/properties/skip-arches"
+        },
+        "dest": {
+          "$ref": "#/$defs/source/allOf/0/properties/dest"
+        },
         "path": {
           "description": "The path to a local checkout of the git repository. Due to how git-clone works, this will be much faster than specifying a URL of file:///...",
           "type": "string"
@@ -693,11 +755,28 @@
           "description": "Don't checkout the git submodules when cloning the repository.",
           "type": "boolean"
         }
-      }
+      },
+      "patternProperties": {
+        "^x-.*": { "$ref": "#/$defs/ignored-prop/custom" },
+        "^//.*": { "$ref": "#/$defs/ignored-prop/comment" }
+      },
+      "additionalProperties": false
     },
-    "bzr-sources": {
+    "source-bzr": {
       "type": "object",
       "properties": {
+        "type": {
+          "$ref": "#/$defs/source/allOf/0/properties/type"
+        },
+        "only-arches": {
+          "$ref": "#/$defs/source/allOf/0/properties/only-arches"
+        },
+        "skip-arches": {
+          "$ref": "#/$defs/source/allOf/0/properties/skip-arches"
+        },
+        "dest": {
+          "$ref": "#/$defs/source/allOf/0/properties/dest"
+        },
         "url": {
           "description": "URL of the bzr repository.",
           "type": "string"
@@ -706,11 +785,28 @@
           "description": "A specific revision to use in the branch.",
           "type": "string"
         }
-      }
+      },
+      "patternProperties": {
+        "^x-.*": { "$ref": "#/$defs/ignored-prop/custom" },
+        "^//.*": { "$ref": "#/$defs/ignored-prop/comment" }
+      },
+      "additionalProperties": false
     },
-    "svn-sources": {
+    "source-svn": {
       "type": "object",
       "properties": {
+        "type": {
+          "$ref": "#/$defs/source/allOf/0/properties/type"
+        },
+        "only-arches": {
+          "$ref": "#/$defs/source/allOf/0/properties/only-arches"
+        },
+        "skip-arches": {
+          "$ref": "#/$defs/source/allOf/0/properties/skip-arches"
+        },
+        "dest": {
+          "$ref": "#/$defs/source/allOf/0/properties/dest"
+        },
         "url": {
           "description": "URL of the svn repository, including branch/tag part.",
           "type": "string"
@@ -719,11 +815,28 @@
           "description": "A specific revision number to use.",
           "type": "string"
         }
-      }
+      },
+      "patternProperties": {
+        "^x-.*": { "$ref": "#/$defs/ignored-prop/custom" },
+        "^//.*": { "$ref": "#/$defs/ignored-prop/comment" }
+      },
+      "additionalProperties": false
     },
-    "dir-sources": {
+    "source-dir": {
       "type": "object",
       "properties": {
+        "type": {
+          "$ref": "#/$defs/source/allOf/0/properties/type"
+        },
+        "only-arches": {
+          "$ref": "#/$defs/source/allOf/0/properties/only-arches"
+        },
+        "skip-arches": {
+          "$ref": "#/$defs/source/allOf/0/properties/skip-arches"
+        },
+        "dest": {
+          "$ref": "#/$defs/source/allOf/0/properties/dest"
+        },
         "path": {
           "description": "The path of a local directory whose content will be copied into the source dir. Note that directory sources don't currently support caching, so they will be rebuilt each time.",
           "type": "string"
@@ -736,11 +849,28 @@
             "type": "string"
           }
         }
-      }
+      },
+      "patternProperties": {
+        "^x-.*": { "$ref": "#/$defs/ignored-prop/custom" },
+        "^//.*": { "$ref": "#/$defs/ignored-prop/comment" }
+      },
+      "additionalProperties": false
     },
-    "file-sources": {
+    "source-file": {
       "type": "object",
       "properties": {
+        "type": {
+          "$ref": "#/$defs/source/allOf/0/properties/type"
+        },
+        "only-arches": {
+          "$ref": "#/$defs/source/allOf/0/properties/only-arches"
+        },
+        "skip-arches": {
+          "$ref": "#/$defs/source/allOf/0/properties/skip-arches"
+        },
+        "dest": {
+          "$ref": "#/$defs/source/allOf/0/properties/dest"
+        },
         "path": {
           "description": "The path of a local file that will be copied into the source dir.",
           "type": "string"
@@ -777,11 +907,28 @@
           "description": "Filename to for the downloaded file, defaults to the basename of url.",
           "type": "string"
         }
-      }
+      },
+      "patternProperties": {
+        "^x-.*": { "$ref": "#/$defs/ignored-prop/custom" },
+        "^//.*": { "$ref": "#/$defs/ignored-prop/comment" }
+      },
+      "additionalProperties": false
     },
-    "script-sources": {
+    "source-script": {
       "type": "object",
       "properties": {
+        "type": {
+          "$ref": "#/$defs/source/allOf/0/properties/type"
+        },
+        "only-arches": {
+          "$ref": "#/$defs/source/allOf/0/properties/only-arches"
+        },
+        "skip-arches": {
+          "$ref": "#/$defs/source/allOf/0/properties/skip-arches"
+        },
+        "dest": {
+          "$ref": "#/$defs/source/allOf/0/properties/dest"
+        },
         "commands": {
           "description": "An array of shell commands that will be put in a shellscript file.",
           "type": "array",
@@ -794,11 +941,28 @@
           "description": "Filename to use inside the source dir, default to autogen.sh.",
           "type": "string"
         }
-      }
+      },
+      "patternProperties": {
+        "^x-.*": { "$ref": "#/$defs/ignored-prop/custom" },
+        "^//.*": { "$ref": "#/$defs/ignored-prop/comment" }
+      },
+      "additionalProperties": false
     },
-    "inline-sources": {
+    "source-inline": {
       "type": "object",
       "properties": {
+        "type": {
+          "$ref": "#/$defs/source/allOf/0/properties/type"
+        },
+        "only-arches": {
+          "$ref": "#/$defs/source/allOf/0/properties/only-arches"
+        },
+        "skip-arches": {
+          "$ref": "#/$defs/source/allOf/0/properties/skip-arches"
+        },
+        "dest": {
+          "$ref": "#/$defs/source/allOf/0/properties/dest"
+        },
         "dest-filename": {
           "description": "Filename to use inside the source dir.",
           "type": "string"
@@ -811,11 +975,28 @@
           "description": "Whether content is base64-encoded.",
           "type": "boolean"
         }
-      }
+      },
+      "patternProperties": {
+        "^x-.*": { "$ref": "#/$defs/ignored-prop/custom" },
+        "^//.*": { "$ref": "#/$defs/ignored-prop/comment" }
+      },
+      "additionalProperties": false
     },
-    "shell-sources": {
+    "source-shell": {
       "type": "object",
       "properties": {
+        "type": {
+          "$ref": "#/$defs/source/allOf/0/properties/type"
+        },
+        "only-arches": {
+          "$ref": "#/$defs/source/allOf/0/properties/only-arches"
+        },
+        "skip-arches": {
+          "$ref": "#/$defs/source/allOf/0/properties/skip-arches"
+        },
+        "dest": {
+          "$ref": "#/$defs/source/allOf/0/properties/dest"
+        },
         "commands": {
           "description": "An array of shell commands that will be run during source extraction.",
           "type": "array",
@@ -824,11 +1005,28 @@
             "type": "string"
           }
         }
-      }
+      },
+      "patternProperties": {
+        "^x-.*": { "$ref": "#/$defs/ignored-prop/custom" },
+        "^//.*": { "$ref": "#/$defs/ignored-prop/comment" }
+      },
+      "additionalProperties": false
     },
-    "patch-sources": {
+    "source-patch": {
       "type": "object",
       "properties": {
+        "type": {
+          "$ref": "#/$defs/source/allOf/0/properties/type"
+        },
+        "only-arches": {
+          "$ref": "#/$defs/source/allOf/0/properties/only-arches"
+        },
+        "skip-arches": {
+          "$ref": "#/$defs/source/allOf/0/properties/skip-arches"
+        },
+        "dest": {
+          "$ref": "#/$defs/source/allOf/0/properties/dest"
+        },
         "path": {
           "description": "The path of a patch file that will be applied in the source dir.",
           "type": "string"
@@ -861,11 +1059,28 @@
             "type": "string"
           }
         }
-      }
+      },
+      "patternProperties": {
+        "^x-.*": { "$ref": "#/$defs/ignored-prop/custom" },
+        "^//.*": { "$ref": "#/$defs/ignored-prop/comment" }
+      },
+      "additionalProperties": false
     },
-    "extra-data-sources": {
+    "source-extra-data": {
       "type": "object",
       "properties": {
+        "type": {
+          "$ref": "#/$defs/source/allOf/0/properties/type"
+        },
+        "only-arches": {
+          "$ref": "#/$defs/source/allOf/0/properties/only-arches"
+        },
+        "skip-arches": {
+          "$ref": "#/$defs/source/allOf/0/properties/skip-arches"
+        },
+        "dest": {
+          "$ref": "#/$defs/source/allOf/0/properties/dest"
+        },
         "filename": {
           "description": "The name to use for the downloaded extra data",
           "type": "string"
@@ -886,7 +1101,12 @@
           "description": "The extra installed size this adds to the app (optional).",
           "type": "number"
         }
-      }
+      },
+      "patternProperties": {
+        "^x-.*": { "$ref": "#/$defs/ignored-prop/custom" },
+        "^//.*": { "$ref": "#/$defs/ignored-prop/comment" }
+      },
+      "additionalProperties": false
     }
   },
   "properties": {
@@ -1139,12 +1359,8 @@
     "additionalProperties": false
   },
   "patternProperties": {
-    "^x-.*": {
-      "description": "Custom property (ignored by flatpak-builder)"
-    },
-    "^//.*": {
-      "description": "Comment property (ignored by flatpak-builder)"
-    }
+    "^x-.*": { "$ref": "#/$defs/ignored-prop/custom" },
+    "^//.*": { "$ref": "#/$defs/ignored-prop/comment" }
   },
   "additionalProperties": false
 }
