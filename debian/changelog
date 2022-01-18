@@ -1,4 +1,4 @@
-flatpak-builder (1.2.2-1flatpak1~20.04) unstable; urgency=high
+flatpak-builder (1.2.2-2flatpak1~20.04) focal; urgency=high
 
   * Merge from Debian
   * Changes relative to Debian:
@@ -6,20 +6,25 @@ flatpak-builder (1.2.2-1flatpak1~20.04) unstable; urgency=high
     - Set changelog merge driver for debian/changelog
     - d/README.source: Add
     - Use the vendored debugedit instead of an external copy
-  * d/control: Set correct dependency on flatpak: 1.12.4, not 1.12.2
 
  -- Simon McVittie <smcv@debian.org>  Tue, 18 Jan 2022 19:28:49 +0000
+
+flatpak-builder (1.2.2-2) unstable; urgency=medium
+
+  * d/control: Set correct dependency on flatpak: 1.12.4, not 1.12.2
+
+ -- Simon McVittie <smcv@debian.org>  Tue, 18 Jan 2022 19:32:39 +0000
 
 flatpak-builder (1.2.2-1) unstable; urgency=high
 
   * New upstream stable release
   * Security fixes:
     - Prevent a malicious build creating directories outside the build
-      directory, when used in conjunction with flatpak (>= 1.12.2)
+      directory, when used in conjunction with flatpak (>= 1.12.4)
       (CVE-2022-21682, GHSA-8ch7-5j3h-g4fx)
   * Other bug fixes:
     - Improve JSON schema
-  * d/control: Bump Flatpak dependency to 1.12.2
+  * d/control: Bump Flatpak dependency to 1.12.4
   * Set urgency to high for CVE-2022-21682
 
  -- Simon McVittie <smcv@debian.org>  Tue, 18 Jan 2022 18:06:42 +0000
