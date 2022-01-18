@@ -16,7 +16,7 @@ Build-Depends:
  dh-exec (>= 0.23~),
  docbook-xml <!nodoc>,
  docbook-xsl <!nodoc>,
- flatpak (>= 1.12.2),
+ flatpak (>= 1.12.4),
  fuse <!nocheck>,
  git <!nocheck>,
  gtk-update-icon-cache <!nocheck>,
@@ -27,7 +27,7 @@ Build-Depends:
  libcurl4-gnutls-dev,
  libdw-dev (>= 0.172),
  libelf-dev,
- libflatpak-dev (>= 1.12.2),
+ libflatpak-dev (>= 1.12.4),
  libglib2.0-dev (>= 2.44),
  libjson-glib-dev,
  libostree-dev (>= 2017.14),
@@ -50,8 +50,8 @@ Package: flatpak-builder
 Architecture: linux-any
 Depends:
  debugedit (>= 1:5.0),
- gir1.2-flatpak-1.0 (>= 1.12.2),
- flatpak (>= 1.12.2),
+ gir1.2-flatpak-1.0 (>= 1.12.4),
+ flatpak (>= 1.12.4),
  ostree (>= 2017.14),
  ${misc:Depends},
  ${shlibs:Depends},
