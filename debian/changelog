@@ -7,7 +7,7 @@ flatpak-builder (1.2.2-2flatpak1~20.04) focal; urgency=high
     - d/README.source: Add
     - Use the vendored debugedit instead of an external copy
 
- -- Simon McVittie <smcv@debian.org>  Tue, 18 Jan 2022 19:28:49 +0000
+ -- Simon McVittie <smcv@debian.org>  Tue, 18 Jan 2022 19:46:24 +0000
 
 flatpak-builder (1.2.2-2) unstable; urgency=medium
 
