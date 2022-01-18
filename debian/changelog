@@ -1,4 +1,4 @@
-flatpak-builder (1.2.2-1flatpak1~20.04) UNRELEASED; urgency=medium
+flatpak-builder (1.2.2-1flatpak1~20.04) unstable; urgency=high
 
   * Merge from Debian
   * Changes relative to Debian:
@@ -6,8 +6,9 @@ flatpak-builder (1.2.2-1flatpak1~20.04) UNRELEASED; urgency=medium
     - Set changelog merge driver for debian/changelog
     - d/README.source: Add
     - Use the vendored debugedit instead of an external copy
+  * d/control: Set correct dependency on flatpak: 1.12.4, not 1.12.2
 
- -- Simon McVittie <smcv@debian.org>  Tue, 18 Jan 2022 19:27:34 +0000
+ -- Simon McVittie <smcv@debian.org>  Tue, 18 Jan 2022 19:28:49 +0000
 
 flatpak-builder (1.2.2-1) unstable; urgency=high
 
