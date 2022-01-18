@@ -1,3 +1,16 @@
+flatpak-builder (1.2.2-1) UNRELEASED; urgency=high
+
+  * New upstream stable release
+  * Security fixes:
+    - Prevent a malicious build creating directories outside the build
+      directory, when used in conjunction with flatpak (>= 1.12.2)
+      (CVE-2022-21682, GHSA-8ch7-5j3h-g4fx)
+  * Other bug fixes:
+    - Improve JSON schema
+  * Set urgency to high for CVE-2022-21682
+
+ -- Simon McVittie <smcv@debian.org>  Tue, 18 Jan 2022 18:03:54 +0000
+
 flatpak-builder (1.2.1-1) unstable; urgency=medium
 
   [ Hans-Christoph Steiner ]
