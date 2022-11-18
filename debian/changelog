@@ -1,3 +1,18 @@
+flatpak-builder (1.2.2-3) unstable; urgency=medium
+
+  * d/watch: Adapt to Github web page changes
+  * d/gbp.conf: Rename packaging branch to debian/latest
+  * d/patches: Update to upstream 1.2.x commit 1.2.2-5-g52d05dd4
+    - Try to auto-detect the default branch name in git remotes
+    - Include the have-kernel-module- family of conditions in the JSON
+      schema
+    - Fix a typo in the terminal title
+  * d/control: Remove unused build-dependency on dbus
+  * Update lintian override syntax
+  * Update standards version to 4.6.1 (no changes needed)
+
+ -- Simon McVittie <smcv@debian.org>  Fri, 18 Nov 2022 10:11:44 +0000
+
 flatpak-builder (1.2.2-2) unstable; urgency=medium
 
   * d/control: Set correct dependency on flatpak: 1.12.4, not 1.12.2
