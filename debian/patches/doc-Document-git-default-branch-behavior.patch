@@ -1,0 +1,22 @@
+From: Patrick Griffis <pgriffis@igalia.com>
+Date: Mon, 24 Jan 2022 18:42:46 -0600
+Subject: doc: Document git default branch behavior
+
+Origin: upstream, 1.2.3, commit:81e529a7ad4886316491c9403239154bb967e168
+---
+ doc/flatpak-manifest.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/doc/flatpak-manifest.xml b/doc/flatpak-manifest.xml
+index 30bf7a2..9e3e5ac 100644
+--- a/doc/flatpak-manifest.xml
++++ b/doc/flatpak-manifest.xml
+@@ -725,7 +725,7 @@
+                     </varlistentry>
+                     <varlistentry>
+                         <term><option>branch</option> (string)</term>
+-                        <listitem><para>The branch to use from the git repository</para></listitem>
++                        <listitem><para>The branch to use from the git repository. As of 1.2.3 this will try to auto-detect the upstream default branch. Previously this defaulted to <literal>master</literal>.</para></listitem>
+                     </varlistentry>
+                     <varlistentry>
+                         <term><option>tag</option> (string)</term>
