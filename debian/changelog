@@ -1,10 +1,10 @@
-flatpak-builder (1.2.3-1) UNRELEASED; urgency=medium
+flatpak-builder (1.2.3-1) unstable; urgency=medium
 
   * New upstream release
     - Allow cloning submodules from file:// URIs with recent versions of git
     - Drop patches, applied upstream
 
- -- Simon McVittie <smcv@debian.org>  Wed, 30 Nov 2022 12:16:27 +0000
+ -- Simon McVittie <smcv@debian.org>  Wed, 30 Nov 2022 12:18:11 +0000
 
 flatpak-builder (1.2.2-3) unstable; urgency=medium
 
