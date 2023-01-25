@@ -1,4 +1,4 @@
-libglnx is the successor to libgsystem: https://git.gnome.org/browse/libgsystem
+libglnx is the successor to [libgsystem](https://gitlab.gnome.org/Archive/libgsystem).
 
 It is for modules which depend on both GLib and Linux, intended to be
 used as a git submodule.
@@ -28,6 +28,32 @@ One could also compare this project to gnulib; the salient differences
 there are that at least some of this module is eventually destined for
 inclusion in GLib.
 
+Adding this to your project
+---------------------------
+
+## Meson
+
+First, set up a Git submodule:
+
+```
+git submodule add https://gitlab.gnome.org/GNOME/libglnx subprojects/libglnx
+```
+
+Or a Git [subtree](https://github.com/git/git/blob/master/contrib/subtree/git-subtree.txt):
+
+```
+git remote add libglnx https://gitlab.gnome.org/GNOME/libglnx.git
+git fetch libglnx
+git subtree add -P subprojects/libglnx libglnx/master
+```
+
+Then, in your top-level `meson.build`:
+
+```
+libglnx_dep = subproject('libglnx').get_variable('libglnx_dep')
+# now use libglnx_dep in your dependencies
+```
+
 Porting from libgsystem
 -----------------------
 
@@ -44,9 +70,13 @@ APIs not defined in GLib yet, such as `glnx_autofd`.
 Contributing
 ------------
 
-Currently there is not a Bugzilla product - one may be created
-in the future.  You can submit PRs against the Github mirror:
+Development happens in GNOME Gitlab: https://gitlab.gnome.org/GNOME/libglnx
 
-https://github.com/GNOME/libglnx/pulls
+(If you're seeing this on the Github mirror, we used to do development
+ on Github but that was before GNOME deployed Gitlab.)
 
-Or alternatively, email one of the maintainers directly.
+<!--
+Copyright 2015-2018 Colin Walters
+Copyright 2019 Endless OS Foundation LLC
+SPDX-License-Identifier: LGPL-2.1-or-later
+-->

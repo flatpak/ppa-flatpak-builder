@@ -147,9 +147,9 @@
           "patternProperties": {
             ".*": {
               "$ref": "#/$defs/build-options"
-            },
-            "additionalProperties": false
-          }
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false
@@ -282,15 +282,16 @@
           "description": "An array of objects defining sources that will be downloaded and extracted in order. String members in the array are interpreted as the name of a separate json or yaml file that contains sources.",
           "type": "array",
           "items": {
-            "oneOf": [
-              {
-                "$ref": "#/$defs/source"
-              },
-              {
-                "type": "string",
-                "description": "Name of a separate json or yaml file that contains sources."
-              }
-            ]
+            "if": {
+              "type": "object"
+            },
+            "then": {
+              "$ref": "#/$defs/source"
+            },
+            "else": {
+              "type": "string",
+              "description": "Name of a separate json or yaml file that contains sources."
+            }
           }
         },
         "config-opts": {
@@ -343,6 +344,7 @@
         },
         "cmake": {
           "description": "Use cmake instead of configure (deprecated: use buildsystem instead).",
+          "deprecated": true,
           "type": "boolean"
         },
         "buildsystem": {
@@ -434,24 +436,36 @@
         },
         "test-commands": {
           "description": "Array of commands to run during the tests.",
-          "type": "string"
+          "type": "array",
+          "items": {
+            "description": "Command to run during the tests.",
+            "type": "string"
+          }
         },
         "modules": {
           "description": "An array of objects specifying the modules to be built in order. String members in the array are interpreted as the name of a separate json or yaml file that contains a module.",
           "type": "array",
           "items": {
-            "oneOf": [
-              {
-                "$ref": "#/$defs/module"
-              },
-              {
-                "type": "string",
-                "description": "Name of a separate json or yaml file that contains a module."
-              }
-            ]
+            "if": {
+              "type": "object"
+            },
+            "then": {
+              "$ref": "#/$defs/module"
+            },
+            "else": {
+              "type": "string",
+              "description": "Name of a separate json or yaml file that contains a module."
+            }
           }
         }
       },
+      "patternProperties": {
+        "^x-.*": { "$ref": "#/$defs/ignored-prop/custom" },
+        "^//.*": { "$ref": "#/$defs/ignored-prop/comment" }
+      },
+      "required": [
+        "name"
+      ],
       "additionalProperties": false
     },
     "source": {
@@ -497,7 +511,10 @@
                 "extra-data"
               ]
             }
-          }
+          },
+          "required": [
+            "type"
+          ]
         },
         {
           "if": {
@@ -688,10 +705,12 @@
         },
         "md5": {
           "description": "The md5 checksum of the file, verified after download. Note that md5 is no longer considered a safe checksum, we recommend you use at least sha256.",
+          "deprecated": true,
           "type": "string"
         },
         "sha1": {
           "description": "The sha1 checksum of the file, verified after download. Note that sha1 is no longer considered a safe checksum, we recommend you use at least sha256.",
+          "deprecated": true,
           "type": "string"
         },
         "sha256": {
@@ -714,6 +733,20 @@
       "patternProperties": {
         "^x-.*": { "$ref": "#/$defs/ignored-prop/custom" },
         "^//.*": { "$ref": "#/$defs/ignored-prop/comment" }
+      },
+      "oneOf": [
+        { "required": [ "url" ] },
+        { "required": [ "path" ] }
+      ],
+      "dependencies": {
+        "url": {
+          "anyOf": [
+            { "required": [ "sha256" ] },
+            { "required": [ "sha512" ] },
+            { "required": [ "sha1" ] },
+            { "required": [ "md5" ] }
+          ]
+        }
       },
       "additionalProperties": false
     },
@@ -769,6 +802,10 @@
         "^x-.*": { "$ref": "#/$defs/ignored-prop/custom" },
         "^//.*": { "$ref": "#/$defs/ignored-prop/comment" }
       },
+      "oneOf": [
+        { "required": [ "url" ] },
+        { "required": [ "path" ] }
+      ],
       "additionalProperties": false
     },
     "source-bzr": {
@@ -799,6 +836,9 @@
         "^x-.*": { "$ref": "#/$defs/ignored-prop/custom" },
         "^//.*": { "$ref": "#/$defs/ignored-prop/comment" }
       },
+      "required": [
+        "url"
+      ],
       "additionalProperties": false
     },
     "source-svn": {
@@ -829,6 +869,9 @@
         "^x-.*": { "$ref": "#/$defs/ignored-prop/custom" },
         "^//.*": { "$ref": "#/$defs/ignored-prop/comment" }
       },
+      "required": [
+        "url"
+      ],
       "additionalProperties": false
     },
     "source-dir": {
@@ -859,6 +902,9 @@
           }
         }
       },
+      "required": [
+        "path"
+      ],
       "patternProperties": {
         "^x-.*": { "$ref": "#/$defs/ignored-prop/custom" },
         "^//.*": { "$ref": "#/$defs/ignored-prop/comment" }
@@ -898,10 +944,12 @@
         },
         "md5": {
           "description": "The md5 checksum of the file, verified after download. Note that md5 is no longer considered a safe checksum, we recommend you use at least sha256.",
+          "deprecated": true,
           "type": "string"
         },
         "sha1": {
           "description": "The sha1 checksum of the file, verified after download. Note that sha1 is no longer considered a safe checksum, we recommend you use at least sha256.",
+          "deprecated": true,
           "type": "string"
         },
         "sha256": {
@@ -920,6 +968,20 @@
       "patternProperties": {
         "^x-.*": { "$ref": "#/$defs/ignored-prop/custom" },
         "^//.*": { "$ref": "#/$defs/ignored-prop/comment" }
+      },
+      "oneOf": [
+        { "required": [ "url" ] },
+        { "required": [ "path" ] }
+      ],
+      "dependencies": {
+        "url": {
+          "anyOf": [
+            { "required": [ "sha256" ] },
+            { "required": [ "sha512" ] },
+            { "required": [ "sha1" ] },
+            { "required": [ "md5" ] }
+          ]
+        }
       },
       "additionalProperties": false
     },
@@ -955,6 +1017,9 @@
         "^x-.*": { "$ref": "#/$defs/ignored-prop/custom" },
         "^//.*": { "$ref": "#/$defs/ignored-prop/comment" }
       },
+      "required": [
+        "commands"
+      ],
       "additionalProperties": false
     },
     "source-inline": {
@@ -989,6 +1054,9 @@
         "^x-.*": { "$ref": "#/$defs/ignored-prop/custom" },
         "^//.*": { "$ref": "#/$defs/ignored-prop/comment" }
       },
+      "required": [
+        "dest-filename"
+      ],
       "additionalProperties": false
     },
     "source-shell": {
@@ -1019,6 +1087,9 @@
         "^x-.*": { "$ref": "#/$defs/ignored-prop/custom" },
         "^//.*": { "$ref": "#/$defs/ignored-prop/comment" }
       },
+      "required": [
+        "commands"
+      ],
       "additionalProperties": false
     },
     "source-patch": {
@@ -1073,6 +1144,10 @@
         "^x-.*": { "$ref": "#/$defs/ignored-prop/custom" },
         "^//.*": { "$ref": "#/$defs/ignored-prop/comment" }
       },
+      "oneOf": [
+        { "required": [ "paths" ] },
+        { "required": [ "path" ] }
+      ],
       "additionalProperties": false
     },
     "source-extra-data": {
@@ -1115,12 +1190,19 @@
         "^x-.*": { "$ref": "#/$defs/ignored-prop/custom" },
         "^//.*": { "$ref": "#/$defs/ignored-prop/comment" }
       },
+      "required": [
+        "url",
+        "sha256",
+        "size",
+        "filename"
+      ],
       "additionalProperties": false
     }
   },
   "properties": {
     "app-id": {
       "description": "A string defining the application id.",
+      "deprecated": true,
       "type": "string"
     },
     "id": {
@@ -1255,19 +1337,7 @@
       "$ref": "#/$defs/build-options"
     },
     "modules": {
-      "description": "An array of objects or strings specifying the modules to be built in order. String members in the array are interpreted as the name of a separate json or yaml file that contains a module.",
-      "type": "array",
-      "items": {
-        "oneOf": [
-          {
-            "$ref": "#/$defs/module"
-          },
-          {
-            "type": "string",
-            "description": "Name of a separate json or yaml file that contains a module."
-          }
-        ]
-      }
+      "$ref": "#/$defs/module/properties/modules"
     },
     "add-extensions": {
       "description": "This is a dictionary of extension objects. The key is the name of the extension.",
@@ -1275,9 +1345,9 @@
       "patternProperties": {
         ".*": {
           "$ref": "#/$defs/extension"
-        },
-        "additionalProperties": false
-      }
+        }
+      },
+      "additionalProperties": false
     },
     "add-build-extensions": {
       "description": "This is a dictionary of extension objects similar to add-extensions. The main difference is that the extensions are added early and are available for use during the build.",
@@ -1285,9 +1355,9 @@
       "patternProperties": {
         ".*": {
           "$ref": "#/$defs/extension"
-        },
-        "additionalProperties": false
-      }
+        }
+      },
+      "additionalProperties": false
     },
     "cleanup": {
       "description": "An array of file patterns that should be removed at the end. Patterns starting with / are taken to be full pathnames (without the /app prefix), otherwise they just match the basename.",
@@ -1364,12 +1434,25 @@
     "desktop-file-name-suffix": {
       "description": "This string will be suffixed to the Name key in the main application desktop file.",
       "type": "string"
-    },
-    "additionalProperties": false
+    }
   },
   "patternProperties": {
     "^x-.*": { "$ref": "#/$defs/ignored-prop/custom" },
     "^//.*": { "$ref": "#/$defs/ignored-prop/comment" }
   },
+  "allOf": [
+    {
+      "oneOf": [
+        { "required": [ "id" ] },
+        { "required": [ "app-id" ] }
+      ]
+    },
+    {
+      "required": [
+        "runtime",
+        "sdk"
+      ]
+    }
+  ],
   "additionalProperties": false
 }

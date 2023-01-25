@@ -87,6 +87,7 @@ static char *opt_installation;
 static gboolean opt_log_session_bus;
 static gboolean opt_log_system_bus;
 static gboolean opt_yes;
+static gint64 opt_source_date_epoch = -1;
 
 static GOptionEntry entries[] = {
   { "verbose", 'v', 0, G_OPTION_ARG_NONE, &opt_verbose, "Print debug information during command processing", NULL },
@@ -141,6 +142,7 @@ static GOptionEntry entries[] = {
   { "state-dir", 0, 0, G_OPTION_ARG_FILENAME, &opt_state_dir, "Use this directory for state instead of .flatpak-builder", "PATH" },
   { "assumeyes", 'y', 0, G_OPTION_ARG_NONE, &opt_yes, N_("Automatically answer yes for all questions"), NULL },
   { "no-shallow-clone", 0, 0, G_OPTION_ARG_NONE, &opt_no_shallow_clone, "Don't use shallow clones when mirroring git repos", NULL },
+  { "override-source-date-epoch", 0, 0, G_OPTION_ARG_INT64, &opt_source_date_epoch, "Use this timestamp to perform the build, instead of the last modification time of the manifest.", NULL },
   { NULL }
 };
 
@@ -404,6 +406,7 @@ main (int    argc,
   int argnr;
   char *p;
   struct stat statbuf;
+  gsize manifest_length;
 
   setlocale (LC_ALL, "");
 
@@ -420,15 +423,7 @@ main (int    argc,
   else
     g_unsetenv ("GIO_USE_VFS");
 
-  /* Work around libsoup/glib race condition, as per:
-     https://bugzilla.gnome.org/show_bug.cgi?id=796031 and
-     https://bugzilla.gnome.org/show_bug.cgi?id=674885#c87 */
-  g_type_ensure (G_TYPE_SOCKET_FAMILY);
-  g_type_ensure (G_TYPE_SOCKET_TYPE);
-  g_type_ensure (G_TYPE_SOCKET_PROTOCOL);
-  g_type_ensure (G_TYPE_SOCKET_ADDRESS);
-
-  orig_argv = g_memdup (argv, sizeof (char *) * argc);
+  orig_argv = g_memdup2 (argv, sizeof (char *) * argc);
   orig_argc = argc;
 
   first_non_arg = 1;
@@ -551,7 +546,7 @@ main (int    argc,
   if (opt_sources_urls)
     {
       g_autoptr(GPtrArray) sources_urls = NULL;
-      sources_urls = g_ptr_array_new_with_free_func ((GDestroyNotify)soup_uri_free);
+      sources_urls = g_ptr_array_new_with_free_func ((GDestroyNotify) g_uri_unref);
       for (i = 0; opt_sources_urls[i] != NULL; i++)
         {
           if (!g_str_has_suffix (opt_sources_urls[i], "/"))
@@ -560,10 +555,10 @@ main (int    argc,
               opt_sources_urls[i] = g_strdup_printf ("%s/", tmp);
             }
 
-          SoupURI *uri = soup_uri_new (opt_sources_urls[i]);
+          GUri *uri = g_uri_parse (opt_sources_urls[i], CONTEXT_HTTP_URI_FLAGS, &error);
           if (uri == NULL)
             {
-              g_printerr ("Invalid URL '%s'", opt_sources_urls[i]);
+              g_printerr ("Invalid URL '%s'", error->message);
               return 1;
             }
           g_ptr_array_add (sources_urls, uri);
@@ -604,6 +599,11 @@ main (int    argc,
 
       int mirror_flags = FLATPAK_GIT_MIRROR_FLAGS_MIRROR_SUBMODULES;
 
+      if (opt_no_shallow_clone)
+        {
+          mirror_flags |= FLATPAK_GIT_MIRROR_FLAGS_DISABLE_SHALLOW;
+        }
+
       if (opt_disable_updates)
         {
           mirror_flags |= FLATPAK_GIT_MIRROR_FLAGS_UPDATE;
@@ -639,14 +639,21 @@ main (int    argc,
     }
 
   builder_context_set_base_dir (build_context, base_dir);
-
-  if (!g_file_get_contents (flatpak_file_get_path_cached (manifest_file), &manifest_contents, NULL, &error))
+  if (!g_file_get_contents (flatpak_file_get_path_cached (manifest_file), &manifest_contents, &manifest_length, &error))
     {
       g_printerr ("Can't load '%s': %s\n", manifest_rel_path, error->message);
       return 1;
     }
 
-  if (stat (flatpak_file_get_path_cached (manifest_file), &statbuf) == 0)
+  if (manifest_length == 0)
+    {
+      g_printerr ("Empty manifest file: '%s'\n", manifest_rel_path);
+      return 1;
+    }
+
+  if (opt_source_date_epoch > -1)
+    builder_context_set_source_date_epoch (build_context, opt_source_date_epoch);
+  else if (stat (flatpak_file_get_path_cached (manifest_file), &statbuf) == 0)
     builder_context_set_source_date_epoch (build_context, (gint64)statbuf.st_mtime);
 
   manifest_sha256 = g_compute_checksum_for_string (G_CHECKSUM_SHA256, manifest_contents, -1);
@@ -775,7 +782,7 @@ main (int    argc,
               g_print ("Emptying app dir '%s'\n", app_dir_path);
               if (!flatpak_rm_rf (app_dir, NULL, &error))
                 {
-                  g_printerr ("Couldn't empty app dir '%s': %s",
+                  g_printerr ("Couldn't empty app dir '%s': %s\n",
                               app_dir_path, error->message);
                   return 1;
                 }

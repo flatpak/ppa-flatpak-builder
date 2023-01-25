@@ -1,6 +1,7 @@
 /* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*-
  *
  * Copyright (C) 2014,2015 Colin Walters <walters@verbum.org>.
+ * SPDX-License-Identifier: LGPL-2.0-or-later
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -43,7 +44,7 @@ G_BEGIN_DECLS
 static inline
 const char *glnx_basename (const char *path)
 {
-  gchar *base = strrchr (path, G_DIR_SEPARATOR);
+  const gchar *base = strrchr (path, G_DIR_SEPARATOR);
 
   if (base)
     return base + 1;
@@ -55,7 +56,7 @@ const char *glnx_basename (const char *path)
 static inline void
 glnx_stdio_file_cleanup (void *filep)
 {
-  FILE *f = filep;
+  FILE *f = (FILE*)filep;
   if (f)
     fclose (f);
 }
@@ -84,6 +85,13 @@ glnx_open_anonymous_tmpfile (int flags,
                              GError **error);
 
 gboolean
+glnx_open_anonymous_tmpfile_full (int flags,
+                                  const char *dir,
+                                  GLnxTmpfile *out_tmpf,
+                                  GError **error);
+
+
+gboolean
 glnx_open_tmpfile_linkable_at (int dfd,
                                const char *subpath,
                                int flags,
@@ -102,6 +110,10 @@ glnx_link_tmpfile_at (GLnxTmpfile *tmpf,
                       int target_dfd,
                       const char *target,
                       GError **error);
+
+gboolean
+glnx_tmpfile_reopen_rdonly (GLnxTmpfile *tmpf,
+                            GError **error);
 
 gboolean
 glnx_openat_rdonly (int             dfd,
@@ -132,12 +144,14 @@ glnx_file_get_contents_utf8_at (int                   dfd,
  * GLnxFileReplaceFlags:
  * @GLNX_FILE_REPLACE_DATASYNC_NEW: Call fdatasync() even if the file did not exist
  * @GLNX_FILE_REPLACE_NODATASYNC: Never call fdatasync()
+ * @GLNX_FILE_REPLACE_INCREASING_MTIME: Ensure that st_mtime increases (in second precision)
  *
  * Flags controlling file replacement.
  */
 typedef enum {
   GLNX_FILE_REPLACE_DATASYNC_NEW = (1 << 0),
   GLNX_FILE_REPLACE_NODATASYNC = (1 << 1),
+  GLNX_FILE_REPLACE_INCREASING_MTIME = (1 << 2),
 } GLnxFileReplaceFlags;
 
 gboolean
@@ -176,13 +190,14 @@ glnx_regfile_copy_bytes (int fdf, int fdt, off_t max_bytes);
 typedef enum {
   GLNX_FILE_COPY_OVERWRITE = (1 << 0),
   GLNX_FILE_COPY_NOXATTRS = (1 << 1),
-  GLNX_FILE_COPY_DATASYNC = (1 << 2)
+  GLNX_FILE_COPY_DATASYNC = (1 << 2),
+  GLNX_FILE_COPY_NOCHOWN = (1 << 3)
 } GLnxFileCopyFlags;
 
 gboolean
 glnx_file_copy_at (int                   src_dfd,
                    const char           *src_subpath,
-                   struct stat          *src_stbuf,
+                   const struct stat    *src_stbuf,
                    int                   dest_dfd,
                    const char           *dest_subpath,
                    GLnxFileCopyFlags     copyflags,
@@ -194,6 +209,7 @@ int glnx_renameat2_noreplace (int olddirfd, const char *oldpath,
 int glnx_renameat2_exchange (int olddirfd, const char *oldpath,
                              int newdirfd, const char *newpath);
 
+#ifdef _GNU_SOURCE
 /**
  * glnx_try_fallocate:
  * @fd: File descriptor
@@ -225,6 +241,7 @@ glnx_try_fallocate (int      fd,
 
   return TRUE;
 }
+#endif
 
 /**
  * glnx_fstat:
