@@ -1,6 +1,7 @@
 /* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*-
  *
  * Copyright (C) 2017 Red Hat, Inc.
+ * SPDX-License-Identifier: LGPL-2.0-or-later
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,12 +19,19 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#include "config.h"
+#include "libglnx-config.h"
 #include "libglnx.h"
 #include <glib.h>
 #include <stdlib.h>
 #include <gio/gio.h>
 #include <string.h>
+
+static void
+test_info (void)
+{
+  g_info ("hello, world");
+  g_info ("answer=%d", 42);
+}
 
 static void
 test_inset (void)
@@ -103,6 +111,7 @@ test_hash_table_foreach (void)
 int main (int argc, char **argv)
 {
   g_test_init (&argc, &argv, NULL);
+  g_test_add_func ("/info", test_info);
   g_test_add_func ("/inset", test_inset);
   g_test_add_func ("/hash_table_foreach", test_hash_table_foreach);
   return g_test_run();

@@ -230,11 +230,23 @@ builder_source_archive_set_property (GObject      *object,
     case PROP_MD5:
       g_free (self->md5);
       self->md5 = g_value_dup_string (value);
+      if (self->md5 != NULL && self->md5[0] != '\0')
+        {
+          g_printerr ("The \"md5\" source property is deprecated due to the weakness of MD5 hashes.\n");
+          g_printerr ("Use the \"sha256\" property for the more secure SHA256 hash.\n");
+        }
+
       break;
 
     case PROP_SHA1:
       g_free (self->sha1);
       self->sha1 = g_value_dup_string (value);
+      if (self->sha1 != NULL && self->sha1[0] != '\0')
+        {
+          g_printerr ("The \"sha1\" source property is deprecated due to the weakness of SHA1 hashes.\n");
+          g_printerr ("Use the \"sha256\" property for the more secure SHA256 hash.\n");
+        }
+
       break;
 
     case PROP_SHA256:
@@ -289,11 +301,11 @@ builder_source_archive_validate (BuilderSource  *source,
   return TRUE;
 }
 
-static SoupURI *
+static GUri *
 get_uri (BuilderSourceArchive *self,
          GError              **error)
 {
-  SoupURI *uri;
+  GUri *uri;
 
   if (self->url == NULL)
     {
@@ -301,10 +313,9 @@ get_uri (BuilderSourceArchive *self,
       return NULL;
     }
 
-  uri = soup_uri_new (self->url);
+  uri = g_uri_parse (self->url, CONTEXT_HTTP_URI_FLAGS, error);
   if (uri == NULL)
     {
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED, "Invalid URL '%s'", self->url);
       return NULL;
     }
   return uri;
@@ -316,7 +327,7 @@ get_download_location (BuilderSourceArchive *self,
                        gboolean             *is_local,
                        GError              **error)
 {
-  g_autoptr(SoupURI) uri = NULL;
+  g_autoptr(GUri) uri = NULL;
   const char *path;
   g_autofree char *base_name = NULL;
   g_autoptr(GFile) file = NULL;
@@ -327,7 +338,7 @@ get_download_location (BuilderSourceArchive *self,
   if (uri == NULL)
     return FALSE;
 
-  path = soup_uri_get_path (uri);
+  path = g_uri_get_path (uri);
 
   if (self->dest_filename)
     base_name = g_strdup (self->dest_filename);

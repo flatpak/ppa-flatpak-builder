@@ -10,7 +10,7 @@
    language is requested. */
 #undef ENABLE_NLS
 
-/* Define if we should be compatible with wrpseudo */
+/* Define if we should be compatible with pseudo */
 #undef ENABLE_WRPSEUDO_COMPAT
 
 /* Define if yaml supported */
@@ -18,6 +18,12 @@
 
 /* gettext domain */
 #undef GETTEXT_PACKAGE
+
+/* Glib max version */
+#undef GLIB_VERSION_MAX_ALLOWED
+
+/* Glib min version */
+#undef GLIB_VERSION_MIN_REQUIRED
 
 /* Define to 1 if you have the Mac OS X function CFLocaleCopyCurrent in the
    CoreFoundation framework. */

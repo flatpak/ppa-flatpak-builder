@@ -1,8 +1,8 @@
 AC_PREREQ([2.63])
 
 m4_define([flatpak_builder_major_version], [1])
-m4_define([flatpak_builder_minor_version], [2])
-m4_define([flatpak_builder_micro_version], [3])
+m4_define([flatpak_builder_minor_version], [3])
+m4_define([flatpak_builder_micro_version], [1])
 m4_define([flatpak_builder_version],
           [flatpak_builder_major_version.flatpak_builder_minor_version.flatpak_builder_micro_version])
 
@@ -12,7 +12,10 @@ AC_INIT([flatpak-builder],
         [flatpak-builder],
         [http://flatpak.org/])
 
-GLIB_REQS=2.44
+AC_DEFINE([GLIB_VERSION_MIN_REQUIRED], [GLIB_VERSION_2_66], [Glib min version])
+AC_DEFINE([GLIB_VERSION_MAX_ALLOWED], [GLIB_VERSION_2_68], [Glib max version])
+
+GLIB_REQS=2.66
 OSTREE_REQS=2017.14
 FLATPAK_REQS=0.99.1
 SYSTEM_DEBUGEDIT_REQS=5.0
@@ -83,7 +86,7 @@ PKG_PROG_PKG_CONFIG([0.24])
 # For libglnx
 AC_CHECK_HEADER([sys/xattr.h], [], [AC_MSG_ERROR([You must have sys/xattr.h from glibc])])
 
-PKG_CHECK_MODULES(BASE, [glib-2.0 >= $GLIB_REQS gio-2.0 gio-unix-2.0 libsoup-2.4 ostree-1 >= $OSTREE_REQS json-glib-1.0 libxml-2.0 >= 2.4 libcurl])
+PKG_CHECK_MODULES(BASE, [glib-2.0 >= $GLIB_REQS gio-2.0 gio-unix-2.0 ostree-1 >= $OSTREE_REQS json-glib-1.0 libxml-2.0 >= 2.4 libcurl])
 
 dnl ************************
 dnl *** check for libelf ***

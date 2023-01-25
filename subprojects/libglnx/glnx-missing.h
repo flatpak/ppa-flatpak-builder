@@ -4,6 +4,7 @@
   This file was originally part of systemd.
 
   Copyright 2010 Lennart Poettering
+  SPDX-License-Identifier: LGPL-2.1-or-later
 
   systemd is free software; you can redistribute it and/or modify it
   under the terms of the GNU Lesser General Public License as published by
@@ -36,7 +37,6 @@
 #include <stdlib.h>
 #include <sys/resource.h>
 #include <sys/syscall.h>
-#include <uchar.h>
 #include <unistd.h>
 
 /* The precise definition of __O_TMPFILE is arch specific; use the

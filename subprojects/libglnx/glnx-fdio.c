@@ -1,6 +1,7 @@
 /* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*-
  *
  * Copyright (C) 2014,2015 Colin Walters <walters@verbum.org>.
+ * SPDX-License-Identifier: LGPL-2.0-or-later
  *
  * Portions derived from systemd:
  *  Copyright 2010 Lennart Poettering
@@ -21,7 +22,7 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#include "config.h"
+#include "libglnx-config.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -37,6 +38,7 @@
 #include <glnx-errors.h>
 #include <glnx-xattrs.h>
 #include <glnx-backport-autoptr.h>
+#include <glnx-backports.h>
 #include <glnx-local-alloc.h>
 #include <glnx-missing.h>
 
@@ -227,7 +229,7 @@ open_tmpfile_core (int dfd, const char *subpath,
   const guint count_max = 100;
   { g_autofree char *tmp = g_strconcat (subpath, "/tmp.XXXXXX", NULL);
 
-    for (int count = 0; count < count_max; count++)
+    for (guint count = 0; count < count_max; count++)
       {
         glnx_gen_temp_name (tmp);
 
@@ -277,17 +279,19 @@ glnx_open_tmpfile_linkable_at (int dfd,
   return open_tmpfile_core (dfd, subpath, flags, out_tmpf, error);
 }
 
+
 /* A variant of `glnx_open_tmpfile_linkable_at()` which doesn't support linking.
- * Useful for true temporary storage. The fd will be allocated in /var/tmp to
- * ensure maximum storage space.
+ * Useful for true temporary storage. The fd will be allocated in the specified
+ * directory.
  */
 gboolean
-glnx_open_anonymous_tmpfile (int          flags,
-                             GLnxTmpfile *out_tmpf,
-                             GError     **error)
+glnx_open_anonymous_tmpfile_full (int          flags,
+                                  const char  *dir,
+                                  GLnxTmpfile *out_tmpf,
+                                  GError     **error)
 {
   /* Add in O_EXCL */
-  if (!open_tmpfile_core (AT_FDCWD, "/var/tmp", flags | O_EXCL, out_tmpf, error))
+  if (!open_tmpfile_core (AT_FDCWD, dir, flags | O_EXCL, out_tmpf, error))
     return FALSE;
   if (out_tmpf->path)
     {
@@ -297,6 +301,24 @@ glnx_open_anonymous_tmpfile (int          flags,
   out_tmpf->anonymous = TRUE;
   out_tmpf->src_dfd = -1;
   return TRUE;
+}
+
+/* A variant of `glnx_open_tmpfile_linkable_at()` which doesn't support linking.
+ * Useful for true temporary storage. The fd will be allocated in `$TMPDIR` if
+ * set or `/var/tmp` otherwise.
+ *
+ * If you need the file on a specific filesystem use glnx_open_anonymous_tmpfile_full()
+ * which lets you pass a directory.
+ */
+gboolean
+glnx_open_anonymous_tmpfile (int          flags,
+                             GLnxTmpfile *out_tmpf,
+                             GError     **error)
+{
+  return glnx_open_anonymous_tmpfile_full (flags,
+                                           getenv("TMPDIR") ?: "/var/tmp",
+                                           out_tmpf,
+                                           error);
 }
 
 /* Use this after calling glnx_open_tmpfile_linkable_at() to give
@@ -346,8 +368,7 @@ glnx_link_tmpfile_at (GLnxTmpfile *tmpf,
     {
       /* This case we have O_TMPFILE, so our reference to it is via /proc/self/fd */
       char proc_fd_path[strlen("/proc/self/fd/") + DECIMAL_STR_MAX(tmpf->fd) + 1];
-
-      sprintf (proc_fd_path, "/proc/self/fd/%i", tmpf->fd);
+      snprintf (proc_fd_path, sizeof (proc_fd_path), "/proc/self/fd/%i", tmpf->fd);
 
       if (replace)
         {
@@ -404,6 +425,45 @@ glnx_link_tmpfile_at (GLnxTmpfile *tmpf,
         }
 
     }
+  return TRUE;
+}
+
+/* glnx_tmpfile_reopen_rdonly:
+ * @tmpf: tmpfile
+ * @error: Error
+ *
+ * Give up write access to the file descriptior.  One use
+ * case for this is fs-verity, which requires a read-only fd.
+ * It could also be useful to allocate an anonymous tmpfile
+ * write some sort of caching/indexing data to it, then reopen it
+ * read-only thereafter.
+ **/
+gboolean
+glnx_tmpfile_reopen_rdonly (GLnxTmpfile *tmpf,
+                            GError **error)
+{
+  g_return_val_if_fail (tmpf->fd >= 0, FALSE);
+  g_return_val_if_fail (tmpf->src_dfd == AT_FDCWD || tmpf->src_dfd >= 0, FALSE);
+
+  glnx_fd_close int rdonly_fd = -1;
+
+  if (tmpf->path)
+    {
+      if (!glnx_openat_rdonly (tmpf->src_dfd, tmpf->path, FALSE, &rdonly_fd, error))
+        return FALSE;
+    }
+  else
+    {
+      /* This case we have O_TMPFILE, so our reference to it is via /proc/self/fd */
+      char proc_fd_path[strlen("/proc/self/fd/") + DECIMAL_STR_MAX(tmpf->fd) + 1];
+      snprintf (proc_fd_path, sizeof (proc_fd_path), "/proc/self/fd/%i", tmpf->fd);
+
+      if (!glnx_openat_rdonly (AT_FDCWD, proc_fd_path, TRUE, &rdonly_fd, error))
+        return FALSE;
+    }
+
+  glnx_close_fd (&tmpf->fd);
+  tmpf->fd = glnx_steal_fd (&rdonly_fd);
   return TRUE;
 }
 
@@ -600,7 +660,7 @@ glnx_file_get_contents_utf8_at (int                   dfd,
 char *
 glnx_readlinkat_malloc (int            dfd,
                         const char    *subpath,
-                        GCancellable  *cancellable,
+                        G_GNUC_UNUSED GCancellable *cancellable,
                         GError       **error)
 {
   dfd = glnx_dirfd_canonicalize (dfd);
@@ -734,10 +794,21 @@ glnx_regfile_copy_bytes (int fdf, int fdt, off_t max_bytes)
 
   /* If we've requested to copy the whole range, try a full-file clone first.
    */
-  if (max_bytes == (off_t) -1)
+  if (max_bytes == (off_t) -1 &&
+      lseek (fdf, 0, SEEK_CUR) == 0 &&
+      lseek (fdt, 0, SEEK_CUR) == 0)
     {
       if (ioctl (fdt, FICLONE, fdf) == 0)
-        return 0;
+        {
+          /* All the other methods advance the fds. Do it here too for consistency. */
+          if (lseek (fdf, 0, SEEK_END) < 0)
+            return -1;
+          if (lseek (fdt, 0, SEEK_END) < 0)
+            return -1;
+
+          return 0;
+        }
+
       /* Fall through */
       struct stat stbuf;
 
@@ -746,7 +817,9 @@ glnx_regfile_copy_bytes (int fdf, int fdt, off_t max_bytes)
        */
       if (fstat (fdf, &stbuf) < 0)
         return -1;
-      max_bytes = stbuf.st_size;
+
+      if (stbuf.st_size > 0)
+        max_bytes = stbuf.st_size;
     }
 
   while (TRUE)
@@ -757,7 +830,7 @@ glnx_regfile_copy_bytes (int fdf, int fdt, off_t max_bytes)
        * try_copy_file_range() from systemd upstream, which works better since
        * we use POSIX errno style.
        */
-      if (try_cfr)
+      if (try_cfr && max_bytes != (off_t) -1)
         {
           n = copy_file_range (fdf, NULL, fdt, NULL, max_bytes, 0u);
           if (n < 0)
@@ -770,7 +843,7 @@ glnx_regfile_copy_bytes (int fdf, int fdt, off_t max_bytes)
                   have_cfr = 0;
                   try_cfr = false;
                 }
-              else if (errno == EXDEV)
+              else if (G_IN_SET (errno, EXDEV, EINVAL, EOPNOTSUPP))
                 /* We won't try cfr again for this run, but let's be
                  * conservative and not mark it as available/unavailable until
                  * we know for sure.
@@ -796,7 +869,7 @@ glnx_regfile_copy_bytes (int fdf, int fdt, off_t max_bytes)
       /* Next try sendfile(); this version is also changed from systemd upstream
        * to match the same logic we have for copy_file_range().
        */
-      if (try_sendfile)
+      if (try_sendfile && max_bytes != (off_t) -1)
         {
           n = sendfile (fdt, fdf, NULL, max_bytes);
           if (n < 0)
@@ -883,7 +956,7 @@ glnx_regfile_copy_bytes (int fdf, int fdt, off_t max_bytes)
 gboolean
 glnx_file_copy_at (int                   src_dfd,
                    const char           *src_subpath,
-                   struct stat          *src_stbuf,
+                   const struct stat    *src_stbuf,
                    int                   dest_dfd,
                    const char           *dest_subpath,
                    GLnxFileCopyFlags     copyflags,
@@ -941,8 +1014,11 @@ glnx_file_copy_at (int                   src_dfd,
   if (glnx_regfile_copy_bytes (src_fd, tmp_dest.fd, (off_t) -1) < 0)
     return glnx_throw_errno_prefix (error, "regfile copy");
 
-  if (fchown (tmp_dest.fd, src_stbuf->st_uid, src_stbuf->st_gid) != 0)
-    return glnx_throw_errno_prefix (error, "fchown");
+  if (!(copyflags & GLNX_FILE_COPY_NOCHOWN))
+    {
+      if (fchown (tmp_dest.fd, src_stbuf->st_uid, src_stbuf->st_gid) != 0)
+        return glnx_throw_errno_prefix (error, "fchown");
+    }
 
   if (!(copyflags & GLNX_FILE_COPY_NOXATTRS))
     {
@@ -1002,8 +1078,7 @@ glnx_file_copy_at (int                   src_dfd,
  * contents.  This and other behavior can be controlled via @flags.
  *
  * Note that no metadata from the existing file is preserved, such as
- * uid/gid or extended attributes.  The default mode will be `0666`,
- * modified by umask.
+ * uid/gid or extended attributes.  The default mode will be `0644`.
  */ 
 gboolean
 glnx_file_replace_contents_at (int                   dfd,
@@ -1025,7 +1100,7 @@ glnx_file_replace_contents_at (int                   dfd,
  * @subpath: Subpath
  * @buf: (array len=len) (element-type guint8): File contents
  * @len: Length (if `-1`, assume @buf is `NUL` terminated)
- * @mode: File mode; if `-1`, use `0666 - umask`
+ * @mode: File mode; if `-1`, use `0644`
  * @flags: Flags
  * @cancellable: Cancellable
  * @error: Error
@@ -1042,11 +1117,16 @@ glnx_file_replace_contents_with_perms_at (int                   dfd,
                                           uid_t                 uid,
                                           gid_t                 gid,
                                           GLnxFileReplaceFlags  flags,
-                                          GCancellable         *cancellable,
+                                          G_GNUC_UNUSED GCancellable *cancellable,
                                           GError              **error)
 {
   char *dnbuf = strdupa (subpath);
   const char *dn = dirname (dnbuf);
+  gboolean increasing_mtime = (flags & GLNX_FILE_REPLACE_INCREASING_MTIME) != 0;
+  gboolean nodatasync = (flags & GLNX_FILE_REPLACE_NODATASYNC) != 0;
+  gboolean datasync_new = (flags & GLNX_FILE_REPLACE_DATASYNC_NEW) != 0;
+  struct stat stbuf;
+  gboolean has_stbuf = FALSE;
 
   dfd = glnx_dirfd_canonicalize (dfd);
 
@@ -1061,7 +1141,7 @@ glnx_file_replace_contents_with_perms_at (int                   dfd,
                                       &tmpf, error))
     return FALSE;
 
-  if (len == -1)
+  if (len == (gsize) -1)
     len = strlen ((char*)buf);
 
   if (!glnx_try_fallocate (tmpf.fd, 0, len, error))
@@ -1070,33 +1150,54 @@ glnx_file_replace_contents_with_perms_at (int                   dfd,
   if (glnx_loop_write (tmpf.fd, buf, len) < 0)
     return glnx_throw_errno_prefix (error, "write");
 
-  if (!(flags & GLNX_FILE_REPLACE_NODATASYNC))
+  if (!nodatasync || increasing_mtime)
     {
-      struct stat stbuf;
-      gboolean do_sync;
-
       if (!glnx_fstatat_allow_noent (dfd, subpath, &stbuf, AT_SYMLINK_NOFOLLOW, error))
         return FALSE;
-      if (errno == ENOENT)
-        do_sync = (flags & GLNX_FILE_REPLACE_DATASYNC_NEW) > 0;
+      has_stbuf = errno != ENOENT;
+    }
+
+  if (!nodatasync)
+    {
+      gboolean do_sync;
+      if (!has_stbuf)
+        do_sync = datasync_new;
       else
         do_sync = TRUE;
 
       if (do_sync)
         {
-          if (fdatasync (tmpf.fd) != 0)
+          if (TEMP_FAILURE_RETRY (fdatasync (tmpf.fd)) != 0)
             return glnx_throw_errno_prefix (error, "fdatasync");
         }
     }
 
   if (uid != (uid_t) -1)
     {
-      if (fchown (tmpf.fd, uid, gid) != 0)
+      if (TEMP_FAILURE_RETRY (fchown (tmpf.fd, uid, gid)) != 0)
         return glnx_throw_errno_prefix (error, "fchown");
     }
 
-  if (fchmod (tmpf.fd, mode) != 0)
+  if (TEMP_FAILURE_RETRY (fchmod (tmpf.fd, mode)) != 0)
     return glnx_throw_errno_prefix (error, "fchmod");
+
+  if (increasing_mtime && has_stbuf)
+    {
+      struct stat fd_stbuf;
+
+      if (fstat (tmpf.fd, &fd_stbuf) != 0)
+        return glnx_throw_errno_prefix (error, "fstat");
+
+      /* We want to ensure that the new file has a st_mtime (i.e. the second precision)
+       * is incrementing to avoid mtime check issues when files change often.
+       */
+      if (fd_stbuf.st_mtime <= stbuf.st_mtime)
+        {
+          struct timespec ts[2] = { {0, UTIME_OMIT}, {stbuf.st_mtime + 1, 0} };
+          if (TEMP_FAILURE_RETRY (futimens (tmpf.fd, ts)) != 0)
+            return glnx_throw_errno_prefix (error, "futimens");
+        }
+    }
 
   if (!glnx_link_tmpfile_at (&tmpf, GLNX_LINK_TMPFILE_REPLACE,
                              dfd, subpath, error))
