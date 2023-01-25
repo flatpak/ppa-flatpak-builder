@@ -9,14 +9,13 @@ Build-Depends:
  attr <!nocheck>,
  automake (>= 1.14.1),
  ca-certificates <!nocheck>,
- dbus,
  debhelper-compat (= 13),
  debugedit (>= 1:5.0),
  desktop-file-utils <!nocheck>,
  dh-exec (>= 0.23~),
  docbook-xml <!nodoc>,
  docbook-xsl <!nodoc>,
- flatpak (>= 0.99.1),
+ flatpak (>= 1.12.4),
  fuse <!nocheck>,
  git <!nocheck>,
  gtk-update-icon-cache <!nocheck>,
@@ -27,7 +26,7 @@ Build-Depends:
  libcurl4-gnutls-dev,
  libdw-dev (>= 0.172),
  libelf-dev,
- libflatpak-dev (>= 0.99.1),
+ libflatpak-dev (>= 1.12.4),
  libglib2.0-dev (>= 2.44),
  libjson-glib-dev,
  libostree-dev (>= 2017.14),
@@ -40,7 +39,7 @@ Build-Depends:
  shared-mime-info <!nocheck>,
  xmlto <!nodoc>,
  xsltproc <!nodoc>,
-Standards-Version: 4.6.0
+Standards-Version: 4.6.1
 Homepage: https://flatpak.org/
 Vcs-Git: https://salsa.debian.org/debian/flatpak-builder.git -b debian/experimental
 Vcs-Browser: https://salsa.debian.org/debian/flatpak-builder
@@ -50,8 +49,8 @@ Package: flatpak-builder
 Architecture: linux-any
 Depends:
  debugedit (>= 1:5.0),
- gir1.2-flatpak-1.0 (>= 0.99.1),
- flatpak (>= 0.99.1),
+ gir1.2-flatpak-1.0 (>= 1.12.4),
+ flatpak (>= 1.12.4),
  ostree (>= 2017.14),
  ${misc:Depends},
  ${shlibs:Depends},
