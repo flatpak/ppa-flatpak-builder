@@ -5,26 +5,10 @@ flatpak-builder (1.3.1-1) UNRELEASED; urgency=medium
     - update GLib version
     - drop libsoup
   * d/copyright: Update
-  * Remove constraints unnecessary since buster (oldstable):
-    + Build-Depends: Drop versioned constraint on automake (>= 1.14.1).
-    + Build-Depends: Drop versioned constraint on dh-exec (>= 0.23~).
-    + Build-Depends: Drop versioned constraint on libarchive-dev (>= 2.8.0).
-    + Build-Depends: Drop versioned constraint on libdw-dev (>= 0.172).
-    + Build-Depends: Drop versioned constraint on libostree-dev (>= 2017.14).
-    + Build-Depends: Drop versioned constraint on libxml2-dev (>= 2.4).
-    + flatpak-builder: Drop versioned constraint on ostree (>= 2017.14) in
-      Depends.
-    + flatpak-builder: Drop conflict with removed package flatpak (<< 0.9.8-1~)
-      in Replaces.
-    + flatpak-builder-tests: Drop versioned constraint on ostree (>= 2017.14) in
-      Depends.
-    + flatpak-builder-tests: Drop conflict with removed package flatpak-tests
-      (<< 0.9.12) in Replaces.
-    + flatpak-builder-tests: Drop conflict with removed package flatpak-tests
-      (<< 0.9.12) in Breaks.
-  * Update standards version to 4.6.2, no changes needed.
+  * Remove version constraints unnecessary since Debian 10
+  * Update standards version to 4.6.2 (no changes needed)
 
- -- Simon McVittie <smcv@debian.org>  Wed, 25 Jan 2023 10:58:41 +0000
+ -- Simon McVittie <smcv@debian.org>  Wed, 25 Jan 2023 11:00:53 +0000
 
 flatpak-builder (1.2.3-1) unstable; urgency=medium
 
