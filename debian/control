@@ -7,12 +7,12 @@ Uploaders:
  Simon McVittie <smcv@debian.org>,
 Build-Depends:
  attr <!nocheck>,
- automake (>= 1.14.1),
+ automake,
  ca-certificates <!nocheck>,
  debhelper-compat (= 13),
  debugedit (>= 1:5.0),
  desktop-file-utils <!nocheck>,
- dh-exec (>= 0.23~),
+ dh-exec,
  docbook-xml <!nodoc>,
  docbook-xsl <!nodoc>,
  flatpak (>= 1.12.4),
@@ -20,17 +20,17 @@ Build-Depends:
  git <!nocheck>,
  gtk-update-icon-cache <!nocheck>,
  hicolor-icon-theme <!nocheck>,
- libarchive-dev (>= 2.8.0),
+ libarchive-dev,
  libattr1-dev,
  libcap-dev,
  libcurl4-gnutls-dev,
- libdw-dev (>= 0.172),
+ libdw-dev,
  libelf-dev,
  libflatpak-dev (>= 1.12.4),
  libglib2.0-dev (>= 2.66),
  libjson-glib-dev,
- libostree-dev (>= 2017.14),
- libxml2-dev (>= 2.4),
+ libostree-dev,
+ libxml2-dev,
  libyaml-dev,
  ostree <!nocheck>,
  procps,
@@ -50,7 +50,7 @@ Depends:
  debugedit (>= 1:5.0),
  gir1.2-flatpak-1.0 (>= 1.12.4),
  flatpak (>= 1.12.4),
- ostree (>= 2017.14),
+ ostree,
  ${misc:Depends},
  ${shlibs:Depends},
 Recommends:
@@ -65,8 +65,6 @@ Suggests:
  brz,
  p7zip-full,
  subversion,
-Replaces:
- flatpak (<< 0.9.8-1~),
 Description: Flatpak application building helper
  Flatpak installs, manages and runs sandboxed desktop application bundles.
  See the flatpak package for a more comprehensive description.
@@ -77,10 +75,6 @@ Description: Flatpak application building helper
 Package: flatpak-builder-tests
 Architecture: linux-any
 Section: misc
-Breaks:
- flatpak-tests (<< 0.9.12),
-Replaces:
- flatpak-tests (<< 0.9.12),
 Depends:
  attr,
  ca-certificates,
@@ -90,7 +84,7 @@ Depends:
  git,
  gtk-update-icon-cache,
  make,
- ostree (>= 2017.14),
+ ostree,
  shared-mime-info,
  ${misc:Depends},
  ${shlibs:Depends},
