@@ -1,10 +1,12 @@
-flatpak-builder (1.2.3-2) UNRELEASED; urgency=medium
+flatpak-builder (1.3.1-1) UNRELEASED; urgency=medium
 
-  * d/p/Remove-FUSE-performance-flags-no-longer-supported-with-FU.patch:
-    Remove patch that was previously in experimental, no longer needed
-    with version 1.2.2
+  * New upstream release
+  * d/control: Update dependencies
+    - update GLib version
+    - drop libsoup
+  * d/copyright: Update
 
- -- Simon McVittie <smcv@debian.org>  Wed, 25 Jan 2023 10:48:19 +0000
+ -- Simon McVittie <smcv@debian.org>  Wed, 25 Jan 2023 10:58:41 +0000
 
 flatpak-builder (1.2.3-1) unstable; urgency=medium
 
