@@ -6,14 +6,22 @@ Files:
  *
 Copyright:
  © 1995-1997 Peter Mattis, Spencer Kimball and Josh MacDonald
+ © 1998 Manish Singh
+ © 1998 Tim Janik
  © 2010-2011 Lennart Poettering
- © 2011-2015 Colin Walters
+ © 2011-2016 Colin Walters
+ © 2014 Dan Winship
  © 2014-2016 Alexander Larsson
- © 2014-2018 Red Hat, Inc
+ © 2014-2022 Red Hat, Inc
+ © 2015 Canonical Limited
  © 2016-2017 Free Software Foundation, Inc.
  © 2016 Zbigniew Jędrzejewski-Szmek
+ © 2017 Emmanuele Bassi
+ © 2017-2020 Endless OS Foundation LLC
  © 2018 Codethink Limited
-License: LGPL-2.1+
+ © 2020 Niels De Graef
+ © 2019-2022 Collabora Ltd.
+License: LGPL-2+ and LGPL-2.1+
 
 Files:
  acinclude.m4
@@ -41,7 +49,8 @@ Files:
  debian/*
 Copyright:
  © 2015 David King <amigadave@amigadave.com>
- © 2016-2018 Collabora Ltd.
+ © 2016-2023 Collabora Ltd.
+ © 2023 Simon McVittie
 License: LGPL-2.1+
 
 License: GPL-2+
