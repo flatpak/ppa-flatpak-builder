@@ -1,0 +1,52 @@
+From: Simon McVittie <smcv@debian.org>
+Date: Wed, 25 Jan 2023 11:22:47 +0000
+Subject: Add missing test data from 1.3.1
+
+Forwarded: not-needed
+---
+ tests/org.test.Deprecated.SHA1.archive.yaml | 14 ++++++++++++++
+ tests/org.test.Deprecated.SHA1.file.yaml    | 14 ++++++++++++++
+ 2 files changed, 28 insertions(+)
+ create mode 100644 tests/org.test.Deprecated.SHA1.archive.yaml
+ create mode 100644 tests/org.test.Deprecated.SHA1.file.yaml
+
+diff --git a/tests/org.test.Deprecated.SHA1.archive.yaml b/tests/org.test.Deprecated.SHA1.archive.yaml
+new file mode 100644
+index 0000000..d64141b
+--- /dev/null
++++ b/tests/org.test.Deprecated.SHA1.archive.yaml
+@@ -0,0 +1,14 @@
++app-id: org.test.Deprecated.SHA1
++runtime: org.test.Platform
++sdk: org.test.Sdk
++command: hello.sh
++modules:
++  - name: hello
++    buildsystem: simple
++    build-commands:
++      - mkdir -p /app/bin
++      - cp hello.sh /app/bin/hello.sh
++    sources:
++      - type: archive
++        path: hello.tar.xz
++        sha1: 0d2bf9dcdc338fa1ce97ae628b96244411b8d326
+diff --git a/tests/org.test.Deprecated.SHA1.file.yaml b/tests/org.test.Deprecated.SHA1.file.yaml
+new file mode 100644
+index 0000000..ff487d0
+--- /dev/null
++++ b/tests/org.test.Deprecated.SHA1.file.yaml
+@@ -0,0 +1,14 @@
++app-id: org.test.Deprecated.SHA1
++runtime: org.test.Platform
++sdk: org.test.Sdk
++command: hello.sh
++modules:
++  - name: hello
++    buildsystem: simple
++    build-commands:
++      - mkdir -p /app/bin
++      - cp hello.sh /app/bin/hello.sh
++    sources:
++      - type: file
++        path: hello.sh
++        sha1: e1f2618c8c35d282026ef57dce85c5cb6df1f27b
