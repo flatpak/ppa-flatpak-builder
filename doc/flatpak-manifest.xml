@@ -1,6 +1,6 @@
 <?xml version='1.0'?> <!--*-nxml-*-->
-<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
-    "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+    "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">
 
 <refentry id="flatpak-manifest">
 
@@ -196,12 +196,12 @@
                 </varlistentry>
                 <varlistentry>
                     <term><option>inherit-extensions</option> (array of strings)</term>
-                    <listitem><para>Inherit these extra extensions points from the base application or sdk when
+                    <listitem><para>Inherit these extra extension points from the base application or sdk when
                     finishing the build.</para></listitem>
                 </varlistentry>
                 <varlistentry>
                     <term><option>inherit-sdk-extensions</option> (array of strings)</term>
-                    <listitem><para>Inherit these extra extensions points from the base application or sdk when
+                    <listitem><para>Inherit these extra extension points from the base application or sdk when
                     finishing the build, but do not inherit them into the platform.</para></listitem>
                 </varlistentry>
 
@@ -259,7 +259,7 @@
                 </varlistentry>
                 <varlistentry>
                     <term><option>rename-appdata-file</option> (string)</term>
-                    <listitem><para>Any appdata file with this name will be renamed to a name based on id during the cleanup phase.</para></listitem>
+                    <listitem><para>Any appdata (metainfo) file with this name will be renamed to a name based on id during the cleanup phase.</para></listitem>
                 </varlistentry>
                 <varlistentry>
                     <term><option>rename-icon</option> (string)</term>
@@ -267,7 +267,7 @@
                 </varlistentry>
                 <varlistentry>
                     <term><option>appdata-license</option> (string)</term>
-                    <listitem><para>Replace the appdata
+                    <listitem><para>Replace the appdata (metainfo)
                     project_license field with this string. This is
                     useful as the upstream license is typically only
                     about the application itself, whereas the bundled
@@ -675,7 +675,7 @@
                         <term><option>archive-type</option> (string)</term>
                         <listitem><para>
                             The type of archive if it cannot be guessed from the path. Possible values are "rpm", "tar",
-                            "tar-gzip", "tar-compress", "tar-bzip2", "tar-lzip", "tar-lzma", "tar-lzop", "tar-xz", "zip" and "7z".
+                            "tar-gzip", "tar-compress", "tar-bzip2", "tar-lzip", "tar-lzma", "tar-lzop", "tar-xz", "tar-zst", "zip" and "7z".
                         </para></listitem>
                     </varlistentry>
                     <varlistentry>
@@ -725,7 +725,7 @@
                     </varlistentry>
                     <varlistentry>
                         <term><option>branch</option> (string)</term>
-                        <listitem><para>The branch to use from the git repository</para></listitem>
+                        <listitem><para>The branch to use from the git repository. As of 1.2.3 this will try to auto-detect the upstream default branch. Previously this defaulted to <literal>master</literal>.</para></listitem>
                     </varlistentry>
                     <varlistentry>
                         <term><option>tag</option> (string)</term>
