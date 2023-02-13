@@ -1,3 +1,10 @@
+flatpak-builder (1.2.3-1flatpak1~22.04.1) UNRELEASED; urgency=medium
+
+  * Backport to Ubuntu 22.04 'jammy'
+    - No functional changes
+
+ -- Simon McVittie <smcv@debian.org>  Mon, 13 Feb 2023 10:40:20 +0000
+
 flatpak-builder (1.2.3-1) unstable; urgency=medium
 
   * New upstream release
@@ -223,6 +230,9 @@ flatpak-builder (1.0.8-2) unstable; urgency=medium
 
   * Upload to unstable
   * Standards-Version: 4.4.0 (no changes required)
+  * Use debhelper-compat 12
+    - Do not explicitly set --libexecdir since /usr/libexec is now the
+      default
 
  -- Simon McVittie <smcv@debian.org>  Tue, 09 Jul 2019 17:35:23 +0100
 
