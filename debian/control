@@ -11,7 +11,6 @@ Build-Depends:
  ca-certificates <!nocheck>,
  dbus,
  debhelper-compat (= 12),
- debugedit (>= 1:5.0),
  desktop-file-utils <!nocheck>,
  dh-exec (>= 0.23~),
  docbook-xml <!nodoc>,
@@ -49,7 +48,6 @@ Rules-Requires-Root: no
 Package: flatpak-builder
 Architecture: linux-any
 Depends:
- debugedit (>= 1:5.0),
  gir1.2-flatpak-1.0 (>= 1.12.4),
  flatpak (>= 1.12.4),
  ostree (>= 2017.14),
