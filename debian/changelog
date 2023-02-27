@@ -1,9 +1,11 @@
-flatpak-builder (1.2.3-1flatpak1~20.04.1) UNRELEASED; urgency=medium
+flatpak-builder (1.2.3-1flatpak1~20.04.1) focal; urgency=medium
 
   * Backport to Ubuntu 20.04 'focal'
     - Roll back to debhelper 12
+    - Build vendored debugedit instead of using the system copy, which
+      was too old in focal
 
- -- Simon McVittie <smcv@debian.org>  Mon, 27 Feb 2023 23:15:17 +0000
+ -- Simon McVittie <smcv@debian.org>  Mon, 27 Feb 2023 23:21:42 +0000
 
 flatpak-builder (1.2.3-1flatpak1~22.04.1) jammy; urgency=medium
 
