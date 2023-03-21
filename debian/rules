@@ -5,23 +5,21 @@ export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 
 binaries := $(shell dh_listpackages)
 %:
-	dh $@
+	dh $@ --buildsystem=meson
 
 configure_options =
 
 ifneq ($(filter nodoc,$(DEB_BUILD_OPTIONS)),)
-configure_options += --disable-docbook-docs
-configure_options += --disable-documentation
+configure_options += -Ddocs=disabled
 else
-configure_options += --enable-docbook-docs
-configure_options += --enable-documentation
+configure_options += -Ddocs=enabled
 endif
 
 override_dh_auto_configure:
 	dh_auto_configure -- \
-		--enable-installed-tests \
-		--with-yaml \
-		--with-system-debugedit=debugedit \
+		-Dinstalled_tests=true \
+		-Dtests=true \
+		-Dyaml=enabled \
 		$(configure_options)
 
 # debhelper >= 13.4 makes all of /usr/libexec executable, which is not

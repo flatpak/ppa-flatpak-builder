@@ -7,7 +7,6 @@ Uploaders:
  Simon McVittie <smcv@debian.org>,
 Build-Depends:
  attr <!nocheck>,
- automake,
  ca-certificates <!nocheck>,
  debhelper-compat (= 13),
  debugedit (>= 1:5.0),
@@ -32,6 +31,7 @@ Build-Depends:
  libostree-dev,
  libxml2-dev,
  libyaml-dev,
+ meson (>= 0.56.2),
  ostree <!nocheck>,
  procps,
  python3,
