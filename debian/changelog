@@ -1,8 +1,13 @@
-flatpak-builder (1.3.3-1) UNRELEASED; urgency=medium
+flatpak-builder (1.3.3-1) experimental; urgency=medium
 
   * New upstream development release
+  * Drop patches, applied upstream
+  * Build using Meson
+  * Explicitly depend on fuse 3
+  * d/p/dist/Add-tests-tap.test.in-missing-from-Autotools-dist.patch:
+    Add a missing file, fixing Meson build with installed-tests enabled
 
- -- Simon McVittie <smcv@debian.org>  Tue, 21 Mar 2023 09:52:15 +0000
+ -- Simon McVittie <smcv@debian.org>  Tue, 21 Mar 2023 10:21:08 +0000
 
 flatpak-builder (1.3.1-1) experimental; urgency=medium
 
