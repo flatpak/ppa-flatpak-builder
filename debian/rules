@@ -17,6 +17,7 @@ endif
 
 override_dh_auto_configure:
 	dh_auto_configure -- \
+		-Dfuse=3 \
 		-Dinstalled_tests=true \
 		-Dtests=true \
 		-Dyaml=enabled \
