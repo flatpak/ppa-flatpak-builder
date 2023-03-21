@@ -47,6 +47,7 @@ struct BuilderSourceArchive
   char         *dest_filename;
   gboolean      git_init;
   char         *archive_type;
+  char         *http_referer;
 };
 
 typedef struct
@@ -69,6 +70,7 @@ enum {
   PROP_MIRROR_URLS,
   PROP_GIT_INIT,
   PROP_ARCHIVE_TYPE,
+  PROP_HTTP_REFERER,
   LAST_PROP
 };
 
@@ -143,6 +145,7 @@ builder_source_archive_finalize (GObject *object)
   g_free (self->dest_filename);
   g_strfreev (self->mirror_urls);
   g_free (self->archive_type);
+  g_free (self->http_referer);
 
   G_OBJECT_CLASS (builder_source_archive_parent_class)->finalize (object);
 }
@@ -199,6 +202,10 @@ builder_source_archive_get_property (GObject    *object,
 
     case PROP_ARCHIVE_TYPE:
       g_value_set_string (value, self->archive_type);
+      break;
+
+    case PROP_HTTP_REFERER:
+      g_value_set_string (value, self->http_referer);
       break;
 
     default:
@@ -281,6 +288,11 @@ builder_source_archive_set_property (GObject      *object,
     case PROP_ARCHIVE_TYPE:
       g_free (self->archive_type);
       self->archive_type = g_value_dup_string (value);
+      break;
+
+    case PROP_HTTP_REFERER:
+      g_free (self->http_referer);
+      self->http_referer = g_value_dup_string (value);
       break;
 
     default:
@@ -453,6 +465,7 @@ builder_source_archive_download (BuilderSource  *source,
   if (!builder_context_download_uri (context,
                                      self->url,
                                      (const char **)self->mirror_urls,
+                                     self->http_referer,
                                      file,
                                      checksums,
                                      checksums_type,
@@ -478,16 +491,14 @@ tar (GFile   *dir,
 }
 
 static gboolean
-unzip (GFile   *dir,
-       GError **error,
-       ...)
+unzip (GFile       *dir,
+       const char  *zip_path,
+       GError     **error)
 {
   gboolean res;
-  va_list ap;
+  const char *argv[] = { "unzip", "-q", zip_path, NULL };
 
-  va_start (ap, error);
-  res = flatpak_spawn (dir, NULL, 0, error, "unzip", ap);
-  va_end (ap);
+  res = flatpak_spawnv (dir, NULL, 0, error, argv, NULL);
 
   return res;
 }
@@ -765,7 +776,7 @@ builder_source_archive_extract (BuilderSource  *source,
       if (zip_dest == NULL)
         return FALSE;
 
-      if (!unzip (zip_dest, error, archive_path, NULL))
+      if (!unzip (zip_dest, archive_path, error))
         return FALSE;
 
       if (self->strip_components > 0)
@@ -986,6 +997,13 @@ builder_source_archive_class_init (BuilderSourceArchiveClass *klass)
   g_object_class_install_property (object_class,
                                    PROP_ARCHIVE_TYPE,
                                    g_param_spec_string ("archive-type",
+                                                        "",
+                                                        "",
+                                                        NULL,
+                                                        G_PARAM_READWRITE));
+  g_object_class_install_property (object_class,
+                                   PROP_HTTP_REFERER,
+                                   g_param_spec_string ("referer",
                                                         "",
                                                         "",
                                                         NULL,

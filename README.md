@@ -2,22 +2,48 @@
   <img src="https://raw.githubusercontent.com/flatpak/flatpak/main/flatpak.png" alt="Flatpak icon"/>
 </p>
 
-Flatpak-builder is a tool for building flatpaks from sources.
+`flatpak-builder` is a tool for building [flatpaks](https://flatpak.org) from sources.
 
-See http://flatpak.org/ for more information.
+It reads a JSON or YAML based manifest to automatically download, build, and install projects which eventually get exported into a flatpak.
 
-Read documentation for the flatpak-builder [commandline tools](http://docs.flatpak.org/en/latest/flatpak-builder-command-reference.html).
+For information on the manifest format see `man flatpak-manifest`. A JSON Schema for this format is [available here](https://github.com/flatpak/flatpak-builder/blob/main/data/flatpak-manifest.schema.json).
 
-# INSTALLATION
+To use the JSON schema, in [an editor with support](https://code.visualstudio.com/docs/languages/json) for schemas, you can include this line in your manifest: 
 
-Flatpak-builder uses a traditional autoconf-style build mechanism. To build just do
-```
- ./configure [args]
- make
- make install
+```json
+  "$schema": "https://raw.githubusercontent.com/flatpak/flatpak-builder/main/data/flatpak-manifest.schema.json"
 ```
 
-Most configure arguments are documented in `./configure --help`. However,
-there are some options that are a bit more complicated.
+For information on the command-line tool see `man flatpak-builder` or the [online documentation](https://docs.flatpak.org/en/latest/flatpak-builder-command-reference.html).
 
-Flatpak-builder relies on flatpak, so it must be installed first.
+# Installation
+
+Flatpak-builder uses the [Meson build system](https://mesonbuild.com/). To build just do:
+```sh
+ meson setup _build
+ meson install -C _build
+```
+
+Configure arguments are documented in `meson_options.txt`.
+
+## Runtime dependencies
+
+The `flatpak-builder` tool requires `flatpak` being available on the host to
+function. Depending on the manifest used it also requires some commands be available on
+the host.
+
+Very commonly used:
+
+ * sh
+ * patch
+ * tar
+ * cp
+ * git
+ * 7z
+ * unzip
+
+Rarely used:
+
+ * rpm2cpio & cpio
+ * svn
+ * bzr

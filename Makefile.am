@@ -80,9 +80,34 @@ flatpak_builder_debugedit_CFLAGS =		\
 
 endif # !WITH_SYSTEM_DEBUGEDIT
 
-EXTRA_DIST += README.md
+EXTRA_DIST += 			\
+	README.md		\
+	meson.build		\
+	meson_options.txt	\
+	doc/meson.build		\
+	src/meson.build		\
+	tests/meson.build \
+	tests/test-keyring/meson.build \
+	tests/test-keyring2/meson.build \
+	subprojects/libglnx.wrap \
+	subprojects/libglnx/meson.build \
+	subprojects/libglnx/meson_options.txt \
+	subprojects/libglnx/tests/meson.build \
+	subprojects/libyaml.wrap \
+	$(NULL)
 
 AM_DISTCHECK_CONFIGURE_FLAGS =		\
 	--enable-documentation		\
 	--disable-maintainer-mode	\
 	--enable-introspection
+
+distcheck-hook: distcheck-hook-meson
+distcheck-hook-meson:
+	set -e; if command -v meson > /dev/null; then \
+		cd $(distdir); \
+		pwd; \
+		meson setup _build/meson; \
+		meson compile -C _build/meson -v; \
+		meson test -C _build/meson -v; \
+		rm -fr _build/meson; \
+	fi

@@ -9,7 +9,6 @@ AM_TESTS_ENVIRONMENT += FLATPAK_BUILDER_DEBUGEDIT=$$(cd $(top_builddir) && pwd)/
 endif
 
 dist_installed_test_extra_scripts += \
-	buildutil/tap-driver.sh \
 	tests/empty-configure \
 	tests/test-configure \
 	tests/make-test-app.sh \
@@ -45,7 +44,9 @@ dist_installed_test_data = \
 	tests/org.test.Deprecated.MD5.file.json \
 	tests/org.test.Deprecated.MD5.file.yaml \
 	tests/org.test.Deprecated.SHA1.archive.json \
+	tests/org.test.Deprecated.SHA1.archive.yaml \
 	tests/org.test.Deprecated.SHA1.file.json \
+	tests/org.test.Deprecated.SHA1.file.yaml \
 	tests/hello.sh \
 	tests/hello.tar.xz \
 	$(NULL)

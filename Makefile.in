@@ -883,10 +883,10 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 NULL = 
-dist_installed_test_extra_scripts = $(NULL) buildutil/tap-driver.sh \
-	tests/empty-configure tests/test-configure \
-	tests/make-test-app.sh tests/make-test-runtime.sh \
-	tests/make-test-bundles.sh tests/testpython.py $(NULL)
+dist_installed_test_extra_scripts = $(NULL) tests/empty-configure \
+	tests/test-configure tests/make-test-app.sh \
+	tests/make-test-runtime.sh tests/make-test-bundles.sh \
+	tests/testpython.py $(NULL)
 noinst_LTLIBRARIES = $(NULL) $(am__append_1) libglnx.la
 CLEANFILES = $(NULL) $(am__append_13) $(top_builddir)/libglnx-config.h
 MAINTAINERCLEANFILES = $(NULL)
@@ -898,7 +898,13 @@ EXTRA_DIST = buildutil/tap-driver.sh buildutil/tap-test \
 	subprojects/libglnx/LICENSES/LGPL-2.0-or-later.txt \
 	subprojects/libglnx/LICENSES/LGPL-2.1-or-later.txt \
 	subprojects/libglnx/libglnx.m4 $(NULL) tests/flatpak.supp \
-	tests/glib.supp README.md
+	tests/glib.supp README.md meson.build meson_options.txt \
+	doc/meson.build src/meson.build tests/meson.build \
+	tests/test-keyring/meson.build tests/test-keyring2/meson.build \
+	subprojects/libglnx.wrap subprojects/libglnx/meson.build \
+	subprojects/libglnx/meson_options.txt \
+	subprojects/libglnx/tests/meson.build subprojects/libyaml.wrap \
+	$(NULL)
 TESTS_ENVIRONMENT = \
 	G_TEST_SRCDIR="$(abs_srcdir)/tests"	\
 	G_TEST_BUILDDIR="$(abs_builddir)/tests"	\
@@ -1096,7 +1102,9 @@ dist_installed_test_data = \
 	tests/org.test.Deprecated.MD5.file.json \
 	tests/org.test.Deprecated.MD5.file.yaml \
 	tests/org.test.Deprecated.SHA1.archive.json \
+	tests/org.test.Deprecated.SHA1.archive.yaml \
 	tests/org.test.Deprecated.SHA1.file.json \
+	tests/org.test.Deprecated.SHA1.file.yaml \
 	tests/hello.sh \
 	tests/hello.tar.xz \
 	$(NULL)
@@ -2937,6 +2945,7 @@ distcheck: dist
 	test -d $(distdir)/_build || exit 0; \
 	dc_install_base=`$(am__cd) $(distdir)/_inst && pwd | sed -e 's,^[^:\\/]:[\\/],/,'` \
 	  && dc_destdir="$${TMPDIR-/tmp}/am-dc-$$$$/" \
+	  && $(MAKE) $(AM_MAKEFLAGS) distcheck-hook \
 	  && am__cwd=`pwd` \
 	  && $(am__cd) $(distdir)/_build/sub \
 	  && ../../configure \
@@ -3306,6 +3315,17 @@ $(top_builddir)/libglnx-config.h: Makefile.am
 	echo '#include "config.h"' > $@
 
 @VALGRIND_CHECK_RULES@
+
+distcheck-hook: distcheck-hook-meson
+distcheck-hook-meson:
+	set -e; if command -v meson > /dev/null; then \
+		cd $(distdir); \
+		pwd; \
+		meson setup _build/meson; \
+		meson compile -C _build/meson -v; \
+		meson test -C _build/meson -v; \
+		rm -fr _build/meson; \
+	fi
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
