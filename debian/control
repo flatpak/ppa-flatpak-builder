@@ -6,6 +6,8 @@ Uploaders:
  Matthias Klumpp <mak@debian.org>,
  Simon McVittie <smcv@debian.org>,
 Build-Depends:
+ appstream (>= 0.15.0),
+ appstream-compose (>= 0.15.0),
  attr <!nocheck>,
  ca-certificates <!nocheck>,
  debhelper-compat (= 13),
@@ -47,6 +49,8 @@ Rules-Requires-Root: no
 Package: flatpak-builder
 Architecture: linux-any
 Depends:
+ appstream (>= 0.15.0),
+ appstream-compose (>= 0.15.0),
  debugedit (>= 1:5.0),
  gir1.2-flatpak-1.0 (>= 1.12.4),
  flatpak (>= 1.12.4),
