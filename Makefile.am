@@ -87,6 +87,7 @@ EXTRA_DIST += 			\
 	doc/meson.build		\
 	src/meson.build		\
 	tests/meson.build \
+	tests/tap.test.in \
 	tests/test-keyring/meson.build \
 	tests/test-keyring2/meson.build \
 	subprojects/libglnx.wrap \
@@ -106,7 +107,7 @@ distcheck-hook-meson:
 	set -e; if command -v meson > /dev/null; then \
 		cd $(distdir); \
 		pwd; \
-		meson setup _build/meson; \
+		meson setup -Dinstalled_tests=true _build/meson; \
 		meson compile -C _build/meson -v; \
 		meson test -C _build/meson -v; \
 		rm -fr _build/meson; \

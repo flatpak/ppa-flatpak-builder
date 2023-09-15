@@ -2314,21 +2314,16 @@ cmpstringp (const void *p1, const void *p2)
 }
 
 static gboolean
-appstream_compose (GFile   *app_dir,
-                   GError **error,
-                   ...)
+appstreamcli_compose (GError **error,
+                      ...)
 {
   g_autoptr(GPtrArray) args = NULL;
   const gchar *arg;
   va_list ap;
 
   args = g_ptr_array_new_with_free_func (g_free);
-  g_ptr_array_add (args, g_strdup ("flatpak"));
-  g_ptr_array_add (args, g_strdup ("build"));
-  g_ptr_array_add (args, g_strdup ("--die-with-parent"));
-  g_ptr_array_add (args, g_strdup ("--nofilesystem=host:reset"));
-  g_ptr_array_add (args, g_file_get_path (app_dir));
-  g_ptr_array_add (args, g_strdup ("appstream-compose"));
+  g_ptr_array_add (args, g_strdup ("appstreamcli"));
+  g_ptr_array_add (args, g_strdup ("compose"));
 
   va_start (ap, error);
   while ((arg = va_arg (ap, const gchar *)))
@@ -2336,9 +2331,9 @@ appstream_compose (GFile   *app_dir,
   g_ptr_array_add (args, NULL);
   va_end (ap);
 
-  if (!builder_maybe_host_spawnv (NULL, NULL, 0, error, (const char * const *)args->pdata, NULL))
+  if (!flatpak_spawnv (NULL, NULL, 0, error, (const char * const *)args->pdata, NULL))
     {
-      g_prefix_error (error, "ERROR: appstream-compose failed: ");
+      g_prefix_error (error, "ERROR: appstreamcli compose failed: ");
       return FALSE;
     }
 
@@ -2430,16 +2425,16 @@ static GFile *
 builder_manifest_find_appdata_file (BuilderManifest *self,
                                     GFile           *app_root)
 {
-  /* We order these so that share/appdata/XXX.appdata.xml if found
+  /* We order these so that share/metainfo/$FLATPAK_ID.metainfo.xml is found
      first, as this is the target name, and apps may have both, which will
      cause issues with the rename. */
   const char *extensions[] = {
-    ".appdata.xml",
     ".metainfo.xml",
+    ".appdata.xml",
   };
   const char *dirs[] = {
-    "share/appdata",
     "share/metainfo",
+    "share/appdata",
   };
   g_autoptr(GFile) source = NULL;
 
@@ -2538,16 +2533,15 @@ builder_manifest_cleanup (BuilderManifest *self,
       appdata_source = builder_manifest_find_appdata_file (self, app_root);
       if (appdata_source)
         {
-          /* We always use the old name / dir, in case the runtime has older appdata tools */
-          g_autoptr(GFile) appdata_dir = g_file_resolve_relative_path (app_root, "share/appdata");
-          g_autofree char *appdata_basename = g_strdup_printf ("%s.appdata.xml", self->id);
+          g_autoptr(GFile) appdata_dir = g_file_resolve_relative_path (app_root, "share/metainfo");
+          g_autofree char *appdata_basename = g_strdup_printf ("%s.metainfo.xml", self->id);
 
           appdata_file = g_file_get_child (appdata_dir, appdata_basename);
 
           if (!g_file_equal (appdata_source, appdata_file))
             {
               g_autofree char *src_basename = g_file_get_basename (appdata_source);
-              g_print ("Renaming %s to share/appdata/%s\n", src_basename, appdata_basename);
+              g_print ("Renaming %s to share/metainfo/%s\n", src_basename, appdata_basename);
 
               if (!flatpak_mkdir_p (appdata_dir, NULL, error))
                 return FALSE;
@@ -2773,15 +2767,58 @@ builder_manifest_cleanup (BuilderManifest *self,
 
       if (self->appstream_compose && appdata_file != NULL)
         {
-          g_autofree char *basename_arg = g_strdup_printf ("--basename=%s", self->id);
-          g_print ("Running appstream-compose\n");
-          if (!appstream_compose (app_dir, error,
-                                  self->build_runtime ?  "--prefix=/usr" : "--prefix=/app",
-                                  "--origin=flatpak",
-                                  basename_arg,
-                                  self->id,
-                                  NULL))
-            return FALSE;
+          g_autofree char *origin = g_strdup_printf ("--origin=%s",
+                                                     builder_manifest_get_id (self));
+          g_autofree char *components_arg = g_strdup_printf ("--components=%s",
+                                                             self->id);
+          const char *app_root_path = flatpak_file_get_path_cached (app_root);
+          g_autofree char *result_root_arg = g_strdup_printf ("--result-root=%s", app_root_path);
+          g_autoptr(GFile) xml_dir = flatpak_build_file (app_root, "share/app-info/xmls", NULL);
+          g_autoptr(GFile) icon_out = flatpak_build_file (app_root, "share/app-info/icons/flatpak", NULL);
+          g_autoptr(GFile) media_dir = flatpak_build_file (app_root, "share/app-info/media", NULL);
+          g_autofree char *data_dir = g_strdup_printf ("--data-dir=%s",
+                                                       flatpak_file_get_path_cached (xml_dir));
+          g_autofree char *icon_dir = g_strdup_printf ("--icons-dir=%s",
+                                                       flatpak_file_get_path_cached (icon_out));
+          const char *opt_mirror_screenshots_url = builder_context_get_opt_mirror_screenshots_url (context);
+          gboolean opt_export_only = builder_context_get_opt_export_only (context);
+
+          if (opt_mirror_screenshots_url && !opt_export_only)
+            {
+              g_autofree char *url = g_build_filename (opt_mirror_screenshots_url, NULL);
+              g_autofree char *arg_base_url = g_strdup_printf ("--media-baseurl=%s", url);
+              g_autofree char *arg_media_dir =  g_strdup_printf ("--media-dir=%s",
+                                                                 flatpak_file_get_path_cached (media_dir));
+
+              g_print ("Running appstreamcli compose\n");
+              g_print ("Saving screenshots in %s\n", flatpak_file_get_path_cached (media_dir));
+              if (!appstreamcli_compose (error,
+                                         "--prefix=/",
+                                         origin,
+                                         arg_base_url,
+                                         arg_media_dir,
+                                         result_root_arg,
+                                         data_dir,
+                                         icon_dir,
+                                         components_arg,
+                                         app_root_path,
+                                         NULL))
+              return FALSE;
+            }
+          else
+            {
+              g_print ("Running appstreamcli compose\n");
+              if (!appstreamcli_compose (error,
+                                         "--prefix=/",
+                                         origin,
+                                         result_root_arg,
+                                         data_dir,
+                                         icon_dir,
+                                         components_arg,
+                                         app_root_path,
+                                         NULL))
+                return FALSE;
+            }
         }
 
       if (!builder_context_disable_rofiles (context, error))
