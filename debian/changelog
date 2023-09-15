@@ -1,3 +1,11 @@
+flatpak-builder (1.3.4-1) UNRELEASED; urgency=medium
+
+  * New upstream development release
+  * d/p/dist/Add-tests-tap.test.in-missing-from-Autotools-dist.patch:
+    Drop patch, no longer needed
+
+ -- Simon McVittie <smcv@debian.org>  Fri, 15 Sep 2023 10:28:18 +0100
+
 flatpak-builder (1.3.3-1) experimental; urgency=medium
 
   * New upstream development release
