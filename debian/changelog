@@ -1,10 +1,17 @@
-flatpak-builder (1.3.4-1) UNRELEASED; urgency=medium
+flatpak-builder (1.3.4-1) experimental; urgency=medium
 
   * New upstream development release
   * d/p/dist/Add-tests-tap.test.in-missing-from-Autotools-dist.patch:
     Drop patch, no longer needed
+  * Depend and build-depend on appstream and appstream-compose
+  * d/patches: Update to upstream commit 1.3.4-5-gc11f8590, excluding
+    CI-only changes
+    - d/p/builder-Fix-silent-truncation-of-32-bit-inodes.patch:
+      Fix cache lookups on filesystems with 64-bit inode numbers
+    - d/p/builder-module-Use-meson-setup-instead-of-meson.patch:
+      Run meson as `meson setup`
 
- -- Simon McVittie <smcv@debian.org>  Fri, 15 Sep 2023 10:28:18 +0100
+ -- Simon McVittie <smcv@debian.org>  Fri, 15 Sep 2023 10:39:19 +0100
 
 flatpak-builder (1.3.3-1) experimental; urgency=medium
 
