@@ -1,8 +1,8 @@
 AC_PREREQ([2.63])
 
 m4_define([flatpak_builder_major_version], [1])
-m4_define([flatpak_builder_minor_version], [3])
-m4_define([flatpak_builder_micro_version], [5])
+m4_define([flatpak_builder_minor_version], [4])
+m4_define([flatpak_builder_micro_version], [0])
 m4_define([flatpak_builder_version],
           [flatpak_builder_major_version.flatpak_builder_minor_version.flatpak_builder_micro_version])
 
@@ -13,7 +13,7 @@ AC_INIT([flatpak-builder],
         [http://flatpak.org/])
 
 AC_DEFINE([GLIB_VERSION_MIN_REQUIRED], [GLIB_VERSION_2_66], [Glib min version])
-AC_DEFINE([GLIB_VERSION_MAX_ALLOWED], [GLIB_VERSION_2_68], [Glib max version])
+AC_DEFINE([GLIB_VERSION_MAX_ALLOWED], [GLIB_VERSION_2_70], [Glib max version])
 
 GLIB_REQS=2.66
 OSTREE_REQS=2017.14
