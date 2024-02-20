@@ -1,8 +1,13 @@
-flatpak-builder (1.4.1-1) UNRELEASED; urgency=medium
+flatpak-builder (1.4.1-1) unstable; urgency=medium
 
   * New upstream stable release
+  * d/p/manifest-Don-t-emit-empty-id-in-provides-when-renaming.patch:
+    Add a post-release bug fix from upstream
+  * d/p/tests-Ensure-all-test-files-are-in-the-dist-tarball.patch,
+    d/p/dist/Add-files-that-were-missing-from-the-dist-tarball.patch:
+    Install missing test files to fix the autopkgtest
 
- -- Simon McVittie <smcv@debian.org>  Mon, 19 Feb 2024 21:48:34 +0000
+ -- Simon McVittie <smcv@debian.org>  Tue, 20 Feb 2024 10:50:18 +0000
 
 flatpak-builder (1.4.0-1) unstable; urgency=medium
 
