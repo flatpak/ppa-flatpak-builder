@@ -1,0 +1,63 @@
+From: Simon McVittie <smcv@collabora.com>
+Date: Tue, 20 Feb 2024 09:46:08 +0000
+Subject: tests: Ensure all test files are in the dist tarball
+
+Otherwise, the tests will fail when built from the dist tarball.
+
+Also install it if "as-installed" tests are enabled, so that it can be
+used in those tests too.
+
+Bug: https://github.com/flatpak/flatpak-builder/issues/585
+Signed-off-by: Simon McVittie <smcv@collabora.com>
+Forwarded: https://github.com/flatpak/flatpak-builder/pull/584
+---
+ tests/Makefile.am.inc | 4 ++++
+ tests/meson.build     | 4 ++++
+ 2 files changed, 8 insertions(+)
+
+diff --git a/tests/Makefile.am.inc b/tests/Makefile.am.inc
+index d960222..2b778b6 100644
+--- a/tests/Makefile.am.inc
++++ b/tests/Makefile.am.inc
+@@ -22,13 +22,17 @@ dist_installed_test_data = \
+ 	tests/org.test.Hello.png \
+ 	tests/org.test.Hello.desktop \
+ 	tests/Hello.desktop \
++	tests/org.test.Hello.appdata.xml \
+ 	tests/org.test.Hello.xml \
+ 	tests/Hello.xml \
++	tests/Hello.appdata.xml \
++	tests/Hello-desktop.appdata.xml \
+ 	tests/source1.json \
+ 	tests/source2.json \
+ 	tests/test.json \
+ 	tests/test.yaml \
+ 	tests/test-rename.json \
++	tests/test-rename-appdata.json \
+ 	tests/test-runtime.json \
+ 	tests/module1.json \
+ 	tests/module1.yaml \
+diff --git a/tests/meson.build b/tests/meson.build
+index 6ec405d..c324bf6 100644
+--- a/tests/meson.build
++++ b/tests/meson.build
+@@ -89,15 +89,19 @@ if get_option('installed_tests')
+     'org.test.Deprecated.SHA1.file.yaml',
+     'org.test.Hello.png',
+     'org.test.Hello.desktop',
++    'org.test.Hello.appdata.xml',
+     'Hello.desktop',
+     'org.test.Hello.xml',
+     'Hello.xml',
++    'Hello.appdata.xml',
++    'Hello-desktop.appdata.xml',
+     'org.test.Python.json',
+     'org.test.Python2.json',
+     'session.conf.in',
+     'source1.json',
+     'source2.json',
+     'test-rename.json',
++    'test-rename-appdata.json',
+     'test-runtime.json',
+     'test.json',
+     'test.yaml',
