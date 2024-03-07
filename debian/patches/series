@@ -1,3 +1,0 @@
-manifest-Don-t-emit-empty-id-in-provides-when-renaming.patch
-tests-Ensure-all-test-files-are-in-the-dist-tarball.patch
-dist/Add-files-that-were-missing-from-the-dist-tarball.patch
