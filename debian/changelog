@@ -86,6 +86,13 @@ flatpak-builder (1.2.1-2) experimental; urgency=medium
 
  -- Simon McVittie <smcv@debian.org>  Mon, 10 Jan 2022 12:05:31 +0000
 
+flatpak-builder (1.2.3-1flatpak1~22.04.1) jammy; urgency=medium
+
+  * Backport to Ubuntu 22.04 'jammy'
+    - No functional changes
+
+ -- Simon McVittie <smcv@debian.org>  Mon, 27 Feb 2023 21:38:27 +0000
+
 flatpak-builder (1.2.3-1) unstable; urgency=medium
 
   * New upstream release
@@ -144,11 +151,31 @@ flatpak-builder (1.2.1-1) unstable; urgency=medium
 
  -- Simon McVittie <smcv@debian.org>  Mon, 10 Jan 2022 11:20:56 +0000
 
+flatpak-builder (1.2.0-1flatpak1~20.04) focal; urgency=medium
+
+  * Merge from Debian
+  * Changes relative to Debian:
+    - Roll back to debhelper 12
+    - Set changelog merge driver for debian/changelog
+    - d/README.source: Add
+
+ -- Simon McVittie <smcv@debian.org>  Sun, 10 Oct 2021 17:24:50 +0100
+
 flatpak-builder (1.2.0-1) unstable; urgency=medium
 
   * New upstream stable release
 
  -- Simon McVittie <smcv@debian.org>  Sun, 10 Oct 2021 13:25:56 +0100
+
+flatpak-builder (1.1.2-1flatpak1~20.04) focal; urgency=medium
+
+  * Merge development version from Debian experimental
+  * Changes relative to Debian:
+    - Roll back to debhelper 12
+    - Set changelog merge driver for debian/changelog
+    - d/README.source: Add
+
+ -- Simon McVittie <smcv@debian.org>  Tue, 05 Oct 2021 20:58:14 +0100
 
 flatpak-builder (1.1.2-1) experimental; urgency=medium
 
@@ -156,6 +183,24 @@ flatpak-builder (1.1.2-1) experimental; urgency=medium
   * Standards-Version: 4.6.0 (no changes required)
 
  -- Simon McVittie <smcv@debian.org>  Thu, 23 Sep 2021 11:20:22 +0100
+
+flatpak-builder (1.1.1-1flatpak2~20.04) focal; urgency=medium
+
+  * Rebuild with arm64 enabled in PPA configuration.
+    No source changes.
+
+ -- Simon McVittie <smcv@debian.org>  Tue, 31 Aug 2021 13:42:05 +0100
+
+flatpak-builder (1.1.1-1flatpak1~20.04) focal; urgency=medium
+
+  * Resync packaging with 1.1.1-1 in Debian
+  * Changes relative to Debian:
+    - Backport to Ubuntu 20.04 'focal'
+      - Roll back to debhelper 12
+    - Set changelog merge driver for debian/changelog
+    - d/README.source: Add
+
+ -- Simon McVittie <smcv@debian.org>  Wed, 25 Aug 2021 19:12:36 +0100
 
 flatpak-builder (1.1.1-1) experimental; urgency=medium
 
@@ -167,6 +212,49 @@ flatpak-builder (1.1.1-1) experimental; urgency=medium
     - Drop dh_missing --fail-missing override, it is now the default
 
  -- Simon McVittie <smcv@debian.org>  Wed, 25 Aug 2021 17:52:01 +0100
+
+flatpak-builder (1.0.12-flatpak1~focal) focal; urgency=medium
+
+  * Rebuild for focal
+
+ -- Alexander Larsson <alexl@redhat.com>  Wed, 17 Feb 2021 11:17:00 +0100
+
+flatpak-builder (1.0.12-flatpak1~bionic) bionic; urgency=medium
+
+  * Update to 1.0.12
+
+ -- Alexander Larsson <alexl@redhat.com>  Wed, 17 Feb 2021 11:14:41 +0100
+
+flatpak-builder (1.0.11-flatpak1~focal) focal; urgency=medium
+
+  * Rebuild for focal
+
+ -- Alexander Larsson <alexl@redhat.com>  Fri, 03 Jul 2020 16:45:04 +0200
+
+flatpak-builder (1.0.11-flatpak1~bionic) bionic; urgency=medium
+
+  * Update to 1.0.11
+
+ -- Alexander Larsson <alexl@redhat.com>  Fri, 03 Jul 2020 16:35:53 +0200
+
+flatpak-builder (1.0.10-flatpak1~bionic) bionic; urgency=medium
+
+  * Update to 1.0.10
+
+ -- Alexander Larsson <alexl@redhat.com>  Thu, 19 Mar 2020 16:48:07 +0100
+
+flatpak-builder (1.0.9-flatpak1~bionic) bionic; urgency=medium
+
+  * Update to 1.0.9
+
+ -- Alexander Larsson <alexl@redhat.com>  Fri, 13 Sep 2019 16:31:45 +0200
+
+flatpak-builder (1.0.8-3~bionic) bionic; urgency=medium
+
+  [ Alexander Larsson ]
+  * Rebuild for bionic
+
+ -- Alexander Larsson <alexl@redhat.com>  Fri, 13 Sep 2019 16:22:39 +0200
 
 flatpak-builder (1.0.14-2) unstable; urgency=medium
 
