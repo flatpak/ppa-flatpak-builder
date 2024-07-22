@@ -1,3 +1,10 @@
+flatpak-builder (1.4.4-1~flatpak1~22.04.1) jammy; urgency=medium
+
+  * Backport to Ubuntu 22.04 'jammy'
+    - No functional changes
+
+ -- Simon McVittie <smcv@debian.org>  Mon, 22 Jul 2024 22:26:25 +0100
+
 flatpak-builder (1.4.4-1~flatpak1~24.04.1) noble; urgency=medium
 
   * Backport to Ubuntu 24.04 'noble'
