@@ -1,3 +1,10 @@
+flatpak-builder (1.4.4-1~flatpak1~24.04.1) UNRELEASED; urgency=medium
+
+  * Backport to Ubuntu 24.04 'jammy'
+    - No functional changes
+
+ -- Simon McVittie <smcv@debian.org>  Mon, 22 Jul 2024 22:10:02 +0100
+
 flatpak-builder (1.4.4-1) unstable; urgency=medium
 
   * New upstream stable release
