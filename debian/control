@@ -69,7 +69,7 @@ Recommends:
  zstd,
 Suggests:
  brz,
- p7zip-full,
+ 7zip,
  subversion,
 Description: Flatpak application building helper
  Flatpak installs, manages and runs sandboxed desktop application bundles.
