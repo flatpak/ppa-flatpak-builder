@@ -31,7 +31,6 @@ ifneq ($(filter %-tests,$(binaries)),)
 	chmod --recursive --changes a+rX,u+w,og-w debian/*-tests/usr/libexec/installed-tests
 endif
 
+# running the tests as during the build is not viable due to the dependencies (e.g. flatpak, dbus session)
+# instead they are run as a autopkgtest
 override_dh_auto_test:
-ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
-	debian/test.sh
-endif
