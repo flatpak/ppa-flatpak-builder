@@ -1,3 +1,17 @@
+flatpak-builder (1.4.4-2) unstable; urgency=medium
+
+  [ Simon McVittie ]
+  * d/upstream/metadata: Canonicalize sort order of keys
+  * d/upstream/metadata: Add Security-Contact field
+
+  [ Felix Geyer ]
+  * d/control: Suggest 7zip instead of p7zip-full (Closes: #1063573)
+  * Clean up unused python2 test script
+  * Stop trying to run the test suite during package build
+  * Add myself as uploader
+
+ -- Felix Geyer <fgeyer@debian.org>  Mon, 03 Mar 2025 18:16:06 +0100
+
 flatpak-builder (1.4.4-1) unstable; urgency=medium
 
   * New upstream stable release
