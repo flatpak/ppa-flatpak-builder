@@ -1,5 +1,12 @@
-Tests: gnome-desktop-testing
+Test-Command: env FLATPAK_BUILDER_TESTS_OFFLINE=1 debian/tests/gnome-desktop-testing
 Restrictions: isolation-machine
+Depends:
+ flatpak-builder-tests,
+ gnome-desktop-testing,
+Features: test-name=gnome-desktop-testing-offline
+
+Tests: gnome-desktop-testing
+Restrictions: flaky, isolation-machine, needs-internet
 Depends:
  flatpak-builder-tests,
  gnome-desktop-testing,
