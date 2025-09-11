@@ -1,10 +1,19 @@
-flatpak-builder (1.4.5-1) UNRELEASED; urgency=medium
+flatpak-builder (1.4.5-1) unstable; urgency=medium
 
   * New upstream stable release
+  * Recommend libarchive-tools (for bsdunzip) instead of Info-Zip unzip.
+    Upstream has changed the tool they use to unpack zip files in response
+    to security concerns about Info-Zip unzip.
   * d/watch: Convert to v5 format
   * d/salsa-ci.yml: Use recommended recipe
+  * d/p/tests-Fix-incorrect-paths-for-test-files.patch:
+    Add a post-release bugfix from upstream
+  * d/p/tests-Add-a-way-to-skip-the-test-involving-mirroring-scre.patch,
+    d/tests: Mark an Internet-dependent test as needs-internet and flaky
+  * d/copyright: Don't quote the FSF's former postal address here
+  * Standards-Version: 4.7.2 (no changes required)
 
- -- Simon McVittie <smcv@debian.org>  Thu, 11 Sep 2025 09:57:39 +0100
+ -- Simon McVittie <smcv@debian.org>  Thu, 11 Sep 2025 11:15:43 +0100
 
 flatpak-builder (1.4.4-2) unstable; urgency=medium
 
