@@ -1,5 +1,6 @@
-flatpak-builder (1.4.4-3) UNRELEASED; urgency=medium
+flatpak-builder (1.4.5-1) UNRELEASED; urgency=medium
 
+  * New upstream stable release
   * d/watch: Convert to v5 format
   * d/salsa-ci.yml: Use recommended recipe
 
