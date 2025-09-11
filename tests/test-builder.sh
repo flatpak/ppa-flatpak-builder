@@ -23,7 +23,7 @@ set -euo pipefail
 
 skip_without_fuse
 
-echo "1..7"
+echo "1..8"
 
 setup_repo
 install_repo
@@ -49,6 +49,10 @@ cp $(dirname $0)/Hello-desktop.appdata.xml .
 cp $(dirname $0)/org.test.Hello.desktop .
 cp $(dirname $0)/org.test.Hello.xml .
 cp $(dirname $0)/org.test.Hello.appdata.xml .
+cp $(dirname $0)/org.flatpak_builder.gui.desktop .
+cp $(dirname $0)/org.flatpak_builder.gui.json .
+cp $(dirname $0)/org.flatpak_builder.gui.metainfo.xml .
+cp $(dirname $0)/org.test.Hello.png .
 mkdir include1
 cp $(dirname $0)/module1.json include1/
 cp $(dirname $0)/module1.yaml include1/
@@ -61,6 +65,7 @@ cp $(dirname $0)/module2.yaml include1/include2/
 cp $(dirname $0)/source2.json include1/include2/
 cp $(dirname $0)/data2 include1/include2/
 cp $(dirname $0)/data2.patch include1/include2/
+echo "MY LICENSE" > ./LICENSE
 
 for MANIFEST in test.json test.yaml test-rename.json test-rename-appdata.json ; do
     echo "building manifest $MANIFEST" >&2
@@ -96,6 +101,8 @@ for MANIFEST in test.json test.yaml test-rename.json test-rename-appdata.json ; 
     ${FLATPAK} build appdir /app/bin/hello2.sh > hello_out2
     assert_file_has_content hello_out2 '^Hello world2, from a sandbox$'
 
+    assert_file_has_content appdir/files/share/licenses/org.test.Hello2/test/LICENSE '^MY LICENSE$'
+
     echo "ok build"
 done
 
@@ -127,3 +134,13 @@ ${FLATPAK_BUILDER} $FL_GPGARGS --repo=$REPO --force-clean runtimedir \
     test-runtime.json >&2
 
 echo "ok runtime build cleanup with build-args"
+
+# test screenshot ref commit
+${FLATPAK_BUILDER} --repo=$REPO/repo_sc --force-clean builddir_sc \
+    --mirror-screenshots-url=https://example.org/media \
+    org.flatpak_builder.gui.json >&2
+ostree --repo=$REPO/repo_sc refs|grep -Eq "^screenshots/$(flatpak --default-arch)$"
+ostree checkout --repo=$REPO/repo_sc -U screenshots/$(flatpak --default-arch) outdir_sc
+find outdir_sc -path "*/screenshots/image-1_orig.png" -type f | grep -q .
+
+echo "ok screenshot ref commit"
