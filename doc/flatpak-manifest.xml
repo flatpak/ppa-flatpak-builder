@@ -483,7 +483,7 @@
                 the build options and a list of sources to download and extract before building.
             </para>
             <para>
-                Modules can be nested, in order to turn related modules on and off with a single key.
+                Modules can be nested, in order to turn related modules on and off with a single key. Module scopes are always isolated, so nested modules do not inherit attributes from parent modules.
             </para>
             <para>
                 These are the properties that are accepted:
@@ -569,7 +569,7 @@
                 </varlistentry>
                 <varlistentry>
                     <term><option>build-options</option> (object)</term>
-                    <listitem><para>A build options object that can override global options</para></listitem>
+                    <listitem><para>A build options object that can override global options. Note that this is not inherited by nested modules.</para></listitem>
                 </varlistentry>
                 <varlistentry>
                     <term><option>build-commands</option> (array of strings)</term>
@@ -624,6 +624,10 @@
                 <varlistentry>
                     <term><option>test-commands</option> (array of strings)</term>
                     <listitem><para>Array of commands to run during the tests.</para></listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term><option>license-files</option> (array of strings)</term>
+                    <listitem><para>Array of paths to LICENSE files of the module.</para></listitem>
                 </varlistentry>
                 <varlistentry>
                     <term><option>modules</option> (array of objects or strings)</term>
