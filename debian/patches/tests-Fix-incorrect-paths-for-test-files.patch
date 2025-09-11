@@ -1,0 +1,30 @@
+From: bbhtt <bbhtt.zn0i8@slmail.me>
+Date: Sun, 7 Sep 2025 20:56:14 +0530
+Subject: tests: Fix incorrect paths for test files
+
+This fixes the meson build with `-Dinstalled_tests=true`
+
+Fixes b5a5f77857251c43cb087ed64b2d4b486be70896
+
+Origin: upstream, 1.5.0, commit:365f9c12c66e16535948ca0b522f2a3dc6131096
+---
+ tests/meson.build | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/tests/meson.build b/tests/meson.build
+index 5752ef5..46c84fa 100644
+--- a/tests/meson.build
++++ b/tests/meson.build
+@@ -105,9 +105,9 @@ if get_option('installed_tests')
+     'test-runtime.json',
+     'test.json',
+     'test.yaml',
+-    'tests/org.flatpak_builder.gui.desktop',
+-    'tests/org.flatpak_builder.gui.json',
+-    'tests/org.flatpak_builder.gui.metainfo.xml',
++    'org.flatpak_builder.gui.desktop',
++    'org.flatpak_builder.gui.json',
++    'org.flatpak_builder.gui.metainfo.xml',
+ 
+     install_dir: installed_testdir,
+     install_mode: 'rw-r--r--',
