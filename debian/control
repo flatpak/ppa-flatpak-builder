@@ -54,8 +54,8 @@ Recommends:
  binutils,
  elfutils,
  git,
+ libarchive-tools,
  patch,
- unzip,
  xz-utils,
  zstd,
 Suggests:
