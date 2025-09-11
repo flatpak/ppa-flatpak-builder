@@ -1,3 +1,10 @@
+flatpak-builder (1.4.4-3) UNRELEASED; urgency=medium
+
+  * d/watch: Convert to v5 format
+  * d/salsa-ci.yml: Use recommended recipe
+
+ -- Simon McVittie <smcv@debian.org>  Thu, 11 Sep 2025 09:57:39 +0100
+
 flatpak-builder (1.4.4-2) unstable; urgency=medium
 
   [ Simon McVittie ]
