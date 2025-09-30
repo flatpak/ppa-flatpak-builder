@@ -1,4 +1,5 @@
 Source: flatpak-builder
+X-Style: black
 Section: devel
 Priority: optional
 Maintainer: Utopia Maintenance Team <pkg-utopia-maintainers@lists.alioth.debian.org>
@@ -7,11 +8,11 @@ Uploaders:
  Matthias Klumpp <mak@debian.org>,
  Simon McVittie <smcv@debian.org>,
 Build-Depends:
+ debhelper-compat (= 13),
+ dh-exec,
  appstream (>= 0.15.0),
  appstream-compose (>= 0.15.0),
- debhelper-compat (= 13),
  debugedit (>= 1:5.0),
- dh-exec,
  docbook-xml <!nodoc>,
  docbook-xsl <!nodoc>,
  flatpak (>= 1.12.4),
@@ -44,9 +45,9 @@ Depends:
  appstream (>= 0.15.0),
  appstream-compose (>= 0.15.0),
  debugedit (>= 1:5.0),
- gir1.2-flatpak-1.0 (>= 1.12.4),
  flatpak (>= 1.12.4),
  fuse3,
+ gir1.2-flatpak-1.0 (>= 1.12.4),
  ostree,
  ${misc:Depends},
  ${shlibs:Depends},
@@ -59,9 +60,9 @@ Recommends:
  xz-utils,
  zstd,
 Suggests:
+ 7zip,
  brz,
  git-lfs,
- 7zip,
  subversion,
 Description: Flatpak application building helper
  Flatpak installs, manages and runs sandboxed desktop application bundles.
@@ -78,9 +79,9 @@ Depends:
  ca-certificates,
  desktop-file-utils,
  flatpak-builder (= ${binary:Version}),
- hicolor-icon-theme,
  git,
  gtk-update-icon-cache,
+ hicolor-icon-theme,
  libxml2-utils,
  make,
  ostree,
