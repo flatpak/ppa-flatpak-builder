@@ -89,6 +89,7 @@ static gboolean opt_log_session_bus;
 static gboolean opt_log_system_bus;
 static gboolean opt_yes;
 static gint64 opt_source_date_epoch = -1;
+static gchar *opt_as_url_policy = NULL;
 
 static GOptionEntry entries[] = {
   { "verbose", 'v', 0, G_OPTION_ARG_NONE, &opt_verbose, "Print debug information during command processing", NULL },
@@ -144,6 +145,7 @@ static GOptionEntry entries[] = {
   { "assumeyes", 'y', 0, G_OPTION_ARG_NONE, &opt_yes, N_("Automatically answer yes for all questions"), NULL },
   { "no-shallow-clone", 0, 0, G_OPTION_ARG_NONE, &opt_no_shallow_clone, "Don't use shallow clones when mirroring git repos", NULL },
   { "override-source-date-epoch", 0, 0, G_OPTION_ARG_INT64, &opt_source_date_epoch, "Use this timestamp to perform the build, instead of the last modification time of the manifest.", NULL },
+  { "compose-url-policy", 0, 0, G_OPTION_ARG_STRING, &opt_as_url_policy, "Set the AppStream compose URL policy to either 'partial' (default) or 'full'", "POLICY" },
   { NULL }
 };
 
@@ -218,6 +220,8 @@ do_export (BuilderContext *build_context,
   g_ptr_array_add (args, g_strdup ("build-export"));
 
   g_ptr_array_add (args, g_strdup_printf ("--arch=%s", builder_context_get_arch (build_context)));
+
+  g_ptr_array_add (args, g_strdup ("--update-appstream"));
 
   if (runtime)
     g_ptr_array_add (args, g_strdup ("--runtime"));
@@ -606,6 +610,29 @@ main (int    argc,
   builder_context_set_opt_export_only (build_context, opt_export_only);
   builder_context_set_opt_mirror_screenshots_url (build_context, opt_mirror_screenshots_url);
 
+  if (opt_mirror_screenshots_url)
+    {
+      BuilderAsUrlPolicy policy = BUILDER_AS_URL_POLICY_PARTIAL;
+
+      if (g_strcmp0 (opt_as_url_policy, "full") == 0)
+        policy = BUILDER_AS_URL_POLICY_FULL;
+      else if (g_strcmp0 (opt_as_url_policy, "partial") == 0)
+        policy = BUILDER_AS_URL_POLICY_PARTIAL;
+      else if (opt_as_url_policy != NULL)
+        {
+          g_printerr ("Invalid value for --compose-url-policy: %s\n", opt_as_url_policy);
+          return 1;
+        }
+
+      if (policy == BUILDER_AS_URL_POLICY_FULL && !appstream_has_version (0, 16, 3))
+        {
+          g_printerr ("AppStream version >= 0.16.3 required for 'full' compose URL policy\n");
+          return 1;
+        }
+
+      builder_context_set_as_url_policy (build_context, policy);
+    }
+
   git_init_email ();
 
   if (!builder_context_create_state_dir (build_context, &error))
@@ -862,6 +889,18 @@ main (int    argc,
         {
           if (opt_force_clean)
             {
+              GFile *state_dir = builder_context_get_state_dir (build_context);
+
+              if (g_file_equal (app_dir, state_dir) ||
+                  g_file_equal (app_dir, cwd_dir) ||
+                  g_file_has_prefix (cwd_dir, app_dir) ||
+                  g_file_has_prefix (state_dir, app_dir))
+                {
+                  g_printerr ("Refusing to delete current working directory, state directory "
+                              "or their parents\n");
+                  return 1;
+                }
+
               g_print ("Emptying app dir '%s'\n", app_dir_path);
               if (!flatpak_rm_rf (app_dir, NULL, &error))
                 {

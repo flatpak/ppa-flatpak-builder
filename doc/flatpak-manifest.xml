@@ -529,7 +529,7 @@
                 </varlistentry>
                 <varlistentry>
                     <term><option>rm-configure</option> (boolean)</term>
-                    <listitem><para>If true, remove the configure script before starting build</para></listitem>
+                    <listitem><para>If true, remove the configure script before starting build. This requires the configure script to exist in the source directory.</para></listitem>
                 </varlistentry>
                 <varlistentry>
                     <term><option>no-autogen</option> (boolean)</term>
@@ -771,6 +771,10 @@
                     <varlistentry>
                         <term><option>disable-submodules</option> (boolean)</term>
                         <listitem><para>Don't checkout the git submodules when cloning the repository.</para></listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term><option>disable-lfs</option> (boolean)</term>
+                        <listitem><para>Don't explicitly fetch or checkout LFS git objects. This will be ignored by Git if LFS filters are active in system or global gitconfig.</para></listitem>
                     </varlistentry>
                 </variablelist>
             </refsect3>
