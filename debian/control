@@ -60,6 +60,7 @@ Recommends:
  zstd,
 Suggests:
  brz,
+ git-lfs,
  7zip,
  subversion,
 Description: Flatpak application building helper
