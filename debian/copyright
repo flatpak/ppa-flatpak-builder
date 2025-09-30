@@ -27,6 +27,7 @@ License: LGPL-2+ and LGPL-2.1+
 Files:
  tests/Hello-desktop.appdata.xml
  tests/Hello.appdata.xml
+ tests/org.flatpak_builder.gui.metainfo.xml
  tests/org.test.Hello.appdata.xml
 Copyright:
  2024 GNOME Foundation Inc.
