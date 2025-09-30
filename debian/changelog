@@ -1,12 +1,14 @@
-flatpak-builder (1.4.6-1) UNRELEASED; urgency=medium
+flatpak-builder (1.4.6-1) unstable; urgency=medium
 
   * New upstream stable release
   * Drop patches, applied or fixed differently upstream
   * Revert separation of tests into online/offline
   * Add Suggests on git-lfs
   * Reformat packaging files using debputy
+  * d/copyright: Update
+  * Add a Lintian override for a non-executable script included in test data
 
- -- Simon McVittie <smcv@debian.org>  Tue, 30 Sep 2025 19:08:23 +0100
+ -- Simon McVittie <smcv@debian.org>  Tue, 30 Sep 2025 19:52:01 +0100
 
 flatpak-builder (1.4.5-1) unstable; urgency=medium
 
