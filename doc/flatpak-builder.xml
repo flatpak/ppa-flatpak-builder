@@ -474,7 +474,9 @@
 
                 <listitem><para>
                     Erase the previous contents of DIRECTORY if it is
-                    not empty.
+                    not empty. Since 1.4.6, deletion will be refused
+                    if DIRECTORY is the current working directory, the
+                    state directory, or any of their parent directories.
                 </para></listitem>
             </varlistentry>
 
@@ -584,6 +586,21 @@
                   Set this timestamp as SOURCE_DATE_EPOCH to perform the
                   build, instead of the last modification time of the manifest.
                   This is available since 1.3.1.
+                </para></listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><option>--compose-url-policy=POLICY</option></term>
+
+                <listitem><para>
+                  Set the AppStream compose URL policy. Accepted values
+                  are <literal>partial</literal> and <literal>full</literal>.
+                  <literal>full</literal> requires AppStream version >= 0.16.3.
+                  Defaults to <literal>partial</literal> if unspecified.
+                  This policy only takes effect when used in conjunction
+                  with <option>--mirror-screenshots-url=URL</option>;
+                  otherwise the Appstream catalogue will preserve
+                  the source media URLs.
                 </para></listitem>
             </varlistentry>
 
