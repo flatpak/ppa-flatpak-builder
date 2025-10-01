@@ -19,7 +19,7 @@ Build-Depends:
  libarchive-dev,
  libattr1-dev,
  libcap-dev,
- libcurl4-gnutls-dev,
+ libcurl4-openssl-dev | libcurl-dev,
  libdw-dev,
  libelf-dev,
  libflatpak-dev (>= 1.12.4),
