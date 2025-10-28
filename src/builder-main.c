@@ -107,7 +107,7 @@ static GOptionEntry entries[] = {
   { "disable-updates", 0, 0, G_OPTION_ARG_NONE, &opt_disable_updates, "Only download missing sources, never update to latest vcs version", NULL },
   { "download-only", 0, 0, G_OPTION_ARG_NONE, &opt_download_only, "Only download sources, don't build", NULL },
   { "bundle-sources", 0, 0, G_OPTION_ARG_NONE, &opt_bundle_sources, "Bundle module sources as runtime", NULL },
-  { "extra-sources", 0, 0, G_OPTION_ARG_STRING_ARRAY, &opt_sources_dirs, "Add a directory of sources specified by SOURCE-DIR, multiple uses of this option possible", "SOURCE-DIR"},
+  { "extra-sources", 0, 0, G_OPTION_ARG_STRING_ARRAY, &opt_sources_dirs, "Add an extra source directory with state directory structure. The option can be repeated", "SOURCE-DIR"},
   { "extra-sources-url", 0, 0, G_OPTION_ARG_STRING_ARRAY, &opt_sources_urls, "Add a url of sources specified by SOURCE-URL multiple uses of this option possible", "SOURCE-URL"},
   { "build-only", 0, 0, G_OPTION_ARG_NONE, &opt_build_only, "Stop after build, don't run clean and finish phases", NULL },
   { "finish-only", 0, 0, G_OPTION_ARG_NONE, &opt_finish_only, "Only run clean and finish and export phases", NULL },
@@ -345,7 +345,7 @@ out:
 static gboolean
 do_install (BuilderContext *build_context,
             const gchar    *repodir,
-            const gchar    *id,
+            GPtrArray      *manifest_ids,
             const gchar    *branch,
             GError        **error)
 {
@@ -369,11 +369,15 @@ do_install (BuilderContext *build_context,
     g_ptr_array_add (args, g_strdup ("--noninteractive"));
   g_ptr_array_add (args, g_strdup ("--reinstall"));
 
-  ref = flatpak_build_untyped_ref (id, branch,
-                                   builder_context_get_arch (build_context));
-
   g_ptr_array_add (args, g_strdup (repodir));
-  g_ptr_array_add (args, g_strdup (ref));
+
+  for (size_t i = 0; i < manifest_ids->len; i++)
+    {
+      const gchar *id = g_ptr_array_index (manifest_ids, i);
+      ref = flatpak_build_untyped_ref (id, branch,
+                                       builder_context_get_arch (build_context));
+      g_ptr_array_add (args, g_strdup (ref));
+    }
 
   g_ptr_array_add (args, NULL);
 
@@ -477,6 +481,7 @@ main (int    argc,
   gboolean is_show_manifest = FALSE;
   gboolean app_dir_is_empty = FALSE;
   gboolean prune_unused_stages = FALSE;
+  gboolean debug_exported = FALSE;
   g_autoptr(FlatpakContext) arg_context = NULL;
   g_autoptr(FlatpakTempDir) cleanup_manifest_dir = NULL;
   g_autofree char *manifest_basename = NULL;
@@ -1152,6 +1157,7 @@ main (int    argc,
               g_printerr ("Export failed: %s\n", error->message);
               return 1;
             }
+          debug_exported = TRUE;
         }
 
       for (l = builder_manifest_get_add_extensions (manifest); l != NULL; l = l->next)
@@ -1275,23 +1281,35 @@ main (int    argc,
         g_printerr ("NOTE: No export due to --require-changes, ignoring --install\n");
       else
         {
+          g_autoptr(GPtrArray) manifest_ids = g_ptr_array_new_with_free_func (g_free);
+          g_ptr_array_add (manifest_ids, g_strdup (builder_manifest_get_id (manifest)));
+
+          if (debug_exported)
+            g_ptr_array_add (manifest_ids, builder_manifest_get_debug_id (manifest));
+
           if (!do_install (build_context, flatpak_file_get_path_cached (export_repo),
-                           builder_manifest_get_id (manifest),
+                           manifest_ids,
                            builder_manifest_get_branch (manifest, build_context),
                            &error))
             {
               g_printerr ("Install failed: %s\n", error->message);
               return 1;
             }
-          if (builder_manifest_get_id_platform (manifest) &&
-              (!do_install (build_context, flatpak_file_get_path_cached (export_repo),
-                            builder_manifest_get_id_platform (manifest),
-                            builder_manifest_get_branch (manifest, build_context),
-                            &error)))
-              {
-                g_printerr ("Install failed: %s\n", error->message);
-                return 1;
-              }
+
+          if (builder_manifest_get_id_platform (manifest))
+            {
+              g_autoptr(GPtrArray) platform_ids = g_ptr_array_new_with_free_func (g_free);
+              g_ptr_array_add (platform_ids, g_strdup (builder_manifest_get_id_platform (manifest)));
+
+              if (!do_install (build_context, flatpak_file_get_path_cached (export_repo),
+                              platform_ids,
+                              builder_manifest_get_branch (manifest, build_context),
+                              &error))
+                {
+                  g_printerr ("Install failed: %s\n", error->message);
+                  return 1;
+                }
+            }
         }
     }
 
