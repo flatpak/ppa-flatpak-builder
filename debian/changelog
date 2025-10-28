@@ -1,3 +1,9 @@
+flatpak-builder (1.4.7-1) UNRELEASED; urgency=medium
+
+  * New upstream stable release
+
+ -- Simon McVittie <smcv@debian.org>  Tue, 28 Oct 2025 22:22:19 +0000
+
 flatpak-builder (1.4.6-2) unstable; urgency=medium
 
   * d/control: Prefer libcurl4-openssl-dev, matching libostree and Flatpak
