@@ -1256,6 +1256,8 @@ setup_build_args (GFile          *app_dir,
     g_ptr_array_add (args, g_strdup_printf ("--bind-mount=%s=%s", source_dir_path, source_dir_path_canonical));
 
   g_ptr_array_add (args, g_strdup_printf ("--bind-mount=%s%s=%s", builddir, module_name, source_dir_path_canonical));
+  g_ptr_array_add (args, g_strdup_printf ("--bind-mount=/run/active-build=%s", source_dir_path_canonical));
+
   if (cwd_subdir)
     g_ptr_array_add (args, g_strdup_printf ("--build-dir=%s%s/%s", builddir, module_name, cwd_subdir));
   else
@@ -1747,8 +1749,12 @@ builder_module_build_helper (BuilderModule   *self,
   g_autofree char *n_jobs = NULL;
   const char *make_cmd = NULL;
   const char *test_arg = NULL;
+  const char *cflags = NULL;
+  const char *cxxflags = NULL;
+  const char *ldflags = NULL;
 
   gboolean autotools = FALSE, cmake = FALSE, cmake_ninja = FALSE, meson = FALSE, simple = FALSE, qmake = FALSE;
+  gboolean build_has_network = FALSE;
   g_autoptr(GFile) configure_file = NULL;
   g_autoptr(GFile) build_dir = NULL;
   g_autofree char *build_dir_relative = NULL;
@@ -1791,7 +1797,12 @@ builder_module_build_helper (BuilderModule   *self,
   if (build_args == NULL)
     return FALSE;
 
+  build_has_network = builder_options_build_has_network (build_args);
+
   env = builder_options_get_env (self->build_options, context);
+  cflags  = g_environ_getenv (env, "CFLAGS");
+  cxxflags = g_environ_getenv (env, "CXXFLAGS");
+  ldflags  = g_environ_getenv (env, "LDFLAGS");
   config_opts = builder_options_get_config_opts (self->build_options, context, self->config_opts);
   secret_opts = builder_options_get_secret_opts (self->build_options, context, self->secret_opts);
   secret_env = builder_options_get_secret_env (self->build_options, context, self->secret_env);
@@ -2012,6 +2023,17 @@ builder_module_build_helper (BuilderModule   *self,
         {
           /* Meson's setup command is now meson setup */
           g_ptr_array_add (configure_args_arr, g_strdup ("setup"));
+         /*
+          * When project dependencies are absent, Meson by default tries
+          * to initialise fallbacks and attempts to download them over
+          * the network, returning a potentially misleading error
+          * message.
+          *
+          * Setting wrap-mode to `nodownload` instructs Meson to not try
+          * to use the network to fetch any resources
+          */
+          if (!build_has_network)
+            g_ptr_array_add (configure_args_arr, g_strdup ("--wrap-mode=nodownload"));
         }
 
       if (cmake || cmake_ninja)
@@ -2027,6 +2049,12 @@ builder_module_build_helper (BuilderModule   *self,
       else if (qmake)
         {
           g_ptr_array_add (configure_args_arr, g_strdup_printf ("PREFIX='%s'", prefix));
+          if (cflags)
+            g_ptr_array_add (configure_args_arr, g_strdup_printf ("QMAKE_CFLAGS+=%s", cflags));
+          if (cxxflags)
+            g_ptr_array_add (configure_args_arr, g_strdup_printf ("QMAKE_CXXFLAGS+=%s", cxxflags));
+          if (ldflags)
+            g_ptr_array_add (configure_args_arr, g_strdup_printf ("QMAKE_LFLAGS+=%s", ldflags));
           /* TODO: What parameter for qmake? */
         }
       else if (meson)
