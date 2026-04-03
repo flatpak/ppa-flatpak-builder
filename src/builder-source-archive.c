@@ -507,7 +507,7 @@ unzip (GFile       *dir,
        GError     **error)
 {
   gboolean res;
-  const char *argv[] = { "unzip", "-q", zip_path, NULL };
+  const char *argv[] = { "bsdunzip", "-q", zip_path, NULL };
 
   res = flatpak_spawnv (dir, NULL, 0, error, argv, NULL);
 
@@ -703,7 +703,7 @@ init_git (GFile   *dir,
   basename = g_file_get_basename (dir);
   if (!git (dir, error, "init", NULL) ||
       !git (dir, error, "add", "--ignore-errors", ".", NULL) ||
-      !git (dir, error, "commit", "-m", basename, NULL))
+      !git (dir, error, "commit", "--no-gpg-sign", "-m", basename, NULL))
     {
       g_free (basename);
       return FALSE;

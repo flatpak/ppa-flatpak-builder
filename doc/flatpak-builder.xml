@@ -474,7 +474,9 @@
 
                 <listitem><para>
                     Erase the previous contents of DIRECTORY if it is
-                    not empty.
+                    not empty. Since 1.4.6, deletion will be refused
+                    if DIRECTORY is the current working directory, the
+                    state directory, or any of their parent directories.
                 </para></listitem>
             </varlistentry>
 
@@ -524,10 +526,13 @@
                 <term><option>--mirror-screenshots-url=URL</option></term>
 
                 <listitem><para>
-                  Mirror any screenshots in the appstream and rewrite the appstream xml
-                  as if they were on the specified URL. The resulting files will
-                  be stored in the "screenshots" subdirectory in the app directory
-                  and needs to be copied to the specified URL for the appdata to work.
+                  Mirror any media in the appstream and rewrite the media URLs
+                  in the appstream xml to the specified URL. The resulting files
+                  will be stored in the "screenshots" subdirectory in the app directory
+                  for versions earlier than 1.3.4 and "files/share/app-info/media"
+                  subdirectory for newer versions. Since version 1.4.5 this
+                  will also create a screenshot ref in the exported OSTree
+                  repo for each architecture containing the mirrored media.
                 </para></listitem>
             </varlistentry>
 
@@ -537,6 +542,26 @@
                 <listitem><para>
                   When downloading sources (archives, files, git, bzr, svn), look in this
                   directory for pre-existing copies and use them instead of downloading.
+                  The directory must match the state directory structure:
+                  <itemizedlist>
+                    <listitem>
+                        <para>Files and archives must be inside the folder: <filename>downloads/&lt;sha256&gt;/</filename></para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            Sources of type <literal>git</literal>, <literal>bzr</literal> and <literal>svn</literal>
+                            must be inside the folder: <filename>&lt;type&gt;/&lt;converted-uri&gt;/</filename>
+                        </para>
+                    </listitem>
+                  </itemizedlist>
+                  The <literal>converted-uri</literal> is constructed from <literal>path</literal> or <literal>url</literal> (in case of <literal>git</literal>)
+                  and from <literal>url</literal> (in case of <literal>bzr</literal> and <literal>svn</literal>). <literal>://</literal> is converted to a single
+                  underscore and every other <literal>/</literal> is replaced by an underscore. For example, <literal>https://github.com/user/repo.git</literal>
+                  becomes <literal>https_github.com_user_repo.git</literal>.
+
+                  In case of <literal>svn</literal> sources if <literal>revision</literal> is present, the folder name is
+                  <filename>svn/&lt;converted-uri&gt;__r&lt;revision&gt;/</filename>. In case of <literal>git</literal>
+                  sources, it needs to be a mirrored clone.
                 </para></listitem>
             </varlistentry>
 
@@ -571,6 +596,31 @@
 
                 <listitem><para>
                   Don't use shallow clones when mirroring git repos.
+                </para></listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><option>--override-source-date-epoch</option></term>
+
+                <listitem><para>
+                  Set this timestamp as SOURCE_DATE_EPOCH to perform the
+                  build, instead of the last modification time of the manifest.
+                  This is available since 1.3.1.
+                </para></listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term><option>--compose-url-policy=POLICY</option></term>
+
+                <listitem><para>
+                  Set the AppStream compose URL policy. Accepted values
+                  are <literal>partial</literal> and <literal>full</literal>.
+                  <literal>full</literal> requires AppStream version >= 0.16.3.
+                  Defaults to <literal>partial</literal> if unspecified.
+                  This policy only takes effect when used in conjunction
+                  with <option>--mirror-screenshots-url=URL</option>;
+                  otherwise the Appstream catalogue will preserve
+                  the source media URLs.
                 </para></listitem>
             </varlistentry>
 

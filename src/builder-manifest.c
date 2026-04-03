@@ -1708,6 +1708,12 @@ builder_manifest_start (BuilderManifest *self,
                          self->sdk,
                          builder_manifest_get_runtime_version (self));
 
+  if (self->sdk_commit != NULL)
+    g_debug ("Using %s version %s commit %s",
+             self->sdk,
+             builder_manifest_get_runtime_version (self),
+             self->sdk_commit);
+
   sdk_path = flatpak_info_show_path (self->sdk, builder_manifest_get_runtime_version (self), context);
   if (sdk_path != NULL &&
       !builder_context_load_sdk_config (context, sdk_path, error))
@@ -1720,6 +1726,12 @@ builder_manifest_start (BuilderManifest *self,
                          self->runtime,
                          builder_manifest_get_runtime_version (self));
 
+  if (self->runtime_commit != NULL)
+    g_debug ("Using %s version %s commit %s",
+             self->runtime,
+             builder_manifest_get_runtime_version (self),
+             self->runtime_commit);
+
   if (self->base != NULL && *self->base != 0)
     {
       self->base_commit = flatpak (NULL, "info", arch_option, "--show-commit", self->base,
@@ -1727,6 +1739,12 @@ builder_manifest_start (BuilderManifest *self,
       if (!download_only && self->base_commit == NULL)
         return flatpak_fail (error, "Unable to find app %s version %s",
                              self->base, builder_manifest_get_base_version (self));
+
+      if (self->base_commit != NULL)
+        g_debug ("Using %s version %s commit %s",
+                 self->base,
+                 builder_manifest_get_base_version (self),
+                 self->base_commit);
     }
 
   if (!expand_modules (context, self->modules, &self->expanded_modules, names, error))
@@ -2101,7 +2119,7 @@ builder_manifest_build_shell (BuilderManifest *self,
   if (found == NULL)
     return flatpak_fail (error, "Can't find module %s", modulename);
 
-  if (!builder_module_build (found, NULL, context, TRUE, error))
+  if (!builder_module_build (found, self->id, NULL, context, TRUE, error))
     return FALSE;
 
   return TRUE;
@@ -2150,7 +2168,7 @@ builder_manifest_build (BuilderManifest *self,
             return FALSE;
           if (!builder_context_enable_rofiles (context, error))
             return FALSE;
-          if (!builder_module_build (m, cache, context, FALSE, error))
+          if (!builder_module_build (m, self->id, cache, context, FALSE, error))
             return FALSE;
           if (!builder_context_disable_rofiles (context, error))
             return FALSE;
@@ -2325,7 +2343,7 @@ _rename_icon (ForeachFile     *self,
            g_str_has_prefix (source_name + strlen (self->rename_icon), "-symbolic.")))
         {
           const char *extension = source_name + strlen (self->rename_icon);
-          g_autofree char *new_name;
+          g_autofree char *new_name = NULL;
           int res;
           if (!prefix)
             new_name = g_strconcat (self->id, extension, NULL);
@@ -2404,7 +2422,8 @@ cmpstringp (const void *p1, const void *p2)
 }
 
 static gboolean
-appstreamcli_compose (GError **error,
+appstreamcli_compose (GError             **error,
+                      BuilderAsUrlPolicy   as_url_policy,
                       ...)
 {
   g_autoptr(GPtrArray) args = NULL;
@@ -2415,7 +2434,10 @@ appstreamcli_compose (GError **error,
   g_ptr_array_add (args, g_strdup ("appstreamcli"));
   g_ptr_array_add (args, g_strdup ("compose"));
 
-  va_start (ap, error);
+  if (as_url_policy == BUILDER_AS_URL_POLICY_FULL)
+    g_ptr_array_add (args, g_strdup ("--no-partial-urls"));
+
+  va_start (ap, as_url_policy);
   while ((arg = va_arg (ap, const gchar *)))
     g_ptr_array_add (args, g_strdup (arg));
   g_ptr_array_add (args, NULL);
@@ -3048,6 +3070,7 @@ builder_manifest_cleanup (BuilderManifest *self,
                                                        flatpak_file_get_path_cached (icon_out));
           const char *opt_mirror_screenshots_url = builder_context_get_opt_mirror_screenshots_url (context);
           gboolean opt_export_only = builder_context_get_opt_export_only (context);
+          BuilderAsUrlPolicy as_url_policy = builder_context_get_as_url_policy (context);
 
           if (opt_mirror_screenshots_url && !opt_export_only)
             {
@@ -3059,6 +3082,7 @@ builder_manifest_cleanup (BuilderManifest *self,
               g_print ("Running appstreamcli compose\n");
               g_print ("Saving screenshots in %s\n", flatpak_file_get_path_cached (media_dir));
               if (!appstreamcli_compose (error,
+                                         as_url_policy,
                                          "--prefix=/",
                                          origin,
                                          arg_base_url,
@@ -3075,6 +3099,7 @@ builder_manifest_cleanup (BuilderManifest *self,
             {
               g_print ("Running appstreamcli compose\n");
               if (!appstreamcli_compose (error,
+                                         as_url_policy,
                                          "--prefix=/",
                                          origin,
                                          result_root_arg,

@@ -1,30 +1,25 @@
 Source: flatpak-builder
+X-Style: black
 Section: devel
 Priority: optional
 Maintainer: Utopia Maintenance Team <pkg-utopia-maintainers@lists.alioth.debian.org>
 Uploaders:
+ Felix Geyer <fgeyer@debian.org>,
  Matthias Klumpp <mak@debian.org>,
  Simon McVittie <smcv@debian.org>,
 Build-Depends:
+ debhelper-compat (= 13),
+ dh-exec,
  appstream (>= 0.15.0),
  appstream-compose (>= 0.15.0),
- attr <!nocheck>,
- ca-certificates <!nocheck>,
- debhelper-compat (= 13),
  debugedit (>= 1:5.0),
- desktop-file-utils <!nocheck>,
- dh-exec,
  docbook-xml <!nodoc>,
  docbook-xsl <!nodoc>,
  flatpak (>= 1.12.4),
- fuse3 <!nocheck>,
- git <!nocheck>,
- gtk-update-icon-cache <!nocheck>,
- hicolor-icon-theme <!nocheck>,
  libarchive-dev,
  libattr1-dev,
  libcap-dev,
- libcurl4-gnutls-dev,
+ libcurl4-openssl-dev | libcurl-dev,
  libdw-dev,
  libelf-dev,
  libflatpak-dev (>= 1.12.4),
@@ -32,16 +27,13 @@ Build-Depends:
  libjson-glib-dev,
  libostree-dev,
  libxml2-dev,
- libxml2-utils <!nocheck>,
  libyaml-dev,
  meson (>= 0.56.2),
- ostree <!nocheck>,
  procps,
  python3,
- shared-mime-info <!nocheck>,
  xmlto <!nodoc>,
  xsltproc <!nodoc>,
-Standards-Version: 4.6.2
+Standards-Version: 4.7.2
 Homepage: https://flatpak.org/
 Vcs-Git: https://salsa.debian.org/debian/flatpak-builder.git
 Vcs-Browser: https://salsa.debian.org/debian/flatpak-builder
@@ -53,9 +45,9 @@ Depends:
  appstream (>= 0.15.0),
  appstream-compose (>= 0.15.0),
  debugedit (>= 1:5.0),
- gir1.2-flatpak-1.0 (>= 1.12.4),
  flatpak (>= 1.12.4),
  fuse3,
+ gir1.2-flatpak-1.0 (>= 1.12.4),
  ostree,
  ${misc:Depends},
  ${shlibs:Depends},
@@ -63,13 +55,14 @@ Recommends:
  binutils,
  elfutils,
  git,
+ libarchive-tools,
  patch,
- unzip,
  xz-utils,
  zstd,
 Suggests:
+ 7zip,
  brz,
- p7zip-full,
+ git-lfs,
  subversion,
 Description: Flatpak application building helper
  Flatpak installs, manages and runs sandboxed desktop application bundles.
@@ -86,9 +79,9 @@ Depends:
  ca-certificates,
  desktop-file-utils,
  flatpak-builder (= ${binary:Version}),
- hicolor-icon-theme,
  git,
  gtk-update-icon-cache,
+ hicolor-icon-theme,
  libxml2-utils,
  make,
  ostree,

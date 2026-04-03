@@ -1,0 +1,31 @@
+{
+    "id": "org.flatpak_builder.gui",
+    "runtime": "org.test.Platform",
+    "sdk": "org.test.Sdk",
+    "command": "hello",
+    "appstream-compose": false,
+    "modules": [
+        {
+            "name": "hello_gui",
+            "buildsystem": "simple",
+            "build-commands": [
+                "mkdir -p ${FLATPAK_DEST}/bin",
+                "cp -vf hello.sh ${FLATPAK_DEST}/bin/hello",
+                "DIR=\"${FLATPAK_DEST}/share/app-info/media/org/flatpak_builder/gui/foobar/icons/64x64\" && mkdir -p \"$DIR\" && cp -vf org.test.Hello.png \"$DIR\""
+            ],
+            "sources": [
+                {
+                    "type": "script",
+                    "dest-filename": "hello.sh",
+                    "commands": [
+                        "echo \"Hello world, from a sandbox\""
+                    ]
+                },
+                {
+                    "type": "file",
+                    "path": "org.test.Hello.png"
+                }
+            ]
+        }
+    ]
+}

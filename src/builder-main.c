@@ -27,6 +27,7 @@
 
 #include <glib/gi18n.h>
 #include <gio/gio.h>
+#include <ostree.h>
 #include "libglnx.h"
 
 #include "builder-flatpak-utils.h"
@@ -88,6 +89,7 @@ static gboolean opt_log_session_bus;
 static gboolean opt_log_system_bus;
 static gboolean opt_yes;
 static gint64 opt_source_date_epoch = -1;
+static gchar *opt_as_url_policy = NULL;
 
 static GOptionEntry entries[] = {
   { "verbose", 'v', 0, G_OPTION_ARG_NONE, &opt_verbose, "Print debug information during command processing", NULL },
@@ -105,7 +107,7 @@ static GOptionEntry entries[] = {
   { "disable-updates", 0, 0, G_OPTION_ARG_NONE, &opt_disable_updates, "Only download missing sources, never update to latest vcs version", NULL },
   { "download-only", 0, 0, G_OPTION_ARG_NONE, &opt_download_only, "Only download sources, don't build", NULL },
   { "bundle-sources", 0, 0, G_OPTION_ARG_NONE, &opt_bundle_sources, "Bundle module sources as runtime", NULL },
-  { "extra-sources", 0, 0, G_OPTION_ARG_STRING_ARRAY, &opt_sources_dirs, "Add a directory of sources specified by SOURCE-DIR, multiple uses of this option possible", "SOURCE-DIR"},
+  { "extra-sources", 0, 0, G_OPTION_ARG_STRING_ARRAY, &opt_sources_dirs, "Add an extra source directory with state directory structure. The option can be repeated", "SOURCE-DIR"},
   { "extra-sources-url", 0, 0, G_OPTION_ARG_STRING_ARRAY, &opt_sources_urls, "Add a url of sources specified by SOURCE-URL multiple uses of this option possible", "SOURCE-URL"},
   { "build-only", 0, 0, G_OPTION_ARG_NONE, &opt_build_only, "Stop after build, don't run clean and finish phases", NULL },
   { "finish-only", 0, 0, G_OPTION_ARG_NONE, &opt_finish_only, "Only run clean and finish and export phases", NULL },
@@ -143,6 +145,7 @@ static GOptionEntry entries[] = {
   { "assumeyes", 'y', 0, G_OPTION_ARG_NONE, &opt_yes, N_("Automatically answer yes for all questions"), NULL },
   { "no-shallow-clone", 0, 0, G_OPTION_ARG_NONE, &opt_no_shallow_clone, "Don't use shallow clones when mirroring git repos", NULL },
   { "override-source-date-epoch", 0, 0, G_OPTION_ARG_INT64, &opt_source_date_epoch, "Use this timestamp to perform the build, instead of the last modification time of the manifest.", NULL },
+  { "compose-url-policy", 0, 0, G_OPTION_ARG_STRING, &opt_as_url_policy, "Set the AppStream compose URL policy to either 'partial' (default) or 'full'", "POLICY" },
   { NULL }
 };
 
@@ -218,6 +221,8 @@ do_export (BuilderContext *build_context,
 
   g_ptr_array_add (args, g_strdup_printf ("--arch=%s", builder_context_get_arch (build_context)));
 
+  g_ptr_array_add (args, g_strdup ("--update-appstream"));
+
   if (runtime)
     g_ptr_array_add (args, g_strdup ("--runtime"));
 
@@ -264,9 +269,83 @@ do_export (BuilderContext *build_context,
 }
 
 static gboolean
+commit_screenshot_ref (const char *repo_path,
+                       const char *app_dir_path,
+                       const char *arch,
+                       GError **error)
+{
+  g_autofree char *media_dir_path = NULL;
+  g_autoptr(GFile) media_dir = NULL;
+  g_autoptr(GFile) repo_file = NULL;
+  g_autoptr(OstreeRepo) repo = NULL;
+  g_autoptr(OstreeMutableTree) tree = NULL;
+  g_autoptr(GFile) tree_root = NULL;
+  g_autofree char *commit_checksum = NULL;
+  g_autofree char *ref_name = NULL;
+  g_autoptr(OstreeRepoCommitModifier) modifier = NULL;
+  gboolean ret = FALSE;
+
+  media_dir_path = g_build_filename (app_dir_path, "files/share/app-info/media", NULL);
+  media_dir = g_file_new_for_path (media_dir_path);
+
+  if (!g_file_query_exists (media_dir, NULL))
+    {
+      g_print ("Media directory does not exist, skipping commit\n");
+      return TRUE;
+    }
+
+  ref_name = g_strdup_printf ("screenshots/%s", arch);
+
+  repo_file = g_file_new_for_path (repo_path);
+  repo = ostree_repo_new (repo_file);
+  if (!ostree_repo_open (repo, NULL, error))
+    return FALSE;
+
+  modifier = ostree_repo_commit_modifier_new (OSTREE_REPO_COMMIT_MODIFIER_FLAGS_CANONICAL_PERMISSIONS,
+                                             NULL, NULL, NULL);
+  if (!ostree_repo_prepare_transaction (repo, NULL, NULL, error))
+    return FALSE;
+
+  tree = ostree_mutable_tree_new ();
+
+  if (!ostree_repo_write_directory_to_mtree (repo, media_dir, tree, modifier, NULL, error))
+    goto out;
+
+  if (!ostree_repo_write_mtree (repo, tree, &tree_root, NULL, error))
+    goto out;
+
+  if (!ostree_repo_write_commit (repo,
+                                 NULL,
+                                 NULL,
+                                 NULL,
+                                 NULL,
+                                 OSTREE_REPO_FILE (tree_root),
+                                 &commit_checksum,
+                                 NULL, error))
+    goto out;
+
+  ostree_repo_transaction_set_ref (repo, NULL, ref_name, commit_checksum);
+
+  if (!ostree_repo_commit_transaction (repo, NULL, NULL, error))
+    goto out;
+
+  g_print ("Committed screenshot ref: %s (%s)\n", ref_name, commit_checksum);
+  ret = TRUE;
+
+out:
+  if (!ret && repo)
+    {
+      if (!ostree_repo_abort_transaction (repo, NULL, NULL))
+        g_warning ("Failed to abort ostree transaction");
+    }
+
+  return ret;
+}
+
+static gboolean
 do_install (BuilderContext *build_context,
             const gchar    *repodir,
-            const gchar    *id,
+            GPtrArray      *manifest_ids,
             const gchar    *branch,
             GError        **error)
 {
@@ -290,11 +369,15 @@ do_install (BuilderContext *build_context,
     g_ptr_array_add (args, g_strdup ("--noninteractive"));
   g_ptr_array_add (args, g_strdup ("--reinstall"));
 
-  ref = flatpak_build_untyped_ref (id, branch,
-                                   builder_context_get_arch (build_context));
-
   g_ptr_array_add (args, g_strdup (repodir));
-  g_ptr_array_add (args, g_strdup (ref));
+
+  for (size_t i = 0; i < manifest_ids->len; i++)
+    {
+      const gchar *id = g_ptr_array_index (manifest_ids, i);
+      ref = flatpak_build_untyped_ref (id, branch,
+                                       builder_context_get_arch (build_context));
+      g_ptr_array_add (args, g_strdup (ref));
+    }
 
   g_ptr_array_add (args, NULL);
 
@@ -398,6 +481,7 @@ main (int    argc,
   gboolean is_show_manifest = FALSE;
   gboolean app_dir_is_empty = FALSE;
   gboolean prune_unused_stages = FALSE;
+  gboolean debug_exported = FALSE;
   g_autoptr(FlatpakContext) arg_context = NULL;
   g_autoptr(FlatpakTempDir) cleanup_manifest_dir = NULL;
   g_autofree char *manifest_basename = NULL;
@@ -531,7 +615,36 @@ main (int    argc,
   builder_context_set_opt_export_only (build_context, opt_export_only);
   builder_context_set_opt_mirror_screenshots_url (build_context, opt_mirror_screenshots_url);
 
+  if (opt_mirror_screenshots_url)
+    {
+      BuilderAsUrlPolicy policy = BUILDER_AS_URL_POLICY_PARTIAL;
+
+      if (g_strcmp0 (opt_as_url_policy, "full") == 0)
+        policy = BUILDER_AS_URL_POLICY_FULL;
+      else if (g_strcmp0 (opt_as_url_policy, "partial") == 0)
+        policy = BUILDER_AS_URL_POLICY_PARTIAL;
+      else if (opt_as_url_policy != NULL)
+        {
+          g_printerr ("Invalid value for --compose-url-policy: %s\n", opt_as_url_policy);
+          return 1;
+        }
+
+      if (policy == BUILDER_AS_URL_POLICY_FULL && !appstream_has_version (0, 16, 3))
+        {
+          g_printerr ("AppStream version >= 0.16.3 required for 'full' compose URL policy\n");
+          return 1;
+        }
+
+      builder_context_set_as_url_policy (build_context, policy);
+    }
+
   git_init_email ();
+
+  if (!builder_context_create_state_dir (build_context, &error))
+  {
+    g_printerr ("Can't create state directory: %s\n", error->message);
+    return 1;
+  }
 
   if (opt_sources_dirs)
     {
@@ -781,6 +894,18 @@ main (int    argc,
         {
           if (opt_force_clean)
             {
+              GFile *state_dir = builder_context_get_state_dir (build_context);
+
+              if (g_file_equal (app_dir, state_dir) ||
+                  g_file_equal (app_dir, cwd_dir) ||
+                  g_file_has_prefix (cwd_dir, app_dir) ||
+                  g_file_has_prefix (state_dir, app_dir))
+                {
+                  g_printerr ("Refusing to delete current working directory, state directory "
+                              "or their parents\n");
+                  return 1;
+                }
+
               g_print ("Emptying app dir '%s'\n", app_dir_path);
               if (!flatpak_rm_rf (app_dir, NULL, &error))
                 {
@@ -968,6 +1093,16 @@ main (int    argc,
           return 1;
         }
 
+      if (opt_mirror_screenshots_url &&
+          !commit_screenshot_ref (flatpak_file_get_path_cached (export_repo),
+                                  app_dir_path,
+                                  builder_context_get_arch (build_context),
+                                  &error))
+        {
+          g_printerr ("Failed to commit screenshot ref: %s\n", error->message);
+          return 1;
+        }
+
       /* Export regular locale extensions */
       dir_enum = g_file_enumerate_children (app_dir, "standard::name,standard::type",
                                             G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
@@ -1022,6 +1157,7 @@ main (int    argc,
               g_printerr ("Export failed: %s\n", error->message);
               return 1;
             }
+          debug_exported = TRUE;
         }
 
       for (l = builder_manifest_get_add_extensions (manifest); l != NULL; l = l->next)
@@ -1143,13 +1279,37 @@ main (int    argc,
          passed and there were no changes, do nothing in that case */
       if (export_repo == NULL)
         g_printerr ("NOTE: No export due to --require-changes, ignoring --install\n");
-      else if (!do_install (build_context, flatpak_file_get_path_cached (export_repo),
-                            builder_manifest_get_id (manifest),
-                            builder_manifest_get_branch (manifest, build_context),
-                            &error))
+      else
         {
-          g_printerr ("Install failed: %s\n", error->message);
-          return 1;
+          g_autoptr(GPtrArray) manifest_ids = g_ptr_array_new_with_free_func (g_free);
+          g_ptr_array_add (manifest_ids, g_strdup (builder_manifest_get_id (manifest)));
+
+          if (debug_exported)
+            g_ptr_array_add (manifest_ids, builder_manifest_get_debug_id (manifest));
+
+          if (!do_install (build_context, flatpak_file_get_path_cached (export_repo),
+                           manifest_ids,
+                           builder_manifest_get_branch (manifest, build_context),
+                           &error))
+            {
+              g_printerr ("Install failed: %s\n", error->message);
+              return 1;
+            }
+
+          if (builder_manifest_get_id_platform (manifest))
+            {
+              g_autoptr(GPtrArray) platform_ids = g_ptr_array_new_with_free_func (g_free);
+              g_ptr_array_add (platform_ids, g_strdup (builder_manifest_get_id_platform (manifest)));
+
+              if (!do_install (build_context, flatpak_file_get_path_cached (export_repo),
+                              platform_ids,
+                              builder_manifest_get_branch (manifest, build_context),
+                              &error))
+                {
+                  g_printerr ("Install failed: %s\n", error->message);
+                  return 1;
+                }
+            }
         }
     }
 

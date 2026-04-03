@@ -1,3 +1,58 @@
+flatpak-builder (1.4.7-1) unstable; urgency=medium
+
+  * New upstream stable release
+
+ -- Simon McVittie <smcv@debian.org>  Tue, 28 Oct 2025 23:37:04 +0000
+
+flatpak-builder (1.4.6-2) unstable; urgency=medium
+
+  * d/control: Prefer libcurl4-openssl-dev, matching libostree and Flatpak
+
+ -- Simon McVittie <smcv@debian.org>  Wed, 01 Oct 2025 11:01:18 +0100
+
+flatpak-builder (1.4.6-1) unstable; urgency=medium
+
+  * New upstream stable release
+  * Drop patches, applied or fixed differently upstream
+  * Revert separation of tests into online/offline
+  * Add Suggests on git-lfs
+  * Reformat packaging files using debputy
+  * d/copyright: Update
+  * Add a Lintian override for a non-executable script included in test data
+
+ -- Simon McVittie <smcv@debian.org>  Tue, 30 Sep 2025 19:52:01 +0100
+
+flatpak-builder (1.4.5-1) unstable; urgency=medium
+
+  * New upstream stable release
+  * Recommend libarchive-tools (for bsdunzip) instead of Info-Zip unzip.
+    Upstream has changed the tool they use to unpack zip files in response
+    to security concerns about Info-Zip unzip.
+  * d/watch: Convert to v5 format
+  * d/salsa-ci.yml: Use recommended recipe
+  * d/p/tests-Fix-incorrect-paths-for-test-files.patch:
+    Add a post-release bugfix from upstream
+  * d/p/tests-Add-a-way-to-skip-the-test-involving-mirroring-scre.patch,
+    d/tests: Mark an Internet-dependent test as needs-internet and flaky
+  * d/copyright: Don't quote the FSF's former postal address here
+  * Standards-Version: 4.7.2 (no changes required)
+
+ -- Simon McVittie <smcv@debian.org>  Thu, 11 Sep 2025 11:15:43 +0100
+
+flatpak-builder (1.4.4-2) unstable; urgency=medium
+
+  [ Simon McVittie ]
+  * d/upstream/metadata: Canonicalize sort order of keys
+  * d/upstream/metadata: Add Security-Contact field
+
+  [ Felix Geyer ]
+  * d/control: Suggest 7zip instead of p7zip-full (Closes: #1063573)
+  * Clean up unused python2 test script
+  * Stop trying to run the test suite during package build
+  * Add myself as uploader
+
+ -- Felix Geyer <fgeyer@debian.org>  Mon, 03 Mar 2025 18:16:06 +0100
+
 flatpak-builder (1.4.4-1~flatpak1~24.04.1) noble; urgency=medium
 
   * Backport to Ubuntu 24.04 'noble'
