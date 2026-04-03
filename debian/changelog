@@ -1,9 +1,9 @@
-flatpak-builder (1.4.7-1~flatpak1~24.04.1) UNRELEASED; urgency=medium
+flatpak-builder (1.4.7-1~flatpak1~24.04.1) noble; urgency=medium
 
   * Backport to Ubuntu 24.04 'noble'
     - No functional changes
 
- -- Simon McVittie <smcv@debian.org>  Fri, 03 Apr 2026 17:14:12 +0100
+ -- Simon McVittie <smcv@debian.org>  Fri, 03 Apr 2026 17:53:55 +0100
 
 flatpak-builder (1.4.7-1) unstable; urgency=medium
 
